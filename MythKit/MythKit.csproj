@@ -114,6 +114,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Utils\ObservableHashSet.cs" />
     <Page Include="HomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -171,6 +172,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mythware\MythwareInstance.cs" />
+    <Compile Include="Mythware\MythwareState.cs" />
     <Compile Include="Pages\About\AboutIndex.xaml.cs">
       <DependentUpon>AboutIndex.xaml</DependentUpon>
     </Compile>

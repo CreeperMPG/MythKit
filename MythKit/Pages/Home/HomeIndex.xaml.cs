@@ -1,15 +1,18 @@
 ﻿using iNKORE.UI.WPF.Modern;
 using Microsoft.Win32;
+using MythKit.Mythware;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Reflection;
-using Modern = iNKORE.UI.WPF.Modern.Controls;
 using System.Windows.Media.Effects;
+using Modern = iNKORE.UI.WPF.Modern.Controls;
 
 namespace MythKit.Pages.Home
 {
@@ -18,49 +21,13 @@ namespace MythKit.Pages.Home
     /// </summary>
     public partial class HomeIndex : UserControl
     {
+        public ObservableCollection<MythwareInstance> MythwareInstances { get; set; }
         public HomeIndex()
         {
             InitializeComponent();
-            string targetDirectoryPath = string.Empty;
-            using (RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class Standard\\1.00"))
-            {
-                bool isRegistryKeyAvailable = registryKey != null;
-                if (isRegistryKeyAvailable)
-                {
-                    object registryValue = registryKey.GetValue("TargetDirectory");
-                    bool isRegistryValueAvailable = registryValue != null;
-                    if (isRegistryValueAvailable)
-                    {
-                        targetDirectoryPath = registryValue.ToString();
-                        IconCannotFind.Visibility = Visibility.Collapsed;
-                        bool isStudentMainRunning = Process.GetProcessesByName("StudentMain").Any();
-                        if (isStudentMainRunning)
-                        {
-                            IconRunning.Visibility = Visibility.Visible;
-                            JiYuDetectState.Text = "正在运行";
-                            JiYuOperate.Content = "关闭极域";
-                        }
-                        else
-                        {
-                            IconClosed.Visibility = Visibility.Visible;
-                            JiYuDetectState.Text = "未在运行";
-                            JiYuOperate.Content = "打开极域";
-                        }
-                        JiYuPathDisplay.Visibility = Visibility.Visible;
-                        JiYuPathDisplay.Text = "Path: " + targetDirectoryPath;
-                        JiYuOperate.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        JiYuDetectState.Text = "未找到极域";
-                    }
-                }
-                else
-                {
-                    JiYuDetectState.Text = "未找到极域";
-                }
-            }
             RefreshSuggestions();
+            DataContext = this;
+            MythwareInstances = MythwareInstance.GetInstances();
         }
         private void RefreshSuggestions()
         {
@@ -69,20 +36,16 @@ namespace MythKit.Pages.Home
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
             {
                 // 获取类型上的所有 Suggestion 特性
-                var suggestions = type.GetCustomAttributes(typeof(SuggestionAttribute), false) as SuggestionAttribute[];
-                if (suggestions != null && suggestions.Length > 0)
+                if (type.GetCustomAttributes(typeof(SuggestionAttribute), false) is SuggestionAttribute[] suggestions && suggestions.Length > 0)
                 {
                     foreach (var suggestion in suggestions)
                     {
-                        // 获取 IsEnabled 方法
                         var isEnabledMethod = type.GetMethod(suggestion.IsEnabled);
                         if (isEnabledMethod != null && isEnabledMethod.IsStatic)
                         {
-                            // 调用 IsEnabled 方法
                             bool isEnabled = (bool)isEnabledMethod.Invoke(null, null);
                             if (isEnabled)
                             {
-                                // 创建建议的 UI 元素
                                 var panel = new StackPanel();
 
                                 // 添加标题
@@ -138,51 +101,51 @@ namespace MythKit.Pages.Home
             }
         }
 
-        private void JiYuOperate_Click(object sender, RoutedEventArgs e)
-        {
-            bool isJiYuRunning = JiYuDetectState.Text == "正在运行";
-            if (isJiYuRunning)
-            {
-                Process[] runningProcesses = Process.GetProcessesByName("StudentMain");
-                foreach (Process process in runningProcesses)
-                {
-                    process.Kill();
-                }
-                IconRunning.Visibility = Visibility.Collapsed;
-                IconClosed.Visibility = Visibility.Visible;
-                JiYuDetectState.Text = "未在运行";
-                JiYuOperate.Content = "打开极域";
-            }
-            else
-            {
-                try
-                {
-                    string targetDirectoryPath = string.Empty;
-                    using (RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class Standard\\1.00"))
-                    {
-                        bool isRegistryKeyAvailable = registryKey != null;
-                        if (isRegistryKeyAvailable)
-                        {
-                            object registryValue = registryKey.GetValue("TargetDirectory");
-                            bool isRegistryValueAvailable = registryValue != null;
-                            if (isRegistryValueAvailable)
-                            {
-                                targetDirectoryPath = registryValue.ToString();
-                                Process.Start(Path.Combine(targetDirectoryPath, "StudentMain.exe"));
-                                JiYuDetectState.Text = "正在运行";
-                                JiYuOperate.Content = "关闭极域";
-                                IconRunning.Visibility = Visibility.Visible;
-                                IconClosed.Visibility = Visibility.Collapsed;
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    JiYuDetectState.Text = "打开极域失败";
-                }
-            }
-        }
+        //private void JiYuOperate_Click(object sender, RoutedEventArgs e)
+        //{
+        //    bool isJiYuRunning = JiYuDetectState.Text == "正在运行";
+        //    if (isJiYuRunning)
+        //    {
+        //        Process[] runningProcesses = Process.GetProcessesByName("StudentMain");
+        //        foreach (Process process in runningProcesses)
+        //        {
+        //            process.Kill();
+        //        }
+        //        IconRunning.Visibility = Visibility.Collapsed;
+        //        IconClosed.Visibility = Visibility.Visible;
+        //        JiYuDetectState.Text = "未在运行";
+        //        JiYuOperate.Content = "打开极域";
+        //    }
+        //    else
+        //    {
+        //        try
+        //        {
+        //            string targetDirectoryPath = string.Empty;
+        //            using (RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class Standard\\1.00"))
+        //            {
+        //                bool isRegistryKeyAvailable = registryKey != null;
+        //                if (isRegistryKeyAvailable)
+        //                {
+        //                    object registryValue = registryKey.GetValue("TargetDirectory");
+        //                    bool isRegistryValueAvailable = registryValue != null;
+        //                    if (isRegistryValueAvailable)
+        //                    {
+        //                        targetDirectoryPath = registryValue.ToString();
+        //                        Process.Start(Path.Combine(targetDirectoryPath, "StudentMain.exe"));
+        //                        JiYuDetectState.Text = "正在运行";
+        //                        JiYuOperate.Content = "关闭极域";
+        //                        IconRunning.Visibility = Visibility.Visible;
+        //                        IconClosed.Visibility = Visibility.Collapsed;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        catch
+        //        {
+        //            JiYuDetectState.Text = "打开极域失败";
+        //        }
+        //    }
+        //}
 
         private void SuggestionsPanel_SizeChanged(object sender, SizeChangedEventArgs e)
         {

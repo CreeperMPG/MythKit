@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:MythKit.Pages.Home"
              xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
              xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
+             xmlns:mythware="clr-namespace:MythKit.Mythware"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -13,55 +14,131 @@
         <ikw:SimpleStackPanel
 			Margin="48, 24"
 			Spacing="24">
-            <Grid>
-                <ikw:SimpleStackPanel
-					Spacing="8"
-					Orientation="Horizontal"
-					HorizontalAlignment="Left">
-                    <Grid>
-                        <ui:FontIcon
-							Name="IconCannotFind"
-							FontSize="50"
-							Icon="{x:Static ui:FluentSystemIcons.Question_16_Filled}"
-							Foreground="#FF808080"/>
-                        <ui:FontIcon
-							Name="IconClosed"
-							Visibility="Collapsed"
-							FontSize="50"
-							Icon="{x:Static ui:FluentSystemIcons.List_16_Filled}"
-							Foreground="#FF000000"/>
-                        <ui:FontIcon
-							Name="IconRunning"
-							Visibility="Collapsed"
-							FontSize="50"
-							Icon="{x:Static ui:FluentSystemIcons.CheckboxChecked_16_Filled}"
-							Foreground="#FF008000"/>
-                    </Grid>
+            <ikw:SimpleStackPanel Spacing="8">
+                <TextBlock Text="极域状态" FontWeight="Bold" FontSize="16"/>
+                <ItemsControl ItemsSource="{Binding MythwareInstances}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="8">
+                                <ui:FontIcon FontSize="50">
+                                    <ui:FontIcon.Style>
+                                        <Style TargetType="ui:FontIcon">
+                                            <Style.Triggers>
+                                                <!-- 当 State == Running -->
+                                                <DataTrigger Binding="{Binding State}" 
+                                                 Value="{x:Static mythware:MythwareState.Running}">
+                                                    <Setter Property="Foreground" Value="Green" />
+                                                    <Setter Property="Icon" Value="{x:Static ui:FluentSystemIcons.CheckboxChecked_16_Filled}" />
+                                                </DataTrigger>
+
+                                                <!-- 当 State == NotRunning -->
+                                                <DataTrigger Binding="{Binding State}" 
+                                                 Value="{x:Static mythware:MythwareState.NotRunning}">
+                                                    <Setter Property="Foreground" Value="Orange" />
+                                                    <Setter Property="Icon" Value="{x:Static ui:FluentSystemIcons.List_16_Filled}" />
+                                                </DataTrigger>
+
+                                                <!-- 当 State == Invalid -->
+                                                <DataTrigger Binding="{Binding State}" 
+                                                 Value="{x:Static mythware:MythwareState.Invalid}">
+                                                    <Setter Property="Foreground" Value="Gray" />
+                                                    <Setter Property="Icon" Value="{x:Static ui:FluentSystemIcons.Question_16_Filled}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:FontIcon.Style>
+                                </ui:FontIcon>
+                                <ikw:SimpleStackPanel
+						            VerticalAlignment="Center"
+						            Spacing="5">
+                                    <TextBlock FontWeight="Bold" FontSize="24">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <!-- 当 State == Running -->
+                                                    <DataTrigger Binding="{Binding State}" 
+                                                        Value="{x:Static mythware:MythwareState.Running}">
+                                                        <Setter Property="Text" Value="正在运行" />
+                                                    </DataTrigger>
+
+                                                    <!-- 当 State == NotRunning -->
+                                                    <DataTrigger Binding="{Binding State}" 
+                                                        Value="{x:Static mythware:MythwareState.NotRunning}">
+                                                        <Setter Property="Text" Value="未在运行" />
+                                                    </DataTrigger>
+
+                                                    <!-- 当 State == Invalid -->
+                                                    <DataTrigger Binding="{Binding State}" 
+                                                        Value="{x:Static mythware:MythwareState.Invalid}">
+                                                        <Setter Property="Text" Value="发现极域安装，但未找到学生端" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock>
+                                        <Run Text="路径:"/>
+                                        <Run Text="{Binding MythwarePath, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <TextBlock>
+                                        <Run Text="PID:"/>
+                                        <Run Text="{Binding Pid, Mode=OneWay}"/>
+                                    </TextBlock>
+                                </ikw:SimpleStackPanel>
+                            </ikw:SimpleStackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <!--<Grid>
                     <ikw:SimpleStackPanel
-						VerticalAlignment="Center"
-						Spacing="5">
-                        <TextBlock
-							Name="JiYuDetectState"
-							Text="正在检测"
-							FontWeight="Bold"
-							FontSize="24"/>
-                        <TextBlock
-							Name="JiYuPathDisplay"
-							Visibility="Collapsed"/>
-                        <TextBlock
-							Name="JiYuPIDDisplay"
-							Visibility="Collapsed"/>
+					    Spacing="8"
+					    Orientation="Horizontal"
+					    HorizontalAlignment="Left">
+                        <Grid>
+                            <ui:FontIcon
+							    Name="IconCannotFind"
+							    FontSize="50"
+							    Icon="{x:Static ui:FluentSystemIcons.Question_16_Filled}"
+							    Foreground="#FF808080"/>
+                            <ui:FontIcon
+							    Name="IconClosed"
+							    Visibility="Collapsed"
+							    FontSize="50"
+							    Icon="{x:Static ui:FluentSystemIcons.List_16_Filled}"
+							    Foreground="#FF000000"/>
+                            <ui:FontIcon
+							    Name="IconRunning"
+							    Visibility="Collapsed"
+							    FontSize="50"
+							    Icon="{x:Static ui:FluentSystemIcons.CheckboxChecked_16_Filled}"
+							    Foreground="#FF008000"/>
+                        </Grid>
+                        <ikw:SimpleStackPanel
+						    VerticalAlignment="Center"
+						    Spacing="5">
+                            <TextBlock
+							    Name="JiYuDetectState"
+							    Text="正在检测"
+							    FontWeight="Bold"
+							    FontSize="24"/>
+                            <TextBlock
+							    Name="JiYuPathDisplay"
+							    Visibility="Collapsed"/>
+                            <TextBlock
+							    Name="JiYuPIDDisplay"
+							    Visibility="Collapsed"/>
+                        </ikw:SimpleStackPanel>
                     </ikw:SimpleStackPanel>
-                </ikw:SimpleStackPanel>
-                <Button
-					Name="JiYuOperate"
-					HorizontalAlignment="Right"
-					VerticalAlignment="Center"
-					Visibility="Collapsed"
-					Click="JiYuOperate_Click" />
-            </Grid>
+                    <Button
+					    Name="JiYuOperate"
+					    HorizontalAlignment="Right"
+					    VerticalAlignment="Center"
+					    Visibility="Collapsed"
+					    Click="JiYuOperate_Click" />
+                </Grid>-->
+            </ikw:SimpleStackPanel>
             <ikw:SimpleStackPanel Spacing="8" Name="SuggestionsBox">
-                <TextBlock Text="建议的操作" FontSize="16"/>
+                <TextBlock FontWeight="Bold" Text="建议的操作" FontSize="16"/>
                 <WrapPanel Name="SuggestionsPanel" ItemHeight="Auto" SizeChanged="SuggestionsPanel_SizeChanged" ItemWidth="200"/>
             </ikw:SimpleStackPanel>
         </ikw:SimpleStackPanel>

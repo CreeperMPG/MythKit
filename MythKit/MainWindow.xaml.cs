@@ -56,32 +56,5 @@ namespace MythKit
 #endif
         }
     }
-
-    //private void CommandExecutingAbility_True(object sender, CanExecuteRoutedEventArgs e)
-    //{
-    //    e.CanExecute = true;
-    //}
-    //private TabItem GenerateNewTab(FrameworkElement content, string header = "新标签页", Modern.IconElement icon = null)
-    //{
-    //    var tab = new TabItem
-    //    {
-    //        Header = header,
-    //        Content = content,
-    //        Background = new SolidColorBrush(Colors.Transparent),
-    //    };
-    //    TabItemHelper.SetIcon(tab, icon);
-    //    return tab;
-    //}
-    //private void CreateNewTab(FrameworkElement content, string header = "新标签页", Modern.IconElement icon = null)
-    //{
-    //    var tab = GenerateNewTab(content, header, icon);
-    //    AppTabView.Items.Add(tab);
-    //    AppTabView.SelectedItem = tab;
-    //}
-
-    //private void AddTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-    //{
-    //    CreateNewTab(new HomePage(), "新标签页", new Modern.FontIcon { Icon = FluentSystemIcons.TabAdd_20_Filled });
-    //}
 }
 
