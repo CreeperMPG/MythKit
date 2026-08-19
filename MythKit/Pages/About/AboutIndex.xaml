@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="MythKit.Pages.About.AboutIndex"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MythKit.Pages.About"
+             xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
+             xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <ui:ScrollViewerEx>
+        <ikw:SimpleStackPanel Margin="24" Spacing="8">
+            <ui:SettingsCard Header="版本信息" Name="VersionInfo">
+                <ui:SettingsCard.HeaderIcon>
+                    <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Info_12_Regular}" />
+                </ui:SettingsCard.HeaderIcon>
+                <ui:SettingsCard.Content>
+                    <TextBlock Name="VersionInfoBlock"/>
+                </ui:SettingsCard.Content>
+            </ui:SettingsCard>
+            <ui:SettingsExpander Header="更新日志" IsEnabled="True" IsExpanded="True">
+                <ui:SettingsExpander.HeaderIcon>
+                    <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.PhoneUpdate_20_Regular}" />
+                </ui:SettingsExpander.HeaderIcon>
+                <ui:SettingsExpander.Items>
+                    <ui:SettingsCard ContentAlignment="Left">
+                        <ui:SettingsCard.Content>
+                            <ikw:SimpleStackPanel Name="UpdateLogView" HorizontalAlignment="Left">
+                                <TextBlock HorizontalAlignment="Stretch" Name="UpdateLogBlock" TextWrapping="Wrap" />
+                            </ikw:SimpleStackPanel>
+                        </ui:SettingsCard.Content>
+                    </ui:SettingsCard>
+                </ui:SettingsExpander.Items>
+            </ui:SettingsExpander>
+        </ikw:SimpleStackPanel>
+    </ui:ScrollViewerEx>
+</UserControl>
