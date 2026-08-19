@@ -7,24 +7,24 @@
              mc:Ignorable="d"
              xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
              xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="800" d:DesignWidth="800">
     <ui:ScrollViewerEx>
         <ikw:SimpleStackPanel Margin="24" Spacing="8">
-            <ui:InfoBar IsOpen="True" Severity="Warning" Title="免责声明" Message="请合理使用此工具。此工具仅供交流讨论原理使用。（拿来" />
-            <ui:SettingsExpander Name="IPCard" Header="UDP 攻击目标" IsEnabled="True" IsExpanded="True">
+            <ui:InfoBar IsOpen="True" Severity="Warning" Title="免责声明" Message="此工具仅供学习交流，请合理使用。" />
+            <ui:SettingsExpander Name="IPCard" Header="目标设定" IsEnabled="True" IsExpanded="True">
                 <ui:SettingsExpander.HeaderIcon>
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Location_12_Filled}" />
                 </ui:SettingsExpander.HeaderIcon>
                 <ui:SettingsExpander.Items>
                     <ui:SettingsCard Header="目标 IP 地址" SizeChanged="TargetIP_SizeChanged">
                         <ui:SettingsCard.Description>
-                            <Button Name="InternetIPCollectButton" Content="获取局域网所有 IP" Margin="0, 5, 0, 0" Click="InternetIPCollectButton_Click" />
+                            <Button Name="InternetIPCollectButton" Content="填入局域网所有 IP" Margin="0, 5, 0, 0" Click="InternetIPCollectButton_Click" />
                         </ui:SettingsCard.Description>
                         <TextBox Name="TargetIPAddress" MaxHeight="100" VerticalScrollBarVisibility="Auto" MinWidth="180" TextWrapping="Wrap" ui:ControlHelper.PlaceholderText="使用英文逗号分隔" />
                     </ui:SettingsCard>
                     <ui:SettingsCard ContentAlignment="Vertical">
                         <ikw:SimpleStackPanel>
-                            <CheckBox Name="EnableGroupIP" Content="分组发送" />
+                            <CheckBox Name="EnableGroupIP" Content="IP 分组" />
                             <ikw:SimpleStackPanel Spacing="8" Orientation="Horizontal" IsEnabled="{Binding ElementName=EnableGroupIP, Path=IsChecked, Mode=OneWay}">
                                 <TextBlock Text="将所有 IP 每" VerticalAlignment="Center" />
                                 <ui:NumberBox Name="GroupIPNumber" Value="12" MinWidth="0" Minimum="1" Maximum="200" MaxWidth="50" />

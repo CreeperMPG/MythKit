@@ -143,7 +143,7 @@ namespace MythKit.Pages.StudentManager
                         process.Kill();
                     }
                 }
-                catch (Exception ex)
+                catch (Exception _)
                 {
                 }
             }

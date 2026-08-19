@@ -14,12 +14,12 @@
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Home_24_Regular}"/>
                 </ui:NavigationViewItem.Icon>
             </ui:NavigationViewItem>
-            <ui:NavigationViewItem Name="UDPAttackViewItem" Content="重放攻击" Tag="MythKit.Pages.UDPAttack.AttackIndex">
+            <ui:NavigationViewItem Name="UDPAttackViewItem" Content="UDP 重放" Tag="MythKit.Pages.UDPAttack.AttackIndex">
                 <ui:NavigationViewItem.Icon>
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.ProtocolHandler_24_Regular}"/>
                 </ui:NavigationViewItem.Icon>
             </ui:NavigationViewItem>
-            <ui:NavigationViewItem Content="机房管理助手破解" Tag="MythKit.Pages.StudentManager.StudentManagerIndex">
+            <ui:NavigationViewItem Content="机房管理助手控制" Tag="MythKit.Pages.StudentManager.StudentManagerIndex">
                 <ui:NavigationViewItem.Icon>
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Window_16_Regular}"/>
                 </ui:NavigationViewItem.Icon>
