@@ -7,10 +7,10 @@
              xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
              xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="700" d:DesignWidth="800">
     <ui:ScrollViewerEx>
         <ikw:SimpleStackPanel Margin="24" Spacing="8">
-            <ui:SettingsCard Header="版本信息" Name="VersionInfo">
+            <ui:SettingsCard Header="Myth Kit 版本" Name="VersionInfo">
                 <ui:SettingsCard.HeaderIcon>
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Info_12_Regular}" />
                 </ui:SettingsCard.HeaderIcon>
@@ -28,6 +28,32 @@
                             <ikw:SimpleStackPanel Name="UpdateLogView" HorizontalAlignment="Left">
                                 <TextBlock HorizontalAlignment="Stretch" Name="UpdateLogBlock" TextWrapping="Wrap" />
                             </ikw:SimpleStackPanel>
+                        </ui:SettingsCard.Content>
+                    </ui:SettingsCard>
+                </ui:SettingsExpander.Items>
+            </ui:SettingsExpander>
+            <ui:SettingsExpander Header="开放源代码许可" IsEnabled="True" IsExpanded="False">
+                <ui:SettingsExpander.HeaderIcon>
+                    <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Code_24_Regular}" />
+                </ui:SettingsExpander.HeaderIcon>
+                <ui:SettingsExpander.Items>
+                    <ui:SettingsCard ContentAlignment="Left">
+                        <ui:SettingsCard.Content>
+                            <ikw:SimpleStackPanel>
+                                <ikw:SimpleStackPanel Orientation="Horizontal">
+                                    <TextBlock VerticalAlignment="Center" Text="Myth Kit 使用 LGPL-2.1 License 开源。"/>
+                                    <ui:HyperlinkButton Content="Github: CreeperMPG/MythKit" NavigateUri="https://github.com/CreeperMPG/MythKit" />
+                                </ikw:SimpleStackPanel>
+                                <TextBlock Text="Copyright (c) 2025-2026 CreeperMPG. All rights reserved." />
+                            </ikw:SimpleStackPanel>
+                        </ui:SettingsCard.Content>
+                    </ui:SettingsCard>
+                    <ui:SettingsCard ContentAlignment="Vertical" Header="下方列出使用的第三方库及其许可信息">
+                        <ui:SettingsCard.HeaderIcon>
+                            <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Library_20_Regular}" />
+                        </ui:SettingsCard.HeaderIcon>
+                        <ui:SettingsCard.Content>
+                            <ikw:SimpleStackPanel Name="DependenciesPanel"/>
                         </ui:SettingsCard.Content>
                     </ui:SettingsCard>
                 </ui:SettingsExpander.Items>
