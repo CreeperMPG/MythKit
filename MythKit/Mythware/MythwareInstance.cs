@@ -76,10 +76,14 @@ namespace MythKit.Mythware
             var processes = Process.GetProcessesByName(processName);
             foreach (var process in processes)
             {
-                if (process.MainModule != null && process.MainModule.FileName.Equals(MythwarePath, StringComparison.OrdinalIgnoreCase))
+                try
                 {
-                    return MythwareState.Running;
+                    if (process.MainModule != null && process.MainModule.FileName.Equals(MythwarePath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return MythwareState.Running;
+                    }
                 }
+                catch { }
             }
             return MythwareState.NotRunning;
         }
@@ -125,6 +129,35 @@ namespace MythKit.Mythware
         public override int GetHashCode()
         {
             return MythwarePath.GetHashCode();
+        }
+        public bool Launch()
+        {
+            if (File.Exists(MythwarePath))
+            {
+                Process.Start(MythwarePath);
+                UpdateState();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public bool Kill()
+        {
+            var processName = Path.GetFileNameWithoutExtension(MythwarePath);
+            var processes = Process.GetProcessesByName(processName);
+            foreach (var process in processes)
+            {
+                if (process.MainModule != null && process.MainModule.FileName.Equals(MythwarePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    process.Kill();
+                    UpdateState();
+                    return true;
+                }
+            }
+            UpdateState();
+            return false;
         }
     }
 }

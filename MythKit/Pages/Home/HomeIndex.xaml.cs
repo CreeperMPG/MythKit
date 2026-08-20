@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -100,53 +101,6 @@ namespace MythKit.Pages.Home
                 SuggestionsBox.Visibility = Visibility.Collapsed;
             }
         }
-
-        //private void JiYuOperate_Click(object sender, RoutedEventArgs e)
-        //{
-        //    bool isJiYuRunning = JiYuDetectState.Text == "正在运行";
-        //    if (isJiYuRunning)
-        //    {
-        //        Process[] runningProcesses = Process.GetProcessesByName("StudentMain");
-        //        foreach (Process process in runningProcesses)
-        //        {
-        //            process.Kill();
-        //        }
-        //        IconRunning.Visibility = Visibility.Collapsed;
-        //        IconClosed.Visibility = Visibility.Visible;
-        //        JiYuDetectState.Text = "未在运行";
-        //        JiYuOperate.Content = "打开极域";
-        //    }
-        //    else
-        //    {
-        //        try
-        //        {
-        //            string targetDirectoryPath = string.Empty;
-        //            using (RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class Standard\\1.00"))
-        //            {
-        //                bool isRegistryKeyAvailable = registryKey != null;
-        //                if (isRegistryKeyAvailable)
-        //                {
-        //                    object registryValue = registryKey.GetValue("TargetDirectory");
-        //                    bool isRegistryValueAvailable = registryValue != null;
-        //                    if (isRegistryValueAvailable)
-        //                    {
-        //                        targetDirectoryPath = registryValue.ToString();
-        //                        Process.Start(Path.Combine(targetDirectoryPath, "StudentMain.exe"));
-        //                        JiYuDetectState.Text = "正在运行";
-        //                        JiYuOperate.Content = "关闭极域";
-        //                        IconRunning.Visibility = Visibility.Visible;
-        //                        IconClosed.Visibility = Visibility.Collapsed;
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        catch
-        //        {
-        //            JiYuDetectState.Text = "打开极域失败";
-        //        }
-        //    }
-        //}
-
         private void SuggestionsPanel_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (SuggestionsPanel.Children.Count == 0)
@@ -180,6 +134,40 @@ namespace MythKit.Pages.Home
                 };
 
                 SuggestionsPanel.Children.Add(border);
+            }
+        }
+
+        private void JiYuOperateButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = sender as Button;
+            if (clickedButton == null) return;
+
+            if (clickedButton.DataContext is MythwareInstance instance)
+            {
+                if (instance.State == MythwareState.Running)
+                {
+                    instance.Kill();
+                }
+                else if (instance.State == MythwareState.NotRunning)
+                {
+                    instance.Launch();
+                }
+                Task.Run(async () =>
+                {
+                    await Task.Delay(500);
+                    instance.UpdateState();
+                });
+            }
+        }
+
+        private void OpenDirectoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = sender as Button;
+            if (clickedButton == null) return;
+
+            if (clickedButton.DataContext is MythwareInstance instance)
+            {
+                Process.Start("explorer.exe", $@"/select, ""{instance.MythwarePath}""");
             }
         }
     }
