@@ -82,11 +82,11 @@ namespace MythKit.Pages.StudentManager
                         // 设置 "Scancode Map" 的值为指定的字节数组
                         byte[] scancodeMap = new byte[]
                         {
-                    0x00, 0x00, 0x00, 0x00, // Header
-                    0x00, 0x00, 0x00, 0x00, // Header
-                    0x00, 0x00, 0x00, 0x00, // No mappings
-                    0x00, 0x00, 0x00, 0x00, // Terminator
-                    0x00, 0x00, 0x00, 0x00  // Terminator
+                            0x00, 0x00, 0x00, 0x00, // Header
+                            0x00, 0x00, 0x00, 0x00, // Header
+                            0x00, 0x00, 0x00, 0x00, // No mappings
+                            0x00, 0x00, 0x00, 0x00, // Terminator
+                            0x00, 0x00, 0x00, 0x00  // Terminator
                         };
 
                         key.SetValue(ScancodeMapValueName, scancodeMap, RegistryValueKind.Binary);
@@ -143,7 +143,7 @@ namespace MythKit.Pages.StudentManager
                         process.Kill();
                     }
                 }
-                catch (Exception _)
+                catch 
                 {
                 }
             }

@@ -15,7 +15,7 @@ namespace MythKit.Pages.About
         public AboutIndex()
         {
             InitializeComponent();
-            VersionInfoBlock.Text = "MYTHKIT DEV";
+            VersionInfoBlock.Text = "1.2.0 Canary 1";
             UpdateLogBlock.Text = new System.IO.StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("MythKit.Pages.About.Info.UpdateLog.txt")).ReadToEnd();
             foreach (string dependency in Dependencies)
             {

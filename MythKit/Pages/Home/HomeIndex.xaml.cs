@@ -30,6 +30,14 @@ namespace MythKit.Pages.Home
             DataContext = this;
             MythwareInstances = MythwareInstance.GetInstances();
         }
+        public void Refresh()
+        {
+            foreach (var instance in MythwareInstances)
+            {
+                instance.UpdateState();
+            }
+            RefreshSuggestions();
+        }
         private void RefreshSuggestions()
         {
             SuggestionsPanel.Children.Clear();
