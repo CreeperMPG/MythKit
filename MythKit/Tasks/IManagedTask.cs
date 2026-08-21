@@ -8,12 +8,12 @@ using System.Windows;
 
 namespace MythKit.Tasks
 {
-    public enum TaskStatus { Idle, Running, Completed, Faulted }
+    public enum TaskState { Idle, Running, Completed, Faulted }
 
     public interface IManagedTask
     {
         string TaskName { get; }
-        TaskStatus Status { get; set; }
+        TaskState State { get; set; }
         int Progress { get; set; }
 
         // 详情控件（UI线程赋值）
@@ -22,8 +22,8 @@ namespace MythKit.Tasks
 
         // 事件通知（用于UI更新）
         event Action<int> ProgressUpdated;
-        event Action<string> StatusMessageUpdated;
-        event Action<TaskStatus> StatusUpdated;
+        event Action<string> StateMessageUpdated;
+        event Action<TaskState> StateUpdated;
 
         Task ExecuteAsync(CancellationToken cancellationToken);
     }

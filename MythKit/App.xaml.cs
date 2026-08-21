@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using MythKit.Tasks;
+using System.Windows;
 
 namespace MythKit
 {
@@ -7,5 +8,6 @@ namespace MythKit
     /// </summary>
     public partial class App : Application
     {
+        public static TaskManager TaskManagerInstance { get; } = new TaskManager();
     }
 }

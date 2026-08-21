@@ -1,0 +1,87 @@
+﻿<UserControl x:Class="MythKit.Pages.TaskManager.TaskManagerIndex"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MythKit.Pages.TaskManager"
+             xmlns:converters="clr-namespace:MythKit.Pages.TaskManager.Converters"
+             xmlns:tasks="clr-namespace:MythKit.Tasks"
+             xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
+             xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:IsRunningOrIdleConverter x:Key="IsRunningOrIdleConverter"/>
+        <!-- 状态文本样式 -->
+        <Style x:Key="StateTextStyle" TargetType="TextBlock">
+            <Setter Property="Text" Value="空闲"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Running}">
+                    <Setter Property="Text" Value="运行中"/>
+                    <Setter Property="Foreground" Value="Orange"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Completed}">
+                    <Setter Property="Text" Value="已完成"/>
+                    <Setter Property="Foreground" Value="Green"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Faulted}">
+                    <Setter Property="Text" Value="失败"/>
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 状态图标样式（FontIcon） -->
+        <Style x:Key="StateIconStyle" TargetType="ui:FontIcon">
+            <Setter Property="Glyph" Value="&#xE7C1;"/>
+            <!-- 默认空闲图标 -->
+            <Setter Property="Foreground" Value="Gray"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Running}">
+                    <Setter Property="Glyph" Value="&#xE895;"/>
+                    <!-- 齿轮 -->
+                    <Setter Property="Foreground" Value="Orange"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Completed}">
+                    <Setter Property="Glyph" Value="&#xE73E;"/>
+                    <!-- 对勾 -->
+                    <Setter Property="Foreground" Value="Green"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Faulted}">
+                    <Setter Property="Glyph" Value="&#xE783;"/>
+                    <!-- 错误 -->
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <ui:ScrollViewerEx>
+        <ItemsControl Name="TasksItemsControl" Margin="48,24" ItemsSource="{Binding TaskList}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type tasks:TaskEntry}">
+                    <ui:SettingsCard Margin="0,4"
+                             Header="{Binding Task.TaskName}"
+                             IsEnabled="{Binding State, Converter={StaticResource IsRunningOrIdleConverter}}">
+                        <!-- 如果需要描述区域显示状态文本，可以放在 Description -->
+                        <ui:SettingsCard.Description>
+                            <TextBlock Style="{StaticResource StateTextStyle}"/>
+                        </ui:SettingsCard.Description>
+
+                        <ui:SettingsCard.HeaderIcon>
+                            <ui:FontIcon Style="{StaticResource StateIconStyle}"/>
+                        </ui:SettingsCard.HeaderIcon>
+
+                        <!-- 内容区域 -->
+                        <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="10">
+                            <ProgressBar Value="{Binding Progress, Mode=OneWay}" 
+                                 Width="200" Height="20" 
+                                 Minimum="0" Maximum="100"/>
+                            <Button Content="详情" Click="InformationButton_Click" Tag="{Binding}" />
+                            <Button Content="取消" Click="CancelButton_Click" Tag="{Binding}" />
+                        </ikw:SimpleStackPanel>
+                    </ui:SettingsCard>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ui:ScrollViewerEx>
+</UserControl>

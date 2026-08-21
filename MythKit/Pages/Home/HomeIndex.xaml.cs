@@ -1,6 +1,8 @@
 ﻿using iNKORE.UI.WPF.Modern;
 using Microsoft.Win32;
 using MythKit.Mythware;
+using MythKit.Pages.About;
+using MythKit.Pages.TaskManager;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -147,8 +149,7 @@ namespace MythKit.Pages.Home
 
         private void JiYuOperateButton_Click(object sender, RoutedEventArgs e)
         {
-            Button clickedButton = sender as Button;
-            if (clickedButton == null) return;
+            if (!(sender is Button clickedButton)) return;
 
             if (clickedButton.DataContext is MythwareInstance instance)
             {
@@ -170,8 +171,7 @@ namespace MythKit.Pages.Home
 
         private void OpenDirectoryButton_Click(object sender, RoutedEventArgs e)
         {
-            Button clickedButton = sender as Button;
-            if (clickedButton == null) return;
+            if (!(sender is Button clickedButton)) return;
 
             if (clickedButton.DataContext is MythwareInstance instance)
             {

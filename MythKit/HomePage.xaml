@@ -26,6 +26,11 @@
             </ui:NavigationViewItem>
         </ui:NavigationView.MenuItems>
         <ui:NavigationView.FooterMenuItems>
+            <ui:NavigationViewItem Content="任务管理" Tag="MythKit.Pages.TaskManager.TaskManagerIndex">
+                <ui:NavigationViewItem.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.TaskListSquareLtr_16_Regular}"/>
+                </ui:NavigationViewItem.Icon>
+            </ui:NavigationViewItem>
             <ui:NavigationViewItem Content="关于" Tag="MythKit.Pages.About.AboutIndex">
                 <ui:NavigationViewItem.Icon>
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Info_12_Regular}"/>
