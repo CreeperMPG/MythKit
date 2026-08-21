@@ -175,7 +175,15 @@ namespace MythKit.Pages.Home
 
             if (clickedButton.DataContext is MythwareInstance instance)
             {
-                Process.Start("explorer.exe", $@"/select, ""{instance.MythwarePath}""");
+                var path = instance.MythwarePath;
+                if (!File.Exists(path))
+                {
+                    Process.Start("explorer.exe", Path.GetDirectoryName(path));
+                }
+                else
+                {
+                    Process.Start("explorer.exe", $@"/select, ""{path}""");
+                }
             }
         }
     }
