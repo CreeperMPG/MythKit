@@ -11,7 +11,34 @@ namespace MythKit.Pages.About
     /// </summary>
     public partial class AboutIndex : UserControl
     {
-        public static readonly List<string> Dependencies = new List<string>() { "CosturaFody", "Fody", "iNKOREUIWPF", "iNKOREUIWPFModern", "SystemValueTuple" };
+        private Modern.HyperlinkButton GenerateLicenseButton(string dependencyName, string licenseText)
+        {
+            var button = new Modern.HyperlinkButton
+            {
+                Content = dependencyName
+            };
+            button.Click += (s, e) =>
+            {
+                var dialog = new Modern.ContentDialog
+                {
+                    Title = dependencyName,
+                    Content = new Modern.ScrollViewerEx
+                    {
+                        Content = new TextBlock
+                        {
+                            Text = licenseText,
+                            TextWrapping = TextWrapping.Wrap
+                        }
+                    },
+                    CloseButtonText = "关闭",
+                    DefaultButton = Modern.ContentDialogButton.Close
+                };
+                dialog.ShowAsync();
+            };
+            return button;
+        }
+        public static readonly List<string> Dependencies = new List<string>() { "CosturaFody", "Fody", "iNKOREUIWPF", "iNKOREUIWPFModern" };
+        public static readonly List<string> MicrosoftMITDependenciesNames = new List<string>() { "System.ValueTuple" };
         public AboutIndex()
         {
             InitializeComponent();
@@ -19,29 +46,17 @@ namespace MythKit.Pages.About
             UpdateLogBlock.Text = new System.IO.StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("MythKit.Pages.About.Info.UpdateLog.txt")).ReadToEnd();
             foreach (string dependency in Dependencies)
             {
-                var button = new Modern.HyperlinkButton
-                {
-                    Content = new System.IO.StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream($"MythKit.Pages.About.Info.Dependencies.{dependency}.name.txt")).ReadToEnd()
-                };
-                button.Click += (s, e) =>
-                {
-                    var dialog = new Modern.ContentDialog
-                    {
-                        Title = button.Content.ToString(),
-                        Content = new Modern.ScrollViewerEx
-                        {
-                            Content = new TextBlock
-                            {
-                                Text = new System.IO.StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream($"MythKit.Pages.About.Info.Dependencies.{dependency}.license.txt")).ReadToEnd(),
-                                TextWrapping = TextWrapping.Wrap
-                            }
-                        },
-                        CloseButtonText = "关闭",
-                        DefaultButton = Modern.ContentDialogButton.Close
-                    };
-                    dialog.ShowAsync();
-                };
-                DependenciesPanel.Children.Add(button);
+                DependenciesPanel.Children.Add(GenerateLicenseButton(
+                    new System.IO.StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream($"MythKit.Pages.About.Info.Dependencies.{dependency}.name.txt")).ReadToEnd(),
+                    new System.IO.StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream($"MythKit.Pages.About.Info.Dependencies.{dependency}.license.txt")).ReadToEnd()
+                ));
+            }
+            foreach (string dependency in MicrosoftMITDependenciesNames)
+            {
+                DependenciesPanel.Children.Add(GenerateLicenseButton(
+                    dependency,
+                    new System.IO.StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream($"MythKit.Pages.About.Info.Dependencies.MicrosoftMIT.txt")).ReadToEnd()
+                ));
             }
 #if LITE
             VersionInfoBlock.Text += " (轻量版)";

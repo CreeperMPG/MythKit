@@ -92,10 +92,11 @@
     </Reference>
     <Reference Include="netstandard" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\iNKORE.UI.WPF.Modern.0.10.2.1\lib\net452\System.ValueTuple.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime" />
+    <Reference Include="System.ValueTuple" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -251,19 +252,16 @@
     <EmbeddedResource Include="Pages\About\Info\Dependencies\iNKOREUIWPFModern\name.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Pages\About\Info\Dependencies\SystemValueTuple\name.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Pages\About\Info\Dependencies\Fody\license.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Pages\About\Info\Dependencies\SystemValueTuple\license.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pages\About\Info\Dependencies\iNKOREUIWPFModern\license.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pages\About\Info\Dependencies\iNKOREUIWPF\license.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Pages\About\Info\Dependencies\MicrosoftMIT.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.6.9.3\build\Fody.targets" Condition="Exists('..\packages\Fody.6.9.3\build\Fody.targets')" />
@@ -274,6 +272,8 @@
     <Error Condition="!Exists('..\packages\Fody.6.9.3\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.6.9.3\build\Fody.targets'))" />
     <Error Condition="!Exists('..\packages\Costura.Fody.6.2.0\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.6.2.0\build\Costura.Fody.props'))" />
     <Error Condition="!Exists('..\packages\Costura.Fody.6.2.0\build\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.6.2.0\build\Costura.Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets'))" />
   </Target>
   <Import Project="..\packages\Costura.Fody.6.2.0\build\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.6.2.0\build\Costura.Fody.targets')" />
+  <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
 </Project>
