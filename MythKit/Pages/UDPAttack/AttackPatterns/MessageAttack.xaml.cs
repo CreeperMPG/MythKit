@@ -10,7 +10,7 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
     /// MessageAttackxaml.xaml 的交互逻辑
     /// </summary>
     [UDPAttackTypeLegacy("发送消息", nameof(ConstructPacket), AttackTarget.Student)]
-    public partial class MessageAttack : UserControl, IAttackType
+    public partial class MessageAttack : UserControl, IAttackPattern
     {
         public MessageAttack()
         {

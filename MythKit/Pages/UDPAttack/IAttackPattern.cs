@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace MythKit.Pages.UDPAttack
 {
-    public interface IAttackType
+    public interface IAttackPattern
     {
-        AttackPacket ConstructPacket(ref string message, string ip, int cycleCount, int groupCount);
+        AttackPacket ConstructPacket(ref string errorMessage, string targetIP, int cycleId, int groupId);
         AttackTarget Target { get; }
         string AttackName { get; }
     }
