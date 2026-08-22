@@ -13,12 +13,12 @@ namespace MythKit.Pages.UDPAttack
         private object _attackFunction;
         private AttackIndex _attackIndex;
         private Type _functionType;
-        private UDPAttackTypeAttribute _typeAttribute;
+        private UDPAttackTypeLegacyAttribute _typeAttribute;
         private Thread _attackThread;
         private bool _skipped = false;
         private bool _stopped = false;
 
-        public AttackDialog(object attackFunction, Type functionType, UDPAttackTypeAttribute typeAttribute, AttackIndex attackIndex)
+        public AttackDialog(object attackFunction, Type functionType, UDPAttackTypeLegacyAttribute typeAttribute, AttackIndex attackIndex)
         {
             InitializeComponent();
             _attackFunction = attackFunction;

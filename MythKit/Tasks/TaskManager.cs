@@ -46,12 +46,6 @@ namespace MythKit.Tasks
             catch { /* 忽略 */ }
             finally
             {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    entry.Task.DetailContentView?.ClearValue(FrameworkElement.DataContextProperty);
-                    entry.Task.DetailContentView = null;
-                    TaskList.Remove(entry);
-                });
                 _activeTasks.TryRemove(id, out _);
             }
         }

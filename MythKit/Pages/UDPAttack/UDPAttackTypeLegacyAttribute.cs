@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace MythKit.Pages.UDPAttack
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class UDPAttackTypeAttribute : Attribute
+    public class UDPAttackTypeLegacyAttribute : Attribute
     {
         private string _name;
         private string _packetConstructor; // 方法名
         private AttackTarget _attackTarget;
-        public UDPAttackTypeAttribute(string name, string packetConstructor, AttackTarget attackTarget)
+        public UDPAttackTypeLegacyAttribute(string name, string packetConstructor, AttackTarget attackTarget)
         { 
             _name = name;
             _packetConstructor = packetConstructor;

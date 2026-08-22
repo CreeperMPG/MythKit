@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace MythKit.Tasks
 {
-    public enum TaskState { Idle, Running, Completed, Faulted }
+    public enum TaskState { Idle, Running, Completed, Faulted, Cancelled }
 
     public interface IManagedTask
     {

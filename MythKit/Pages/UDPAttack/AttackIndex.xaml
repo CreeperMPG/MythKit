@@ -41,7 +41,7 @@
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.KeyCommand_16_Regular}" />
                 </ui:SettingsExpander.HeaderIcon>
                 <ui:SettingsExpander.Items>
-                    <ui:SettingsCard Name="OptionCard" ContentAlignment="Vertical" />
+                    <ui:SettingsCard Name="OptionCardL" ContentAlignment="Vertical" />
                     <ui:SettingsCard ContentAlignment="Left">
                         <ui:SettingsCard.Content>
                             <Button Content="查看关于字符串格式化的说明" Name="StringFormattingDisplayButton">
@@ -54,7 +54,16 @@
                         </ui:SettingsCard.Content>
                     </ui:SettingsCard>
                 </ui:SettingsExpander.Items>
-                <ComboBox Name="AttackTypeComboBox" IsTextSearchEnabled="False" IsEditable="False" SelectionChanged="AttackTypeComboBox_SelectionChanged" />
+                <ComboBox Name="AttackTypeComboBoxL" IsTextSearchEnabled="False" IsEditable="False" SelectionChanged="AttackTypeComboBoxL_SelectionChanged"/>
+            </ui:SettingsExpander>
+            <ui:SettingsExpander Name="AttackCommandCard" Header="执行命令 [新版 实验性]" IsEnabled="True" IsExpanded="False">
+                <ui:SettingsExpander.HeaderIcon>
+                    <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.KeyCommand_16_Regular}" />
+                </ui:SettingsExpander.HeaderIcon>
+                <ui:SettingsExpander.Items>
+                    <ui:SettingsCard Name="AttackArgumentsCard" ContentAlignment="Vertical" />
+                </ui:SettingsExpander.Items>
+                <ComboBox Name="AttackCommandTypeComboBox" IsTextSearchEnabled="False" IsEditable="False" SelectionChanged="AttackCommandTypeComboBox_SelectionChanged"/>
             </ui:SettingsExpander>
             <ui:SettingsExpander Name="MoreSettingsCard" Header="更多设置" IsEnabled="True" IsExpanded="True">
                 <ui:SettingsExpander.HeaderIcon>
@@ -85,7 +94,8 @@
                     </ui:SettingsCard>
                 </ui:SettingsExpander.Items>
             </ui:SettingsExpander>
-            <Button Name="StartButton" HorizontalAlignment="Right" Content="开始" Style="{DynamicResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}" Click="StartButton_Click" />
+            <Button Name="StartButton_Legacy" HorizontalAlignment="Right" Content="开始" Style="{DynamicResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}" Click="StartButton_Legacy_Click" />
+            <Button Name="StartButton" HorizontalAlignment="Right" Content="开始 [新版 实验性]" Click="StartButton_Click"/>
         </ikw:SimpleStackPanel>
     </ui:ScrollViewerEx>
 </UserControl>

@@ -9,6 +9,7 @@ using System.Windows;
 
 namespace MythKit.Pages.TaskManager
 {
+    // AI-GENERATED TEST TASK IMPLEMENTATION
     public class TestTask : IManagedTask
     {
         private readonly Random _random = new Random();
@@ -81,9 +82,9 @@ namespace MythKit.Pages.TaskManager
             }
             catch (OperationCanceledException)
             {
-                State = TaskState.Faulted;
-                StateUpdated?.Invoke(State);
                 StateMessageUpdated?.Invoke("❌ 任务已被用户取消");
+                State = TaskState.Cancelled;
+                StateUpdated?.Invoke(State);
                 throw;
             }
             catch (Exception ex)

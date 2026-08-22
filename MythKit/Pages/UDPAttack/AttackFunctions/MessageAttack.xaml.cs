@@ -9,13 +9,15 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
     /// <summary>
     /// MessageAttackxaml.xaml 的交互逻辑
     /// </summary>
-    [UDPAttackType("发送消息", nameof(ConstructPacket), AttackTarget.Student)]
-    public partial class MessageAttack : UserControl
+    [UDPAttackTypeLegacy("发送消息", nameof(ConstructPacket), AttackTarget.Student)]
+    public partial class MessageAttack : UserControl, IAttackType
     {
         public MessageAttack()
         {
             InitializeComponent();
         }
+        public string AttackName => "发送消息";
+        public AttackTarget Target => AttackTarget.Student;
         public AttackPacket ConstructPacket(ref string message, string ip, int cycleCount, int groupCount)
         {
             byte[] packet;

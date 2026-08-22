@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Windows.Data;
 
 namespace MythKit.Pages.TaskManager.Converters
@@ -15,9 +16,9 @@ namespace MythKit.Pages.TaskManager.Converters
             if (value is TaskState status)
             {
                 // 当任务状态为 Running 或 Idle 时，返回 true（可启用）
-                return status == TaskState.Running || status == TaskState.Idle;
+                return (status == TaskState.Running || status == TaskState.Idle) ? Visibility.Visible : Visibility.Collapsed;
             }
-            return false;
+            return Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -1,4 +1,6 @@
 ﻿using MythKit.Pages.Home;
+using MythKit.Pages.UDPAttack.AttackFunctions;
+using TeacherAttack = MythKit.Pages.UDPAttack.AttackFunctions.TeacherAttack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,55 +9,62 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace MythKit.Pages.UDPAttack
 {
-    class AttackFunctionInfo
+    class AttackInfoLegacy
     {
         public object Function { get; set; }
         public Type FunctionType { get; set; }
-        public UDPAttackTypeAttribute FunctionAttribute { get; set; }
+        public UDPAttackTypeLegacyAttribute FunctionAttribute { get; set; }
     }
     /// <summary>
     /// AttackIndex.xaml 的交互逻辑
     /// </summary>
     public partial class AttackIndex : UserControl
-    {// MythKit.Pages.UDPAttack.AttackIndex
-     // Token: 0x04000044 RID: 68
-        private Dictionary<string, AttackFunctionInfo> AttackFunctionDict = new Dictionary<string, AttackFunctionInfo>();
-        // Token: 0x0600004C RID: 76 RVA: 0x00003D0C File Offset: 0x00001F0C
+    {
+        private Dictionary<string, AttackInfoLegacy> AttackFunctionDictL = new Dictionary<string, AttackInfoLegacy>();
+        public List<IAttackType> AttackTypes { get; set; } = new List<IAttackType>();
         public AttackIndex()
         {
             this.InitializeComponent();
-            // 遍历程序集中的所有类型
+            DataContext = this;
+            // LEGACY-遍历程序集中的所有类型
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
             {
-                bool flag = type.IsClass && !type.IsAbstract && Attribute.IsDefined(type, typeof(UDPAttackTypeAttribute));
+                bool flag = type.IsClass && !type.IsAbstract && Attribute.IsDefined(type, typeof(UDPAttackTypeLegacyAttribute));
                 if (flag)
                 {
                     object attackFunction = Activator.CreateInstance(type);
-                    var attackTypes = type.GetCustomAttributes(typeof(UDPAttackTypeAttribute), false) as UDPAttackTypeAttribute[];
-                    foreach (UDPAttackTypeAttribute attackType in attackTypes)
+                    var attackTypes = type.GetCustomAttributes(typeof(UDPAttackTypeLegacyAttribute), false) as UDPAttackTypeLegacyAttribute[];
+                    foreach (UDPAttackTypeLegacyAttribute attackType in attackTypes)
                     {
                         string nickname = attackType.Name;
                         if (type.Namespace.Contains("TeacherAttack"))
                         {
                             nickname = $"（教师端）{nickname}";
                         }
-                        this.AttackFunctionDict.Add(nickname, new AttackFunctionInfo() { Function = attackFunction, FunctionAttribute = attackType, FunctionType = type });
-                        this.AttackTypeComboBox.Items.Add(nickname);
+                        this.AttackFunctionDictL.Add(nickname, new AttackInfoLegacy() { Function = attackFunction, FunctionAttribute = attackType, FunctionType = type });
+                        this.AttackTypeComboBoxL.Items.Add(nickname);
                     }
                 }
             }
-            this.AttackTypeComboBox.SelectedIndex = 0;
+            this.AttackTypeComboBoxL.SelectedIndex = 0;
             StringFormattingDescription.Text = "只有部分输入框支持字符串格式化\n" +
                 "格式化语法：\n" +
                 "\t${ip} - IP 地址\n" +
                 "\t${cycle} - 攻击轮数\n" +
                 "\t${group} - 攻击组数";
-
+            // 注册攻击类型
+            AttackTypes.Add(new MessageAttack());
+            AttackTypes.Add(new CommandAttack());
+            AttackTypes.Add(new BlackScreenAttack());
+            AttackTypes.Add(new TeacherAttack.RaiseHandAttack());
+            AttackCommandTypeComboBox.ItemsSource = AttackTypes.Select((item) => item.AttackName);
+            AttackCommandTypeComboBox.SelectedIndex = 0;
         }
-        // Token: 0x0600004D RID: 77 RVA: 0x00003DC4 File Offset: 0x00001FC4
         private void InternetIPCollectButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -86,7 +95,6 @@ namespace MythKit.Pages.UDPAttack
             }
         }
 
-        // Token: 0x0600004E RID: 78 RVA: 0x00003EAC File Offset: 0x000020AC
         private string GetLocalIPAddress()
         {
             string result = string.Empty;
@@ -99,24 +107,30 @@ namespace MythKit.Pages.UDPAttack
             return result;
         }
 
-        // Token: 0x0600004F RID: 79 RVA: 0x00003F18 File Offset: 0x00002118
         private void TargetIP_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             this.TargetIPAddress.MaxWidth = e.NewSize.Width - 300.0;
         }
 
-        // Token: 0x06000050 RID: 80 RVA: 0x00003F4A File Offset: 0x0000214A
-        private void AttackTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void AttackTypeComboBoxL_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.OptionCard.Content = this.AttackFunctionDict[this.AttackTypeComboBox.SelectedValue as string].Function;
+            this.OptionCardL.Content = this.AttackFunctionDictL[this.AttackTypeComboBoxL.SelectedValue as string].Function;
         }
 
-        // Token: 0x06000051 RID: 81 RVA: 0x00003F74 File Offset: 0x00002174
-        private void StartButton_Click(object sender, RoutedEventArgs e)
+        private void StartButton_Legacy_Click(object sender, RoutedEventArgs e)
         {
-            AttackFunctionInfo info = this.AttackFunctionDict[this.AttackTypeComboBox.SelectedValue as string];
+            AttackInfoLegacy info = this.AttackFunctionDictL[this.AttackTypeComboBoxL.SelectedValue as string];
             new AttackDialog(info.Function, info.FunctionType, info.FunctionAttribute, this).ShowAsync();
         }
 
+        private void StartButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AttackCommandTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            AttackArgumentsCard.Content = AttackTypes[AttackCommandTypeComboBox.SelectedIndex];
+        }
     }
 }

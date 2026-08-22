@@ -8,12 +8,13 @@
              xmlns:tasks="clr-namespace:MythKit.Tasks"
              xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
              xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
+             xmlns:updater="clr-namespace:MythKit.Utils.iUWM442TempFix"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <converters:IsRunningOrIdleConverter x:Key="IsRunningOrIdleConverter"/>
         <!-- 状态文本样式 -->
-        <Style x:Key="StateTextStyle" TargetType="TextBlock">
+        <Style x:Key="StateTextStyle" TargetType="Run">
             <Setter Property="Text" Value="空闲"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Running}">
@@ -28,29 +29,35 @@
                     <Setter Property="Text" Value="失败"/>
                     <Setter Property="Foreground" Value="Red"/>
                 </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Cancelled}">
+                    <Setter Property="Text" Value="已取消"/>
+                    <Setter Property="Foreground" Value="Gray"/>
+                </DataTrigger>
             </Style.Triggers>
         </Style>
 
         <!-- 状态图标样式（FontIcon） -->
         <Style x:Key="StateIconStyle" TargetType="ui:FontIcon">
-            <Setter Property="Glyph" Value="&#xE7C1;"/>
-            <!-- 默认空闲图标 -->
-            <Setter Property="Foreground" Value="Gray"/>
             <Style.Triggers>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Idle}">
+                    <Setter Property="Icon" Value="{x:Static ui:FluentSystemIcons.Flag_20_Regular}"/>
+                    <Setter Property="Foreground" Value="Gray"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Running}">
-                    <Setter Property="Glyph" Value="&#xE895;"/>
-                    <!-- 齿轮 -->
+                    <Setter Property="Icon" Value="{x:Static ui:FluentSystemIcons.Play_20_Regular}"/>
                     <Setter Property="Foreground" Value="Orange"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Completed}">
-                    <Setter Property="Glyph" Value="&#xE73E;"/>
-                    <!-- 对勾 -->
+                    <Setter Property="Icon" Value="{x:Static ui:FluentSystemIcons.Check_20_Regular}"/>
                     <Setter Property="Foreground" Value="Green"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Faulted}">
-                    <Setter Property="Glyph" Value="&#xE783;"/>
-                    <!-- 错误 -->
+                    <Setter Property="Icon" Value="{x:Static ui:FluentSystemIcons.ErrorCircle_20_Regular}"/>
                     <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static tasks:TaskState.Cancelled}">
+                    <Setter Property="Icon" Value="{x:Static ui:FluentSystemIcons.Delete_20_Regular}"/>
+                    <Setter Property="Foreground" Value="Gray"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -60,15 +67,18 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type tasks:TaskEntry}">
                     <ui:SettingsCard Margin="0,4"
-                             Header="{Binding Task.TaskName}"
-                             IsEnabled="{Binding State, Converter={StaticResource IsRunningOrIdleConverter}}">
+                             Header="{Binding TaskName}">
                         <!-- 如果需要描述区域显示状态文本，可以放在 Description -->
                         <ui:SettingsCard.Description>
-                            <TextBlock Style="{StaticResource StateTextStyle}"/>
+                            <TextBlock TextWrapping="Wrap">
+                                <Run Style="{StaticResource StateTextStyle}"/>
+                                <Run Text="-"/>
+                                <Run Text="{Binding StateMessage, Mode=OneWay}"/>
+                            </TextBlock>
                         </ui:SettingsCard.Description>
 
                         <ui:SettingsCard.HeaderIcon>
-                            <ui:FontIcon Style="{StaticResource StateIconStyle}"/>
+                            <ui:FontIcon Style="{StaticResource StateIconStyle}" updater:TaskManagerIconUpdater.State="{Binding State}"/>
                         </ui:SettingsCard.HeaderIcon>
 
                         <!-- 内容区域 -->
@@ -77,7 +87,7 @@
                                  Width="200" Height="20" 
                                  Minimum="0" Maximum="100"/>
                             <Button Content="详情" Click="InformationButton_Click" Tag="{Binding}" />
-                            <Button Content="取消" Click="CancelButton_Click" Tag="{Binding}" />
+                            <Button Content="取消" Click="CancelButton_Click" Tag="{Binding}" Visibility="{Binding State, Converter={StaticResource IsRunningOrIdleConverter}}"/>
                         </ikw:SimpleStackPanel>
                     </ui:SettingsCard>
                 </DataTemplate>

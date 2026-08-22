@@ -11,15 +11,21 @@ namespace MythKit.Tasks
 {
     public class TaskEntry : INotifyPropertyChanged
     {
-        private TaskState _status;
+        private TaskState _state;
+        private string _stateMessage;
         private int _progress;
         public Guid Id { get; }
         public IManagedTask Task { get; }
         public string TaskName => Task.TaskName;
-        public TaskState Status
+        public TaskState State
         {
-            get => _status;
-            private set { _status = value; OnPropertyChanged(); }
+            get => _state;
+            private set { _state = value; OnPropertyChanged(); }
+        }
+        public string StateMessage
+        {
+            get => _stateMessage;
+            private set { _stateMessage = value; OnPropertyChanged(); }
         }
         public int Progress
         {
@@ -35,14 +41,17 @@ namespace MythKit.Tasks
             Task = task;
 
             // 初始化状态
-            _status = task.State;
+            _state = task.State;
             _progress = task.Progress;
 
             Task.ProgressUpdated += (p) =>
                 Application.Current.Dispatcher.Invoke(() => Progress = p);
 
             Task.StateUpdated += (s) =>
-                Application.Current.Dispatcher.Invoke(() => Status = s);
+                Application.Current.Dispatcher.Invoke(() => State = s);
+
+            Task.StateMessageUpdated += (msg) =>
+                Application.Current.Dispatcher.Invoke(() => StateMessage = msg);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

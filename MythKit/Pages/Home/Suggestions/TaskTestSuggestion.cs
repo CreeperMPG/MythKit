@@ -15,8 +15,7 @@ namespace MythKit.Pages.Home.Suggestions
         public static void ButtonCallback()
         {
             var task = new TestTask(durationSeconds: 20);
-            // 如果有特定的详情控件，可以创建并挂载（测试任务可以使用通用的详情控件）
-            var detailView = new AboutIndex(); // 或者创建一个专门针对 TestTask 的详情控件
+            var detailView = new AboutIndex();
             detailView.DataContext = task;
             task.DetailContentView = detailView;
             task.IsDetailViewReady = true;
