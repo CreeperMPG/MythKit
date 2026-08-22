@@ -13,7 +13,6 @@ namespace MythKit.Tasks
     public interface IManagedTask
     {
         string TaskName { get; }
-        TaskState State { get; set; }
         bool IsIndeterminate { get; }
 
         // 详情控件（UI线程赋值）

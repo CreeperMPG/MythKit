@@ -43,7 +43,7 @@ namespace MythKit.Tasks
             Task = task;
 
             // 初始化状态
-            _state = task.State;
+            _state = TaskState.Idle;
 
             Task.ProgressUpdated += (p) =>
                 Application.Current.Dispatcher.Invoke(() => Progress = p);
