@@ -126,6 +126,7 @@
     <Compile Include="Tasks\IManagedTask.cs" />
     <Compile Include="Tasks\TaskEntry.cs" />
     <Compile Include="Tasks\TaskManager.cs" />
+    <Compile Include="Utils\InverseBooleanConverter.cs" />
     <Compile Include="Utils\iUWM442TempFix\MythwareStateIconUpdater.cs" />
     <Compile Include="Utils\iUWM442TempFix\TaskManagerIconUpdater.cs" />
     <Compile Include="Utils\ObservableHashSet.cs" />

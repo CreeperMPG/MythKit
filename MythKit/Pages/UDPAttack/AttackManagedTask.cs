@@ -18,9 +18,11 @@ namespace MythKit.Pages.UDPAttack
         public FrameworkElement DetailContentView { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public bool IsDetailViewReady { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public bool IsIndeterminate => throw new NotImplementedException();
+
         public event Action<int> ProgressUpdated;
         public event Action<string> StateMessageUpdated;
-        public event Action<Tasks.TaskState> StateUpdated;
+        public event Action<TaskState> StateUpdated;
 
         public Task ExecuteAsync(CancellationToken cancellationToken)
         {

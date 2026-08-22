@@ -14,7 +14,7 @@ namespace MythKit.Tasks
     {
         string TaskName { get; }
         TaskState State { get; set; }
-        int Progress { get; set; }
+        bool IsIndeterminate { get; }
 
         // 详情控件（UI线程赋值）
         FrameworkElement DetailContentView { get; set; }

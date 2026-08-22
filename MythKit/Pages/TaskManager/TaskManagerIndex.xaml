@@ -83,10 +83,10 @@
 
                         <!-- 内容区域 -->
                         <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="10">
-                            <ProgressBar Value="{Binding Progress, Mode=OneWay}" 
-                                 Width="200" Height="20" 
+                            <ProgressBar Value="{Binding Progress, Mode=OneWay}" IsIndeterminate="{Binding IsUIIndeterminate, Mode=OneWay}"
+                                 Width="200" Height="20"
                                  Minimum="0" Maximum="100"/>
-                            <Button Content="详情" Click="InformationButton_Click" Tag="{Binding}" />
+                            <Button Content="详情" Click="InformationButton_Click" Tag="{Binding}" IsEnabled="{Binding IsDetailViewReady}" />
                             <Button Content="取消" Click="CancelButton_Click" Tag="{Binding}" Visibility="{Binding State, Converter={StaticResource IsRunningOrIdleConverter}}"/>
                         </ikw:SimpleStackPanel>
                     </ui:SettingsCard>

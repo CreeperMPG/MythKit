@@ -21,6 +21,8 @@ namespace MythKit.Pages.TaskManager
         public FrameworkElement DetailContentView { get; set; }
         public bool IsDetailViewReady { get; set; }
 
+        public bool IsIndeterminate => false;
+
         public event Action<int> ProgressUpdated;
         public event Action<string> StateMessageUpdated;
         public event Action<TaskState> StateUpdated;
@@ -37,7 +39,7 @@ namespace MythKit.Pages.TaskManager
             {
                 State = TaskState.Running;
                 StateUpdated?.Invoke(State);
-                StateMessageUpdated?.Invoke("任务启动...");
+                StateMessageUpdated?.Invoke("LAUNCHING...");
 
                 int totalSteps = _durationSeconds * 2;
                 for (int step = 0; step <= totalSteps; step++)
@@ -48,41 +50,26 @@ namespace MythKit.Pages.TaskManager
                     Progress = progress;
                     ProgressUpdated?.Invoke(progress);
 
-                    // 使用 if-else 代替关系模式
-                    string message;
-                    if (progress < 20)
-                        message = "初始化中...";
-                    else if (progress < 40)
-                        message = "正在加载数据...";
-                    else if (progress < 60)
-                        message = "处理核心逻辑...";
-                    else if (progress < 80)
-                        message = "生成报告...";
-                    else if (progress < 100)
-                        message = "收尾工作...";
-                    else
-                        message = "即将完成";
-
-                    StateMessageUpdated?.Invoke($"{message} ({progress}%)");
+                    StateMessageUpdated?.Invoke($"{progress}%");
 
                     int delayMs = _random.Next(200, 800);
                     await Task.Delay(delayMs, cancellationToken);
 
                     if (progress == 50 && !cancellationToken.IsCancellationRequested)
                     {
-                        StateMessageUpdated?.Invoke("⚠️ 遇到非关键错误，自动恢复...");
+                        StateMessageUpdated?.Invoke("⚠️ DELAY TEST...");
                         await Task.Delay(1000, cancellationToken);
-                        StateMessageUpdated?.Invoke("✅ 恢复成功，继续执行");
+                        StateMessageUpdated?.Invoke("✅ CONTINUE");
                     }
                 }
 
                 State = TaskState.Completed;
                 StateUpdated?.Invoke(State);
-                StateMessageUpdated?.Invoke("🎉 测试任务完成！");
+                StateMessageUpdated?.Invoke("🎉 COMPLETED");
             }
             catch (OperationCanceledException)
             {
-                StateMessageUpdated?.Invoke("❌ 任务已被用户取消");
+                StateMessageUpdated?.Invoke("❌ CANCELLED");
                 State = TaskState.Cancelled;
                 StateUpdated?.Invoke(State);
                 throw;
@@ -91,7 +78,7 @@ namespace MythKit.Pages.TaskManager
             {
                 State = TaskState.Faulted;
                 StateUpdated?.Invoke(State);
-                StateMessageUpdated?.Invoke($"💥 任务异常: {ex.Message}");
+                StateMessageUpdated?.Invoke($"💥 EXCEPTION: {ex.Message}");
                 throw;
             }
         }

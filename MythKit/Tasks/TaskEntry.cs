@@ -17,10 +17,12 @@ namespace MythKit.Tasks
         public Guid Id { get; }
         public IManagedTask Task { get; }
         public string TaskName => Task.TaskName;
+        public bool IsIndeterminate => Task.IsIndeterminate;
+        public bool IsUIIndeterminate => Task.IsIndeterminate && State == TaskState.Running;
         public TaskState State
         {
             get => _state;
-            private set { _state = value; OnPropertyChanged(); }
+            private set { _state = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsUIIndeterminate)); }
         }
         public string StateMessage
         {
@@ -42,13 +44,19 @@ namespace MythKit.Tasks
 
             // 初始化状态
             _state = task.State;
-            _progress = task.Progress;
 
             Task.ProgressUpdated += (p) =>
                 Application.Current.Dispatcher.Invoke(() => Progress = p);
 
             Task.StateUpdated += (s) =>
-                Application.Current.Dispatcher.Invoke(() => State = s);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    State = s;
+                    if (s == TaskState.Completed)
+                    {
+                        Progress = 100;
+                    }
+                });
 
             Task.StateMessageUpdated += (msg) =>
                 Application.Current.Dispatcher.Invoke(() => StateMessage = msg);

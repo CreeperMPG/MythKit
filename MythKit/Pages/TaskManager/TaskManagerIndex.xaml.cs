@@ -38,7 +38,7 @@ namespace MythKit.Pages.TaskManager
                 {
                     Title = taskEntry.TaskName,
                     Content = taskEntry.DetailContentView,
-                    CloseButtonText = "Close"
+                    CloseButtonText = "关闭"
                 };
                 dialog.ShowAsync();
             }
