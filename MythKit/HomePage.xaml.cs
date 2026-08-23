@@ -1,7 +1,9 @@
 ﻿using iNKORE.UI.WPF.Modern;
 using iNKORE.UI.WPF.Modern.Media.Animation;
+using MythKit.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -11,7 +13,7 @@ namespace MythKit
     public partial class HomePage : UserControl
     {
         public static Dictionary<Type, object> NavPages = new Dictionary<Type, object>();
-
+        public ObservableCollection<TaskEntry> TaskList => App.TaskManagerInstance.TaskList;
         public HomePage()
         {
             InitializeComponent();
@@ -29,6 +31,7 @@ namespace MythKit
                 NavView.Resources[ThemeKeys.NavigationViewContentGridBorderThicknessKey] = new Thickness(0.0, 0.0, 0.0, 0.0);
             }
             NavigationInit();
+            DataContext = this;
 #if LITE
             UDPAttackViewItem.IsEnabled = false;
 #endif
