@@ -85,10 +85,12 @@
       <HintPath>..\packages\iNKORE.UI.WPF.1.2.8\lib\net452\iNKORE.UI.WPF.dll</HintPath>
     </Reference>
     <Reference Include="iNKORE.UI.WPF.Modern, Version=0.10.2.0, Culture=neutral, PublicKeyToken=cd19e634b9706635, processorArchitecture=MSIL">
-      <HintPath>..\packages\iNKORE.UI.WPF.Modern.0.10.2.1\lib\net452\iNKORE.UI.WPF.Modern.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\iNKORE.UI.WPF.Modern.dll</HintPath>
     </Reference>
     <Reference Include="iNKORE.UI.WPF.Modern.Controls, Version=0.10.2.0, Culture=neutral, PublicKeyToken=cd19e634b9706635, processorArchitecture=MSIL">
-      <HintPath>..\packages\iNKORE.UI.WPF.Modern.0.10.2.1\lib\net452\iNKORE.UI.WPF.Modern.Controls.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\iNKORE.UI.WPF.Modern.Controls.dll</HintPath>
     </Reference>
     <Reference Include="netstandard" />
     <Reference Include="System" />
@@ -96,7 +98,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime" />
-    <Reference Include="System.ValueTuple" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -122,13 +123,14 @@
     </Compile>
     <Compile Include="Pages\TaskManager\TestTask.cs" />
     <Compile Include="Pages\UDPAttack\AttackManagedTask.cs" />
-    <Compile Include="Pages\UDPAttack\IAttackType.cs" />
+    <Compile Include="Pages\UDPAttack\AttackConfig.cs" />
+    <Compile Include="Pages\UDPAttack\IAttackPattern.cs" />
     <Compile Include="Tasks\IManagedTask.cs" />
     <Compile Include="Tasks\TaskEntry.cs" />
     <Compile Include="Tasks\TaskManager.cs" />
+    <Compile Include="Utils\ConverterChain.cs" />
     <Compile Include="Utils\InverseBooleanConverter.cs" />
-    <Compile Include="Utils\iUWM442TempFix\MythwareStateIconUpdater.cs" />
-    <Compile Include="Utils\iUWM442TempFix\TaskManagerIconUpdater.cs" />
+    <Compile Include="Utils\InverseVisibilityConverter.cs" />
     <Compile Include="Utils\ObservableHashSet.cs" />
     <Page Include="HomePage.xaml">
       <SubType>Designer</SubType>
@@ -169,19 +171,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\UDPAttack\AttackFunctions\BlackScreenAttack.xaml">
+    <Page Include="Pages\UDPAttack\AttackPatterns\BlackScreenAttack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\UDPAttack\AttackFunctions\CommandAttack.xaml">
+    <Page Include="Pages\UDPAttack\AttackPatterns\CommandAttack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\UDPAttack\AttackFunctions\MessageAttack.xaml">
+    <Page Include="Pages\UDPAttack\AttackPatterns\MessageAttack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\UDPAttack\AttackFunctions\TeacherAttack\RaiseHandAttack.xaml">
+    <Page Include="Pages\UDPAttack\AttackPatterns\TeacherAttack\RaiseHandAttack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -207,16 +209,16 @@
     <Compile Include="Pages\UDPAttack\AttackDialog.xaml.cs">
       <DependentUpon>AttackDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackFunctions\BlackScreenAttack.xaml.cs">
+    <Compile Include="Pages\UDPAttack\AttackPatterns\BlackScreenAttack.xaml.cs">
       <DependentUpon>BlackScreenAttack.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackFunctions\CommandAttack.xaml.cs">
+    <Compile Include="Pages\UDPAttack\AttackPatterns\CommandAttack.xaml.cs">
       <DependentUpon>CommandAttack.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackFunctions\MessageAttack.xaml.cs">
+    <Compile Include="Pages\UDPAttack\AttackPatterns\MessageAttack.xaml.cs">
       <DependentUpon>MessageAttack.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackFunctions\TeacherAttack\RaiseHandAttack.xaml.cs">
+    <Compile Include="Pages\UDPAttack\AttackPatterns\TeacherAttack\RaiseHandAttack.xaml.cs">
       <DependentUpon>RaiseHandAttack.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\UDPAttack\AttackIndex.xaml.cs">

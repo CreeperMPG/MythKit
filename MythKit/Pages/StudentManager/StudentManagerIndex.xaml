@@ -10,7 +10,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <ui:ScrollViewerEx>
         <ikw:SimpleStackPanel Margin="48, 24" Spacing="12">
-            <ui:HyperlinkButton Content="此页面上的大部分功能都需要使用管理员权限。点击此处以管理员权限重启程序" Click="AdminFlag_Click" Name="AdminFlag" RaiseHyperlinkClicks="False"/>
+            <ui:HyperlinkButton Content="此页面上的大部分功能都需要使用管理员权限。点击此处以管理员权限重启程序" Click="AdminFlag_Click" Name="AdminFlag"/>
             <Button Name="KillManager" Content="强制⚡关闭机房管理助手" Click="KillManager_Click"/>
             <Button Name="DisableManager" Content="禁用机房管理助手" Click="DisableManager_Click"/>
             <Button Name="EnableManager" Content="启用机房管理助手" Click="EnableManager_Click"/>

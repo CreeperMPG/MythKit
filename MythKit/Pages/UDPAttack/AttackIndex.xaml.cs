@@ -26,7 +26,7 @@ namespace MythKit.Pages.UDPAttack
     public partial class AttackIndex : UserControl
     {
         private Dictionary<string, AttackInfoLegacy> AttackFunctionDictL = new Dictionary<string, AttackInfoLegacy>();
-        public List<IAttackType> AttackTypes { get; set; } = new List<IAttackType>();
+        public List<IAttackPattern> AttackTypes { get; set; } = new List<IAttackPattern>();
         public AttackIndex()
         {
             this.InitializeComponent();
@@ -125,7 +125,28 @@ namespace MythKit.Pages.UDPAttack
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-
+            List<string> ipAddresses = new List<string>();
+            foreach (string ip in TargetIPAddress.Text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                ipAddresses.Add(ip.Trim());
+            }
+            AttackConfig config = new AttackConfig()
+            {
+                TargetIPs = ipAddresses.Select(ip => IPAddress.Parse(ip)).ToList(),
+                AttackPattern = AttackTypes[AttackCommandTypeComboBox.SelectedIndex],
+                CycleIntervalMilliseconds = (int)IntervalSeconds.Value,
+                TotalCycles = EnableInterval.IsChecked ?? false ? NotInfiniteSwitch.IsChecked ?? false ? (int)(IntervalTimes.Value * 1000) : (int?)null : 1
+            };
+            if (EnableGroupIP.IsChecked ?? false)
+            {
+                config.GroupConfig = new IPGroupConfig()
+                {
+                    SingleGroupSize = (int)GroupIPNumber.Value,
+                    GroupIntevalMilliseconds = (int)(GroupInterval.Value * 1000)
+                };
+            }
+            AttackManagedTask task = new AttackManagedTask(config);
+            App.TaskManagerInstance.StartTask(task);
         }
 
         private void AttackCommandTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
