@@ -17,7 +17,7 @@ namespace MythKit.Tasks
 
         // 详情控件（UI线程赋值）
         FrameworkElement DetailContentView { get; set; }
-        bool IsDetailViewReady { get; set; }
+        bool IsDetailViewReady { get; }
 
         // 事件通知（用于UI更新）
         event Action<int> ProgressUpdated;

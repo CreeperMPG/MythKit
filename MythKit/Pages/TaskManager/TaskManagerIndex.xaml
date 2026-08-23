@@ -8,11 +8,15 @@
              xmlns:tasks="clr-namespace:MythKit.Tasks"
              xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
              xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
-             xmlns:updater="clr-namespace:MythKit.Utils.iUWM442TempFix"
+             xmlns:utils="clr-namespace:MythKit.Utils"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <converters:IsRunningOrIdleConverter x:Key="IsRunningOrIdleConverter"/>
+        <utils:ConverterChain x:Key="IsNotRunningAndIdleConverter">
+            <converters:IsRunningOrIdleConverter/>
+            <utils:InverseVisibilityConverter/>
+        </utils:ConverterChain>
         <!-- 状态文本样式 -->
         <Style x:Key="StateTextStyle" TargetType="Run">
             <Setter Property="Text" Value="空闲"/>
@@ -68,7 +72,6 @@
                 <DataTemplate DataType="{x:Type tasks:TaskEntry}">
                     <ui:SettingsCard Margin="0,4"
                              Header="{Binding TaskName}">
-                        <!-- 如果需要描述区域显示状态文本，可以放在 Description -->
                         <ui:SettingsCard.Description>
                             <TextBlock TextWrapping="Wrap">
                                 <Run Style="{StaticResource StateTextStyle}"/>
@@ -78,16 +81,30 @@
                         </ui:SettingsCard.Description>
 
                         <ui:SettingsCard.HeaderIcon>
-                            <ui:FontIcon Style="{StaticResource StateIconStyle}" updater:TaskManagerIconUpdater.State="{Binding State}"/>
+                            <ui:FontIcon Style="{StaticResource StateIconStyle}"/>
                         </ui:SettingsCard.HeaderIcon>
 
                         <!-- 内容区域 -->
                         <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsUIIndeterminate, Mode=OneWay}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                                <Run Text="{Binding Progress, Mode=OneWay}"/>
+                                <Run>%</Run>
+                            </TextBlock>
                             <ProgressBar Value="{Binding Progress, Mode=OneWay}" IsIndeterminate="{Binding IsUIIndeterminate, Mode=OneWay}"
                                  Width="200" Height="20"
                                  Minimum="0" Maximum="100"/>
                             <Button Content="详情" Click="InformationButton_Click" Tag="{Binding}" IsEnabled="{Binding IsDetailViewReady}" />
                             <Button Content="取消" Click="CancelButton_Click" Tag="{Binding}" Visibility="{Binding State, Converter={StaticResource IsRunningOrIdleConverter}}"/>
+                            <Button Content="删除" Click="DeleteButton_Click" Tag="{Binding}" Visibility="{Binding State, Converter={StaticResource IsNotRunningAndIdleConverter}}"/>
                         </ikw:SimpleStackPanel>
                     </ui:SettingsCard>
                 </DataTemplate>

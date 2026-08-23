@@ -37,6 +37,9 @@ namespace MythKit.Tasks
         public FrameworkElement DetailContentView => Task.DetailContentView;
         public bool IsDetailViewReady => Task.IsDetailViewReady;
 
+        private DateTime _lastUiProgressUpdate = DateTime.MinValue;
+        private DateTime _lastUiStateMessageUpdate = DateTime.MinValue;
+        private readonly int _updateIntervalMs = 50;
         public TaskEntry(Guid id, IManagedTask task)
         {
             Id = id;
@@ -46,7 +49,19 @@ namespace MythKit.Tasks
             _state = TaskState.Idle;
 
             Task.ProgressUpdated += (p) =>
-                Application.Current.Dispatcher.Invoke(() => Progress = p);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    var now = DateTime.UtcNow;
+                    if ((now - _lastUiProgressUpdate).TotalMilliseconds >= _updateIntervalMs)
+                    {
+                        _lastUiProgressUpdate = now;
+                        Application.Current.Dispatcher.Invoke(() => Progress = p);
+                    }
+                    else
+                    {
+                        _progress = p;
+                    }
+                });
 
             Task.StateUpdated += (s) =>
                 Application.Current.Dispatcher.Invoke(() =>
@@ -59,7 +74,19 @@ namespace MythKit.Tasks
                 });
 
             Task.StateMessageUpdated += (msg) =>
-                Application.Current.Dispatcher.Invoke(() => StateMessage = msg);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    var now = DateTime.UtcNow;
+                    if ((now - _lastUiStateMessageUpdate).TotalMilliseconds >= _updateIntervalMs)
+                    {
+                        _lastUiStateMessageUpdate = now;
+                        Application.Current.Dispatcher.Invoke(() => StateMessage = msg);
+                    }
+                    else
+                    {
+                        _stateMessage = msg;
+                    }
+                });
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

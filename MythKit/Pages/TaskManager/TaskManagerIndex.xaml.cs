@@ -51,5 +51,13 @@ namespace MythKit.Pages.TaskManager
                 App.TaskManagerInstance.StopTask(taskEntry.Id);
             }
         }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.DataContext is TaskEntry taskEntry)
+            {
+                App.TaskManagerInstance.TaskList.Remove(taskEntry);
+            }
+        }
     }
 }
