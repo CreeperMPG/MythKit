@@ -67,48 +67,68 @@
         </Style>
     </UserControl.Resources>
     <ui:ScrollViewerEx>
-        <ItemsControl Name="TasksItemsControl" Margin="48,24" ItemsSource="{Binding TaskList}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type tasks:TaskEntry}">
-                    <ui:SettingsCard Margin="0,4"
+        <Grid>
+            <ItemsControl Name="TasksItemsControl" Margin="48,24" ItemsSource="{Binding TaskList}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type tasks:TaskEntry}">
+                        <ui:SettingsCard Margin="0,4"
                              Header="{Binding TaskName}">
-                        <ui:SettingsCard.Description>
-                            <TextBlock TextWrapping="Wrap">
+                            <ui:SettingsCard.Description>
+                                <TextBlock TextWrapping="Wrap">
                                 <Run Style="{StaticResource StateTextStyle}"/>
                                 <Run Text="-"/>
                                 <Run Text="{Binding StateMessage, Mode=OneWay}"/>
-                            </TextBlock>
-                        </ui:SettingsCard.Description>
+                                </TextBlock>
+                            </ui:SettingsCard.Description>
 
-                        <ui:SettingsCard.HeaderIcon>
-                            <ui:FontIcon Style="{StaticResource StateIconStyle}"/>
-                        </ui:SettingsCard.HeaderIcon>
+                            <ui:SettingsCard.HeaderIcon>
+                                <ui:FontIcon Style="{StaticResource StateIconStyle}"/>
+                            </ui:SettingsCard.HeaderIcon>
 
-                        <!-- 内容区域 -->
-                        <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock VerticalAlignment="Center">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsUIIndeterminate, Mode=OneWay}" Value="True">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
+                            <!-- 内容区域 -->
+                            <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsUIIndeterminate, Mode=OneWay}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
                                 <Run Text="{Binding Progress, Mode=OneWay}"/>
                                 <Run>%</Run>
-                            </TextBlock>
-                            <ProgressBar Value="{Binding Progress, Mode=OneWay}" IsIndeterminate="{Binding IsUIIndeterminate, Mode=OneWay}"
+                                </TextBlock>
+                                <ProgressBar Value="{Binding Progress, Mode=OneWay}" IsIndeterminate="{Binding IsUIIndeterminate, Mode=OneWay}"
                                  Width="200" Height="20"
                                  Minimum="0" Maximum="100"/>
-                            <Button Content="详情" Click="InformationButton_Click" Tag="{Binding}" IsEnabled="{Binding IsDetailViewReady}" />
-                            <Button Content="取消" Click="CancelButton_Click" Tag="{Binding}" Visibility="{Binding State, Converter={StaticResource IsRunningOrIdleConverter}}"/>
-                            <Button Content="删除" Click="DeleteButton_Click" Tag="{Binding}" Visibility="{Binding State, Converter={StaticResource IsNotRunningAndIdleConverter}}"/>
-                        </ikw:SimpleStackPanel>
-                    </ui:SettingsCard>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                                <Button Content="详情" Click="InformationButton_Click" Tag="{Binding}" IsEnabled="{Binding IsDetailViewReady}" />
+                                <Button Content="取消" Click="CancelButton_Click" Tag="{Binding}" Visibility="{Binding State, Converter={StaticResource IsRunningOrIdleConverter}}"/>
+                                <Button Content="删除" Click="DeleteButton_Click" Tag="{Binding}" Visibility="{Binding State, Converter={StaticResource IsNotRunningAndIdleConverter}}"/>
+                            </ikw:SimpleStackPanel>
+                        </ui:SettingsCard>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock Text="暂无任务" 
+               FontSize="16" 
+               Foreground="Gray"
+               HorizontalAlignment="Center" 
+               VerticalAlignment="Center"
+               Margin="0,0,0,20">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding TaskList.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
     </ui:ScrollViewerEx>
 </UserControl>
