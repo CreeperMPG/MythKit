@@ -27,9 +27,9 @@
                             <CheckBox Name="EnableGroupIP" Content="IP 分组" />
                             <ikw:SimpleStackPanel Spacing="8" Orientation="Horizontal" IsEnabled="{Binding ElementName=EnableGroupIP, Path=IsChecked, Mode=OneWay}">
                                 <TextBlock Text="将所有 IP 每" VerticalAlignment="Center" />
-                                <ui:NumberBox Name="GroupIPNumber" Value="12" MinWidth="0" Minimum="1" Maximum="200" MaxWidth="50" />
+                                <ui:NumberBox Name="GroupIPNumber" Value="12" MinWidth="0" Minimum="1" Maximum="200" MaxWidth="250" />
                                 <TextBlock Text="个分为一组。其中一组发送完毕后等待" VerticalAlignment="Center" />
-                                <ui:NumberBox Name="GroupInterval" Value="8" MinWidth="0" Minimum="0" MaxWidth="50" />
+                                <ui:NumberBox Name="GroupInterval" Value="8" MinWidth="0" Minimum="0" MaxWidth="250" />
                                 <TextBlock Text="秒发送下一组。" VerticalAlignment="Center" />
                             </ikw:SimpleStackPanel>
                         </ikw:SimpleStackPanel>
@@ -75,13 +75,13 @@
                             <CheckBox Name="EnableInterval" Content="循环发送" />
                             <ikw:SimpleStackPanel VerticalAlignment="Center" Spacing="8" Orientation="Horizontal" IsEnabled="{Binding ElementName=EnableInterval, Path=IsChecked, Mode=OneWay}">
                                 <TextBlock Text="每隔" VerticalAlignment="Center" />
-                                <ui:NumberBox VerticalAlignment="Center" Name="IntervalSeconds" Value="8" MinWidth="0" Minimum="0" Maximum="60" MaxWidth="50" />
+                                <ui:NumberBox VerticalAlignment="Center" Name="IntervalSeconds" Value="8" MinWidth="0" Minimum="0" Maximum="60" MaxWidth="250" />
                                 <TextBlock Text="秒发送一次。" VerticalAlignment="Center" />
                                 <CheckBox VerticalAlignment="Center" Name="NotInfiniteSwitch" IsChecked="False">
                                     <CheckBox.Content>
                                         <ikw:SimpleStackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="8">
                                             <TextBlock Text="共发送" VerticalAlignment="Center" />
-                                            <ui:NumberBox IsEnabled="{Binding ElementName=NotInfiniteSwitch, Path=IsChecked, Mode=OneWay}" Name="IntervalTimes" Value="8" MinWidth="0" Minimum="0" Maximum="200" MaxWidth="50" />
+                                            <ui:NumberBox IsEnabled="{Binding ElementName=NotInfiniteSwitch, Path=IsChecked, Mode=OneWay}" Name="IntervalTimes" Value="8" MinWidth="0" Minimum="0" Maximum="200" MaxWidth="250" />
                                             <TextBlock Text="次。" VerticalAlignment="Center" />
                                         </ikw:SimpleStackPanel>
                                     </CheckBox.Content>
@@ -94,8 +94,8 @@
                     </ui:SettingsCard>
                 </ui:SettingsExpander.Items>
             </ui:SettingsExpander>
-            <Button Name="StartButton_Legacy" HorizontalAlignment="Right" Content="开始" Style="{DynamicResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}" Click="StartButton_Legacy_Click" />
-            <Button Name="StartButton" HorizontalAlignment="Right" Content="开始 [新版 实验性]" Click="StartButton_Click"/>
+            <Button Name="StartButton_Legacy" HorizontalAlignment="Right" Content="开始" Click="StartButton_Legacy_Click" />
+            <Button Name="StartButton" HorizontalAlignment="Right" Content="开始 [新版 实验性]" Style="{DynamicResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}" Click="StartButton_Click"/>
         </ikw:SimpleStackPanel>
     </ui:ScrollViewerEx>
 </UserControl>

@@ -124,6 +124,9 @@
     <Compile Include="Pages\TaskManager\TestTask.cs" />
     <Compile Include="Pages\UDPAttack\AttackManagedTask.cs" />
     <Compile Include="Pages\UDPAttack\AttackConfig.cs" />
+    <Compile Include="Pages\UDPAttack\AttackStateControl.xaml.cs">
+      <DependentUpon>AttackStateControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\UDPAttack\IAttackPattern.cs" />
     <Compile Include="Tasks\IManagedTask.cs" />
     <Compile Include="Tasks\TaskEntry.cs" />
@@ -188,6 +191,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\UDPAttack\AttackIndex.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\UDPAttack\AttackStateControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

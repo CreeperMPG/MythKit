@@ -26,6 +26,8 @@ namespace MythKit.Pages.TaskManager
         public event Action<int> ProgressUpdated;
         public event Action<string> StateMessageUpdated;
         public event Action<TaskState> StateUpdated;
+        public event Action<int> ProgressUpdatedBackground;
+        public event Action<string> StateMessageUpdatedBackground;
 
         /// <param name="durationSeconds">任务预计运行秒数（模拟总时长）</param>
         public TestTask(int durationSeconds = 30)

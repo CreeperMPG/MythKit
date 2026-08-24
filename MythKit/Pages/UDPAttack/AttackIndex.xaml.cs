@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Modern = iNKORE.UI.WPF.Modern.Controls;
 
 namespace MythKit.Pages.UDPAttack
 {
@@ -130,12 +131,23 @@ namespace MythKit.Pages.UDPAttack
             {
                 ipAddresses.Add(ip.Trim());
             }
+            if (ipAddresses.Count == 0)
+            {
+                Modern.ContentDialog dialog = new Modern.ContentDialog()
+                {
+                    Title = "错误",
+                    Content = "请至少输入一个有效目标 IP 地址",
+                    CloseButtonText = "确定"
+                };
+                dialog.ShowAsync();
+                return;
+            }
             AttackConfig config = new AttackConfig()
             {
                 TargetIPs = ipAddresses.Select(ip => IPAddress.Parse(ip)).ToList(),
                 AttackPattern = AttackTypes[AttackCommandTypeComboBox.SelectedIndex],
-                CycleIntervalMilliseconds = (int)IntervalSeconds.Value,
-                TotalCycles = EnableInterval.IsChecked ?? false ? NotInfiniteSwitch.IsChecked ?? false ? (int)(IntervalTimes.Value * 1000) : (int?)null : 1
+                CycleIntervalMilliseconds = (int)(IntervalSeconds.Value * 1000),
+                TotalCycles = EnableInterval.IsChecked ?? false ? NotInfiniteSwitch.IsChecked ?? false ? (int)IntervalTimes.Value : (int?)null : 1
             };
             if (EnableGroupIP.IsChecked ?? false)
             {

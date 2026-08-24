@@ -1,0 +1,120 @@
+﻿<UserControl x:Class="MythKit.Pages.UDPAttack.AttackStateControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MythKit.Pages.UDPAttack"
+             xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
+             xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <ui:ScrollViewerEx>
+        <ikw:SimpleStackPanel Spacing="8">
+            <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                <ui:ProgressRing Name="AttackProgressRing" IsIndeterminate="{Binding AttackTask.IsIndeterminate, Mode=OneWay}" Value="{Binding AttackTask.Progress, Mode=OneWay}" />
+                <ikw:SimpleStackPanel>
+                    <TextBlock Name="AttackProgressText" FontSize="16" FontWeight="Bold">
+                        <Run Text="进度"/>
+                        <Run Text="{Binding AttackTask.Progress, Mode=OneWay, StringFormat={}{0:F1}%}"/>
+                    </TextBlock>
+                    <TextBlock Name="TotalAttackCountTextBlock"> <!--已攻击 x/y 次-->
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AttackTask.IsIndeterminate}" Value="True">
+                                        <Setter Property="Text">
+                                            <Setter.Value>
+                                                <MultiBinding StringFormat="{}已攻击 {0} 次。">
+                                                    <Binding Path="AttackTask.CurrentAttackCount" />
+                                                </MultiBinding>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding AttackTask.IsIndeterminate}" Value="False">
+                                        <Setter Property="Text">
+                                            <Setter.Value>
+                                                <MultiBinding StringFormat="{}已攻击 {0} / {1} 次。">
+                                                    <Binding Path="AttackTask.CurrentAttackCount" />
+                                                    <Binding Path="AttackTask.TotalAttackCount" />
+                                                </MultiBinding>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Name="AttackTargetTextBlock"> <!--第 x/y 轮攻击，本轮已攻击 a/b 个 IP-->
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AttackTask.IsIndeterminate}" Value="True">
+                                        <Setter Property="Text">
+                                            <Setter.Value>
+                                                <MultiBinding StringFormat="{}第 {0} 轮攻击，本轮已攻击 {1}/{2} 个 IP。">
+                                                    <Binding Path="AttackTask.CurrentCycle" />
+                                                    <Binding Path="AttackTask.CurrentTargetIndexUI" />
+                                                    <Binding Path="AttackTask.Config.TargetIPs.Count" />
+                                                </MultiBinding>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding AttackTask.IsIndeterminate}" Value="False">
+                                        <Setter Property="Text">
+                                            <Setter.Value>
+                                                <MultiBinding StringFormat="{}第 {0}/{1} 轮攻击，本轮已攻击 {2}/{3} 个 IP。">
+                                                    <Binding Path="AttackTask.CurrentCycle" />
+                                                    <Binding Path="AttackTask.Config.TotalCycles" />
+                                                    <Binding Path="AttackTask.CurrentTargetIndexUI" />
+                                                    <Binding Path="AttackTask.Config.TargetIPs.Count" />
+                                                </MultiBinding>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Name="AttackStateBlock"> <!--正在发送数据包 / 等待-->
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AttackTask.CurrentWaitingState}" Value="{x:Static local:WaitingState.None}">
+                                        <Setter Property="Text" Value="正在发送数据包"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding AttackTask.CurrentWaitingState}" Value="{x:Static local:WaitingState.GroupInterval}">
+                                        <Setter Property="Text" Value="{Binding AttackTask.RemainingWaitingSeconds, Mode=OneWay, StringFormat={}等待 {0} 秒后攻击下一分组…}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding AttackTask.CurrentWaitingState}" Value="{x:Static local:WaitingState.CycleInterval}">
+                                        <Setter Property="Text" Value="{Binding AttackTask.RemainingWaitingSeconds, Mode=OneWay, StringFormat={}等待 {0} 秒后攻击下一轮…}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding AttackTask.Paused}" Value="True">
+                                        <Setter Property="Text" Value="攻击已暂停"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </ikw:SimpleStackPanel>
+            </ikw:SimpleStackPanel>
+            <TextBox Name="LogTextBox" IsReadOnly="True" AcceptsReturn="True" ui:ControlHelper.Header="错误日志" ui:ControlHelper.PlaceholderText="暂无错误日志" />
+            <ikw:SimpleStackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button Name="PauseButton" Click="PauseButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AttackTask.Paused}" Value="True">
+                                    <Setter Property="Content" Value="继续"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding AttackTask.Paused}" Value="False">
+                                    <Setter Property="Content" Value="暂停"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Name="ClearLogButton" Content="清空错误日志" Click="ClearLogButton_Click"/>
+            </ikw:SimpleStackPanel>
+        </ikw:SimpleStackPanel>
+    </ui:ScrollViewerEx>
+</UserControl>

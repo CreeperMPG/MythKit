@@ -22,6 +22,8 @@ namespace MythKit.Tasks
         // 事件通知（用于UI更新）
         event Action<int> ProgressUpdated;
         event Action<string> StateMessageUpdated;
+        event Action<int> ProgressUpdatedBackground; // 背景事件，有更新冷却，频繁更新时使用
+        event Action<string> StateMessageUpdatedBackground; // 背景事件，有更新冷却，频繁更新时使用
         event Action<TaskState> StateUpdated;
 
         Task ExecuteAsync(CancellationToken cancellationToken);

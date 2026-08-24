@@ -52,6 +52,13 @@ namespace MythKit.Tasks
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     var now = DateTime.UtcNow;
+                    _lastUiProgressUpdate = now;
+                    Application.Current.Dispatcher.Invoke(() => Progress = p);
+                });
+            Task.ProgressUpdatedBackground += (p) =>
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    var now = DateTime.UtcNow;
                     if ((now - _lastUiProgressUpdate).TotalMilliseconds >= _updateIntervalMs)
                     {
                         _lastUiProgressUpdate = now;
@@ -62,18 +69,14 @@ namespace MythKit.Tasks
                         _progress = p;
                     }
                 });
-
-            Task.StateUpdated += (s) =>
+            Task.StateMessageUpdated += (msg) =>
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    State = s;
-                    if (s == TaskState.Completed)
-                    {
-                        Progress = 100;
-                    }
+                    var now = DateTime.UtcNow;
+                    _lastUiStateMessageUpdate = now;
+                    Application.Current.Dispatcher.Invoke(() => StateMessage = msg);
                 });
-
-            Task.StateMessageUpdated += (msg) =>
+            Task.StateMessageUpdatedBackground += (msg) =>
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     var now = DateTime.UtcNow;
@@ -87,6 +90,17 @@ namespace MythKit.Tasks
                         _stateMessage = msg;
                     }
                 });
+            Task.StateUpdated += (s) =>
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    State = s;
+                    if (s == TaskState.Completed)
+                    {
+                        Progress = 100;
+                    }
+                    OnPropertyChanged(nameof(StateMessage));
+                });
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

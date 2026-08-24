@@ -27,7 +27,7 @@ namespace MythKit.Tasks
             if (_activeTasks.TryAdd(id, (cts, runningTask)))
             {
                 Application.Current.Dispatcher.Invoke(() => TaskList.Add(entry));
-                _ = CleanupTaskAsync(id, runningTask, entry);
+                _ = CleanupTaskAsync(id, runningTask);
             }
             return id;
         }
@@ -40,7 +40,7 @@ namespace MythKit.Tasks
             }
         }
 
-        private async Task CleanupTaskAsync(Guid id, Task runningTask, TaskEntry entry)
+        private async Task CleanupTaskAsync(Guid id, Task runningTask)
         {
             try { await runningTask; }
             catch { /* 忽略 */ }
