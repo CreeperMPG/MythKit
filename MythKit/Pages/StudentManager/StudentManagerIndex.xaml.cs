@@ -130,6 +130,7 @@ namespace MythKit.Pages.StudentManager
             KillProcess("srvany");
             KillProcess("zmserv");
             KillProcess("jfglzs");
+            KillProcess("jfglzsn");
             foreach (Process process in Process.GetProcesses())
             {
                 try
@@ -150,20 +151,24 @@ namespace MythKit.Pages.StudentManager
         }
         private void DisableManager_Click(object sender, RoutedEventArgs e)
         {
+            EndJFGLZS();
+            AddIFEO("jfglzs.exe");
+            AddIFEO("jfglzsn.exe");
+        }
+        private void AddIFEO(string targetExecutable)
+        {
             const string IFEORegistryPath = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
-            const string TargetExecutable = "jfglzs.exe";
             const string DebuggerValueName = "Debugger";
             const string DebuggerValueData = "null";
 
             try
             {
-                EndJFGLZS();
                 using (RegistryKey baseKey = Registry.LocalMachine.OpenSubKey(IFEORegistryPath, writable: true))
                 {
                     if (baseKey != null)
                     {
                         // 创建或打开目标子项
-                        using (RegistryKey targetKey = baseKey.CreateSubKey(TargetExecutable))
+                        using (RegistryKey targetKey = baseKey.CreateSubKey(targetExecutable))
                         {
                             if (targetKey != null)
                             {
@@ -194,7 +199,6 @@ namespace MythKit.Pages.StudentManager
                 Modern.MessageBox.Show($"发生错误: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
         private void EnableManager_Click(object sender, RoutedEventArgs e)
         {
             const string IFEORegistryPath = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
