@@ -19,7 +19,6 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
     /// <summary>
     /// BlackScreenAttack.xaml 的交互逻辑
     /// </summary>
-    [UDPAttackTypeLegacy("黑屏安静", nameof(ConstructPacket), AttackTarget.Student)]
     public partial class BlackScreenAttack : UserControl, IAttackPattern
     {
         public BlackScreenAttack()

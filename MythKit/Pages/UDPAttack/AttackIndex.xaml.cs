@@ -15,44 +15,16 @@ using Modern = iNKORE.UI.WPF.Modern.Controls;
 
 namespace MythKit.Pages.UDPAttack
 {
-    class AttackInfoLegacy
-    {
-        public object Function { get; set; }
-        public Type FunctionType { get; set; }
-        public UDPAttackTypeLegacyAttribute FunctionAttribute { get; set; }
-    }
     /// <summary>
     /// AttackIndex.xaml 的交互逻辑
     /// </summary>
     public partial class AttackIndex : UserControl
     {
-        private Dictionary<string, AttackInfoLegacy> AttackFunctionDictL = new Dictionary<string, AttackInfoLegacy>();
         public List<IAttackPattern> AttackTypes { get; set; } = new List<IAttackPattern>();
         public AttackIndex()
         {
             this.InitializeComponent();
             DataContext = this;
-            // LEGACY-遍历程序集中的所有类型
-            foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
-            {
-                bool flag = type.IsClass && !type.IsAbstract && Attribute.IsDefined(type, typeof(UDPAttackTypeLegacyAttribute));
-                if (flag)
-                {
-                    object attackFunction = Activator.CreateInstance(type);
-                    var attackTypes = type.GetCustomAttributes(typeof(UDPAttackTypeLegacyAttribute), false) as UDPAttackTypeLegacyAttribute[];
-                    foreach (UDPAttackTypeLegacyAttribute attackType in attackTypes)
-                    {
-                        string nickname = attackType.Name;
-                        if (type.Namespace.Contains("TeacherAttack"))
-                        {
-                            nickname = $"（教师端）{nickname}";
-                        }
-                        this.AttackFunctionDictL.Add(nickname, new AttackInfoLegacy() { Function = attackFunction, FunctionAttribute = attackType, FunctionType = type });
-                        this.AttackTypeComboBoxL.Items.Add(nickname);
-                    }
-                }
-            }
-            this.AttackTypeComboBoxL.SelectedIndex = 0;
             StringFormattingDescription.Text = "只有部分输入框支持字符串格式化\n" +
                 "格式化语法：\n" +
                 "\t${ip} - IP 地址\n" +
@@ -112,18 +84,6 @@ namespace MythKit.Pages.UDPAttack
         {
             this.TargetIPAddress.MaxWidth = e.NewSize.Width - 300.0;
         }
-
-        private void AttackTypeComboBoxL_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            this.OptionCardL.Content = this.AttackFunctionDictL[this.AttackTypeComboBoxL.SelectedValue as string].Function;
-        }
-
-        private void StartButton_Legacy_Click(object sender, RoutedEventArgs e)
-        {
-            AttackInfoLegacy info = this.AttackFunctionDictL[this.AttackTypeComboBoxL.SelectedValue as string];
-            new AttackDialog(info.Function, info.FunctionType, info.FunctionAttribute, this).ShowAsync();
-        }
-
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             List<string> ipAddresses = new List<string>();
@@ -159,6 +119,31 @@ namespace MythKit.Pages.UDPAttack
             }
             AttackManagedTask task = new AttackManagedTask(config);
             App.TaskManagerInstance.StartTask(task);
+            var stateStackPanel = new iNKORE.UI.WPF.Controls.SimpleStackPanel()
+            {
+                Children =
+                    {
+                        new TextBlock()
+                        {
+                            Text = "攻击已开始。最小化后任务仍会继续运行，你可以在任务管理中查看。",
+                            Margin = new Thickness(0, 0, 0, 10),
+                            TextWrapping = TextWrapping.Wrap
+                        },
+                        task.DetailContentView
+                    }
+            };
+            Modern.ContentDialog attackDialog = new Modern.ContentDialog()
+            {
+                Title = task.TaskName,
+                Content = stateStackPanel,
+                CloseButtonText = "最小化到后台"
+            };
+            attackDialog.Closed += (s, args) =>
+            {
+                stateStackPanel.Children.Remove(task.DetailContentView);
+            };
+            attackDialog.ShowAsync();
+            return;
         }
 
         private void AttackCommandTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

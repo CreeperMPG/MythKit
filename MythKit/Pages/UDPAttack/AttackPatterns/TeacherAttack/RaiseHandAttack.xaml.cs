@@ -7,14 +7,13 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions.TeacherAttack
     /// <summary>
     /// RaiseHandAttack.xaml 的交互逻辑
     /// </summary>
-    [UDPAttackTypeLegacy("举手", nameof(ConstructPacket), AttackTarget.Teacher)]
     public partial class RaiseHandAttack : UserControl, IAttackPattern
     {
         public RaiseHandAttack()
         {
             InitializeComponent();
         }
-        public string AttackName => "举手";
+        public string AttackName => "（教师端）举手";
         public AttackTarget Target => AttackTarget.Teacher;
         public AttackPacket ConstructPacket(ref string message, string ip, int cycleCount, int groupCount)
         {

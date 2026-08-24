@@ -9,7 +9,6 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
     /// <summary>
     /// CommandAttack.xaml 的交互逻辑
     /// </summary>
-    [UDPAttackTypeLegacy("远程命令", nameof(ConstructPacket), AttackTarget.Student)]
     public partial class CommandAttack : UserControl, IAttackPattern
     {
         public CommandAttack()

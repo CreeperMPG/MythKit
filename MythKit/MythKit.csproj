@@ -122,6 +122,9 @@
       <DependentUpon>TaskManagerIndex.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\TaskManager\TestTask.cs" />
+    <Compile Include="Pages\UDPAttack\AttackIndex.xaml.cs">
+      <DependentUpon>AttackIndex.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\UDPAttack\AttackManagedTask.cs" />
     <Compile Include="Pages\UDPAttack\AttackConfig.cs" />
     <Compile Include="Pages\UDPAttack\AttackStateControl.xaml.cs">
@@ -170,9 +173,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\UDPAttack\AttackDialog.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Pages\UDPAttack\AttackIndex.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\UDPAttack\AttackPatterns\BlackScreenAttack.xaml">
       <SubType>Designer</SubType>
@@ -187,10 +190,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\UDPAttack\AttackPatterns\TeacherAttack\RaiseHandAttack.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\UDPAttack\AttackIndex.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -213,9 +212,6 @@
     <Compile Include="Pages\StudentManager\StudentManagerIndex.xaml.cs">
       <DependentUpon>StudentManagerIndex.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackDialog.xaml.cs">
-      <DependentUpon>AttackDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\UDPAttack\AttackPatterns\BlackScreenAttack.xaml.cs">
       <DependentUpon>BlackScreenAttack.xaml</DependentUpon>
     </Compile>
@@ -228,12 +224,8 @@
     <Compile Include="Pages\UDPAttack\AttackPatterns\TeacherAttack\RaiseHandAttack.xaml.cs">
       <DependentUpon>RaiseHandAttack.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackIndex.xaml.cs">
-      <DependentUpon>AttackIndex.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\UDPAttack\AttackPacket.cs" />
     <Compile Include="Pages\UDPAttack\AttackTarget.cs" />
-    <Compile Include="Pages\UDPAttack\UDPAttackTypeLegacyAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
