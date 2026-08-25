@@ -42,7 +42,7 @@ namespace MythKit.Pages.About
         public AboutIndex()
         {
             InitializeComponent();
-            VersionInfoBlock.Text = "1.2.0 Snapshot 3";
+            VersionInfoBlock.Text = "1.2.0 Release Candidate 1";
             UpdateLogBlock.Text = new System.IO.StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("MythKit.Pages.About.Info.UpdateLog.txt")).ReadToEnd();
             foreach (string dependency in Dependencies)
             {
