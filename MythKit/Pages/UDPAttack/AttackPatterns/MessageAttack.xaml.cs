@@ -11,11 +11,13 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
     /// </summary>
     public partial class MessageAttack : UserControl, IAttackPattern
     {
-        public MessageAttack()
+        public MessageAttack(string message = "")
         {
             InitializeComponent();
+            Message.Text = message;
         }
         public string AttackName => "发送消息";
+        public string AttackId => "send_message";
         public AttackTarget Target => AttackTarget.Student;
         public AttackPacket ConstructPacket(ref string message, string ip, int cycleCount, int groupCount)
         {

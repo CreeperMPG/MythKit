@@ -26,6 +26,7 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
             InitializeComponent();
         }
         public string AttackName => "黑屏安静";
+        public string AttackId => "black_screen";
         public AttackTarget Target => AttackTarget.Student;
         public AttackPacket ConstructPacket(ref string message, string ip, int cycleCount, int groupCount)
         {

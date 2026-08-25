@@ -9,11 +9,15 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions.TeacherAttack
     /// </summary>
     public partial class RaiseHandAttack : UserControl, IAttackPattern
     {
-        public RaiseHandAttack()
+        public RaiseHandAttack(string raiseHandIntervalString = "500")
         {
             InitializeComponent();
+            int raiseHandInterval = 500;
+            if (int.TryParse(raiseHandIntervalString, out raiseHandInterval))
+                RaiseHandInterval.Value = raiseHandInterval;
         }
         public string AttackName => "（教师端）举手";
+        public string AttackId => "raise_hand";
         public AttackTarget Target => AttackTarget.Teacher;
         public AttackPacket ConstructPacket(ref string message, string ip, int cycleCount, int groupCount)
         {

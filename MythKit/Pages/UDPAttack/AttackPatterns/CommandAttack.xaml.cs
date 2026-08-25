@@ -11,11 +11,14 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
     /// </summary>
     public partial class CommandAttack : UserControl, IAttackPattern
     {
-        public CommandAttack()
+        public CommandAttack(string command = "", string arguments = "")
         {
             InitializeComponent();
+            Command.Text = command;
+            Arguments.Text = arguments;
         }
         public string AttackName => "远程命令";
+        public string AttackId => "remote_command";
         public AttackTarget Target => AttackTarget.Student;
         public AttackPacket ConstructPacket(ref string message, string ip, int cycleCount, int groupCount)
         {

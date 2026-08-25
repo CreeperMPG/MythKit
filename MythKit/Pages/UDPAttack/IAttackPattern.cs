@@ -11,5 +11,6 @@ namespace MythKit.Pages.UDPAttack
         AttackPacket ConstructPacket(ref string errorMessage, string targetIP, int cycleId, int groupId);
         AttackTarget Target { get; }
         string AttackName { get; }
+        string AttackId { get; }
     }
 }

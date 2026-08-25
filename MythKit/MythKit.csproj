@@ -116,12 +116,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Pages\Home\Suggestions\TaskTestSuggestion.cs" />
+    <Compile Include="Pages\Home\Suggestions\MythKitProtocolSuggestion.cs" />
     <Compile Include="Pages\TaskManager\Converters\IsRunningOrIdleConverter.cs" />
     <Compile Include="Pages\TaskManager\TaskManagerIndex.xaml.cs">
       <DependentUpon>TaskManagerIndex.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\TaskManager\TestTask.cs" />
     <Compile Include="Pages\UDPAttack\AttackIndex.xaml.cs">
       <DependentUpon>AttackIndex.xaml</DependentUpon>
     </Compile>
@@ -138,6 +137,7 @@
     <Compile Include="Utils\InverseBooleanConverter.cs" />
     <Compile Include="Utils\InverseVisibilityConverter.cs" />
     <Compile Include="Utils\ObservableHashSet.cs" />
+    <Compile Include="Utils\QueryStringHelper.cs" />
     <Page Include="HomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

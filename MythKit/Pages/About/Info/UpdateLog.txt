@@ -1,5 +1,13 @@
-﻿1.2.0 Snapshot 3
-发布时间 2026-08-25 23:18
+﻿1.2.0 Release Candidate 1
+发布时间 2025-08-26 00:42
+	1. 修复了更新日志 1.2.0 Snapshot 3 发布日期显示错误的 Bug
+	2. 移除了 1.2.0 Snapshot 2 加入的测试任务
+	3. 现在可以使用 URI Scheme (mythkit://) 打开 MythKit
+		- mythkit://attack/recommend 重放攻击推荐参数
+	4. 主页建议的操作板块现在可以注册 Myth Kit 的 URI Scheme
+
+1.2.0 Snapshot 3
+发布时间 2026-08-24 23:18
 	1. 修复了重放攻击轮数、轮间间隔设置错误的 Bug
 	2. 为重放攻击任务添加详情页，支持查看攻击进度、错误日志，支持暂停、继续攻击
 	3. 移除了旧版重放攻击

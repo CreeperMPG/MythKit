@@ -21,9 +21,18 @@ namespace MythKit.Pages.UDPAttack
     public partial class AttackIndex : UserControl
     {
         public List<IAttackPattern> AttackTypes { get; set; } = new List<IAttackPattern>();
+        public AttackIndex(string defaultType = null, string[] typeArguments = null)
+        {
+            InitializeComponent();
+            InitializePage(defaultType, typeArguments);
+        }
         public AttackIndex()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+            InitializePage();
+        }
+        private void InitializePage(string defaultType = null, string[] typeArguments = null)
+        {
             DataContext = this;
             StringFormattingDescription.Text = "只有部分输入框支持字符串格式化\n" +
                 "格式化语法：\n" +
@@ -36,7 +45,37 @@ namespace MythKit.Pages.UDPAttack
             AttackTypes.Add(new BlackScreenAttack());
             AttackTypes.Add(new TeacherAttack.RaiseHandAttack());
             AttackCommandTypeComboBox.ItemsSource = AttackTypes.Select((item) => item.AttackName);
-            AttackCommandTypeComboBox.SelectedIndex = 0;
+            if (defaultType != null)
+            {
+                int index = AttackTypes.FindIndex((item) => item.AttackId == defaultType);
+                if (index >= 0)
+                {
+                    if (typeArguments != null && typeArguments.Length > 0)
+                    {
+                        IAttackPattern attackPattern = AttackTypes[index];
+                        Type patternType = attackPattern.GetType();
+                        ConstructorInfo constructor = patternType.GetConstructors().FirstOrDefault();
+                        if (constructor != null)
+                        {
+                            try
+                            {
+                                object instance = constructor.Invoke(typeArguments);
+                                AttackTypes[index] = (IAttackPattern)instance;
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                else
+                {
+                    index = 0;
+                }
+                AttackCommandTypeComboBox.SelectedIndex = index;
+            }
+            else
+            {
+                AttackCommandTypeComboBox.SelectedIndex = 0;
+            }
         }
         private void InternetIPCollectButton_Click(object sender, RoutedEventArgs e)
         {
