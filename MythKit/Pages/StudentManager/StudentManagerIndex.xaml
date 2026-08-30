@@ -26,8 +26,9 @@
             <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="8">
                 <Button Name="KillJFGLZS" Click="KillJFGLZS_Click" Content="关闭机房管理助手"/>
                 <Button Name="RecoverySystem" Click="RecoverySystem_Click" Content="恢复所有设置"/>
-                <Button Name="IFEOJFGLZS" Click="IFEOJFGLZS_Click" Content="映像劫持机房管理助手"/>
-                <Button Name="RestartExplorer" Click="RestartExplorer_Click" Content="重启 Windows 资源管理器"/>
+                <Button Name="IFEOJFGLZS" Click="IFEOJFGLZS_Click" Content="映像劫持管理助手"/>
+                <Button Name="ClearPassword" Click="ClearPassword_Click" Content="重置助手密码 [慎用]"/>
+                <Button Name="RestartExplorer" Click="RestartExplorer_Click" Content="重启资源管理器"/>
             </ikw:SimpleStackPanel>
             <Button Name="DelIFEOJFGLZS" Click="DelIFEOJFGLZS_Click" Content="移除对机房管理助手的映像劫持"/>
         </ikw:SimpleStackPanel>

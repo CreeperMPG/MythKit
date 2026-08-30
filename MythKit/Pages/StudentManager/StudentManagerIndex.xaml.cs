@@ -884,5 +884,32 @@ namespace MythKit.Pages.StudentManager
                 successDialog.ShowAsync();
             }
         }
+
+        private void ClearPassword_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                WriteRegistryValue(Registry.CurrentUser, "Software\\", "n", "92bf4bdc8277b626e73074ea254f02bcabb989ab7b970d00829dc7ff89533e60"); // SHA256('114514' + 'bfdshgs')
+                Modern.ContentDialog successDialog = new Modern.ContentDialog()
+                {
+                    Title = "操作完成",
+                    Content = "成功重置助手密码为 114514",
+                    DefaultButton = Modern.ContentDialogButton.Close,
+                    CloseButtonText = "确认"
+                };
+                successDialog.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                Modern.ContentDialog successDialog = new Modern.ContentDialog()
+                {
+                    Title = "遇到错误",
+                    Content = $"重置助手密码时遇到错误：\n{ex.Message})",
+                    DefaultButton = Modern.ContentDialogButton.Close,
+                    CloseButtonText = "确认"
+                };
+                successDialog.ShowAsync();
+            }
+        }
     }
 }

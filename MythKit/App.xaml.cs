@@ -16,6 +16,7 @@ namespace MythKit
     /// </summary>
     public partial class App : Application
     {
+        public const string VERSION = "1.2.0";
         public static List<string> DecodePrefixedStrings(string data)
         {
             if (data == null)
@@ -77,6 +78,9 @@ namespace MythKit
                     switch (uri.Host.ToLower())
                     {
                         case "attack":
+#if LITE
+                            break;
+#endif
                             // mythkit://attack/recommend
                             if (segments.Count > 0 && segments[0].ToLower() == "recommend")
                             {

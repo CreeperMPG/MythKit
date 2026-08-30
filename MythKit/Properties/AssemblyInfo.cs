@@ -1,16 +1,17 @@
-﻿using System.Reflection;
+﻿using MythKit;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("MythKit")]
+[assembly: AssemblyTitle("Myth Kit")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("HP")]
-[assembly: AssemblyProduct("MythKit")]
-[assembly: AssemblyCopyright("Copyright © HP 2025")]
+[assembly: AssemblyCompany("CreeperMPG")]
+[assembly: AssemblyProduct("Myth Kit")]
+[assembly: AssemblyCopyright("Copyright © CreeperMPG 2025-2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -46,5 +47,5 @@ using System.Windows;
 //      生成号
 //      修订号
 //
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion(App.VERSION)]
+[assembly: AssemblyFileVersion(App.VERSION)]
