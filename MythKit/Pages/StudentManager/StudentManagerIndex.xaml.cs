@@ -716,13 +716,13 @@ namespace MythKit.Pages.StudentManager
                 );
                 result.Add(Tuple.Create("删除启动延迟设置", true, ""));
             }
-            catch (UnauthorizedAccessException ex)
-            {
-                result.Add(Tuple.Create("删除启动延迟设置", false, ex.Message));
-            }
-            catch
+            catch (NullReferenceException)
             {
                 result.Add(Tuple.Create("删除启动延迟设置", true, ""));
+            }
+            catch (Exception ex)
+            {
+                result.Add(Tuple.Create("删除启动延迟设置", false, ex.Message));
             }
 
             // 34. 恢复触摸键盘
@@ -770,6 +770,24 @@ namespace MythKit.Pages.StudentManager
                 result.Add(Tuple.Create("恢复游戏/.NET文件夹隐藏属性", false, ex.Message));
             }
 
+            try
+            {
+                // 37. 恢复 Microsoft Store
+                DeleteRegistryKey(
+                    Registry.LocalMachine,
+                    "SOFTWARE\\Policies\\Microsoft\\WindowsStore",
+                    "RemoveWindowsStore"
+                );
+                result.Add(Tuple.Create("恢复 Microsoft Store", true, ""));
+            }
+            catch (NullReferenceException)
+            {
+                result.Add(Tuple.Create("恢复 Microsoft Store", true, ""));
+            }
+            catch (Exception ex)
+            {
+                result.Add(Tuple.Create("恢复 Microsoft Store", false, ex.Message));
+            }
             return result;
         }
 
@@ -832,6 +850,34 @@ namespace MythKit.Pages.StudentManager
                 {
                     Title = "遇到错误",
                     Content = $"移除对机房管理助手映像劫持时遇到错误：\n{ex.Message})",
+                    DefaultButton = Modern.ContentDialogButton.Close,
+                    CloseButtonText = "确认"
+                };
+                successDialog.ShowAsync();
+            }
+        }
+
+        private void RestartExplorer_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                KillProcessByName("explorer");
+                Process.Start("explorer");
+                Modern.ContentDialog successDialog = new Modern.ContentDialog()
+                {
+                    Title = "操作完成",
+                    Content = "成功重启 Windows 资源管理器",
+                    DefaultButton = Modern.ContentDialogButton.Close,
+                    CloseButtonText = "确认"
+                };
+                successDialog.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                Modern.ContentDialog successDialog = new Modern.ContentDialog()
+                {
+                    Title = "遇到错误",
+                    Content = $"重启 Windows 资源管理器时遇到错误：\n{ex.Message})",
                     DefaultButton = Modern.ContentDialogButton.Close,
                     CloseButtonText = "确认"
                 };
