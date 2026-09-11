@@ -80,9 +80,6 @@
                             </ikw:SimpleStackPanel>
                         </ikw:SimpleStackPanel>
                     </ui:SettingsCard>
-                    <ui:SettingsCard ContentAlignment="Left">
-                        <CheckBox Name="ShowLog" IsChecked="True" Content="显示错误日志" />
-                    </ui:SettingsCard>
                 </ui:SettingsExpander.Items>
             </ui:SettingsExpander>
             <Button Name="StartButton" HorizontalAlignment="Right" Content="开始" Style="{DynamicResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}" Click="StartButton_Click"/>

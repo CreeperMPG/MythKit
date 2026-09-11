@@ -42,5 +42,10 @@ namespace MythKit.Pages.UDPAttack
         {
             LogTextBox.Text = "";
         }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            App.TaskManagerInstance.StopTask(AttackTask);
+        }
     }
 }

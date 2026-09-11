@@ -39,6 +39,14 @@ namespace MythKit.Tasks
                 entry.Cts.Cancel();
             }
         }
+        public void StopTask(IManagedTask task)
+        {
+            var taskEntry = TaskList.FirstOrDefault(t => t.Task == task);
+            if (taskEntry != null)
+            {
+                StopTask(taskEntry.Id);
+            }
+        }
 
         private async Task CleanupTaskAsync(Guid id, Task runningTask)
         {

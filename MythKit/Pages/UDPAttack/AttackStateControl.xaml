@@ -99,6 +99,7 @@
             </ikw:SimpleStackPanel>
             <TextBox Name="LogTextBox" IsReadOnly="True" AcceptsReturn="True" ui:ControlHelper.Header="错误日志" ui:ControlHelper.PlaceholderText="暂无错误日志" />
             <ikw:SimpleStackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button Name="CancelButton" Click="CancelButton_Click" Content="取消任务"/>
                 <Button Name="PauseButton" Click="PauseButton_Click">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
