@@ -15,7 +15,7 @@
 			Margin="48, 24"
 			Spacing="24">
             <ikw:SimpleStackPanel Spacing="8">
-                <TextBlock Text="极域状态" FontWeight="Bold" FontSize="16"/>
+                <TextBlock Text="极域状态" FontWeight="SemiBold" FontSize="20"/>
                 <ItemsControl ItemsSource="{Binding MythwareInstances}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -147,7 +147,7 @@
                 </ItemsControl>
             </ikw:SimpleStackPanel>
             <ikw:SimpleStackPanel Spacing="8" Name="SuggestionsBox">
-                <TextBlock FontWeight="Bold" Text="建议的操作" FontSize="16"/>
+                <TextBlock FontWeight="SemiBold" Text="建议的操作" FontSize="20"/>
                 <WrapPanel Name="SuggestionsPanel" ItemHeight="Auto" SizeChanged="SuggestionsPanel_SizeChanged" ItemWidth="200"/>
             </ikw:SimpleStackPanel>
         </ikw:SimpleStackPanel>

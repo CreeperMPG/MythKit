@@ -19,7 +19,7 @@
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.ProtocolHandler_24_Regular}"/>
                 </ui:NavigationViewItem.Icon>
             </ui:NavigationViewItem>
-            <ui:NavigationViewItem Content="机房管理助手控制" Tag="MythKit.Pages.StudentManager.StudentManagerIndex">
+            <ui:NavigationViewItem Content="限制解除" Tag="MythKit.Pages.RestrictionsRemoving.RestrictionsRemovingIndex">
                 <ui:NavigationViewItem.Icon>
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Window_16_Regular}"/>
                 </ui:NavigationViewItem.Icon>

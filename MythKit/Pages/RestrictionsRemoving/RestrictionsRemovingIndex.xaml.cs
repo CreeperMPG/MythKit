@@ -5,18 +5,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Modern = iNKORE.UI.WPF.Modern.Controls;
 
-namespace MythKit.Pages.StudentManager
+namespace MythKit.Pages.RestrictionsRemoving
 {
     /// <summary>
-    /// StudentManagerIndex.xaml 的交互逻辑
+    /// RestrictionsRemovingIndex.xaml 的交互逻辑
     /// </summary>
-    public partial class StudentManagerIndex : UserControl
+    public partial class RestrictionsRemovingIndex : UserControl
     {
         // 路径缓存值
         private string _jfglzsInstallPath = null;
@@ -105,7 +107,7 @@ namespace MythKit.Pages.StudentManager
             }
             return killed;
         }
-        public StudentManagerIndex()
+        public RestrictionsRemovingIndex()
         {
             InitializeComponent();
             using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
@@ -122,7 +124,7 @@ namespace MythKit.Pages.StudentManager
         {
             Home.Suggestions.AdministratorPermissionSuggestion.ButtonCallback();
         }
-
+        #region 机房管理助手
         private void KillJFGLZS_Click(object sender, RoutedEventArgs e)
         {
             KillProcessByName("jfglzs");
@@ -266,15 +268,7 @@ namespace MythKit.Pages.StudentManager
             // ============================================================
 
             // 5. 恢复开机启动菜单 (F8 安全模式)
-            try
-            {
-                ShellExecute("cmd /c bcdedit /set {bootmgr} displaybootmenu yes");
-                result.Add(Tuple.Create("恢复开机启动菜单", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复开机启动菜单", false, ex.Message));
-            }
+            // REMOVED
 
             // 6. 删除恶意自启动项 (Run 键)
             try
@@ -283,11 +277,11 @@ namespace MythKit.Pages.StudentManager
                 DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "jfglzsn");
                 DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "prozs");
                 DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "jfglzsn");
-                result.Add(Tuple.Create("删除恶意自启动项", true, ""));
+                result.Add(Tuple.Create("删除机房管理助手自启动项", true, ""));
             }
             catch (Exception ex)
             {
-                result.Add(Tuple.Create("删除恶意自启动项", false, ex.Message));
+                result.Add(Tuple.Create("删除机房管理助手自启动项", false, ex.Message));
             }
 
             // ============================================================
@@ -788,6 +782,25 @@ namespace MythKit.Pages.StudentManager
             {
                 result.Add(Tuple.Create("恢复 Microsoft Store", false, ex.Message));
             }
+
+            // 38. 移除 Scancode Map
+            try
+            {
+                DeleteRegistryKey(
+                    Registry.LocalMachine,
+                    "SYSTEM\\CurrentControlSet\\Control\\Keyboard Layout",
+                    "Scancode Map"
+                );
+                result.Add(Tuple.Create("移除键盘映射", true, "修改后可能需要重启电脑"));
+            }
+            catch (NullReferenceException)
+            {
+                result.Add(Tuple.Create("移除键盘映射", true, "修改后可能需要重启电脑"));
+            }
+            catch (Exception ex)
+            {
+                result.Add(Tuple.Create("移除键盘映射", false, ex.Message));
+            }
             return result;
         }
 
@@ -911,5 +924,127 @@ namespace MythKit.Pages.StudentManager
                 successDialog.ShowAsync();
             }
         }
+        #endregion
+        #region 增霸卡密码
+        private string ZBKPassword = null;
+        const uint GENERIC_READ = 0x80000000;
+        const uint GENERIC_WRITE = 0x40000000;
+        const uint FILE_SHARE_READ = 0x00000001;
+        const uint FILE_SHARE_WRITE = 0x00000002;
+        const uint OPEN_EXISTING = 3;
+        static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
+        private string GetZBKPassword()
+        {
+            // https://www.luogu.com.cn/article/bzu60i4t
+            IntPtr hDevice = INVALID_HANDLE_VALUE;
+            ulong baseLBA = 0;
+            uint dwBytesReturned;
+
+            // 1. 遍历物理磁盘，找到存储增霸卡信息的磁盘并获取基地址(LBA)
+            for (int diskIndex = 0; diskIndex < 20; ++diskIndex)
+            {
+                string deviceName = string.Format("\\\\.\\PhysicalDrive{0}", diskIndex);
+                hDevice = NativeMethods.CreateFile(deviceName,
+                                     GENERIC_READ | GENERIC_WRITE,
+                                     FILE_SHARE_READ | FILE_SHARE_WRITE,
+                                     IntPtr.Zero,
+                                     OPEN_EXISTING,
+                                     0,
+                                     IntPtr.Zero);
+
+                if (hDevice == INVALID_HANDLE_VALUE)
+                    continue;
+
+                // 发送 IOCTL_ZENGBA_GET_LBA 控制码 (0x72054) 获取基地址
+                byte[] inBuffer = new byte[8]; // 8字节，初始化为0
+                bool bResult = NativeMethods.DeviceIoControl(hDevice, 0x72054, inBuffer, 8, inBuffer, 8, out dwBytesReturned, IntPtr.Zero);
+
+                if (bResult)
+                {
+                    ulong value = BitConverter.ToUInt64(inBuffer, 0);
+                    if (value != 0)
+                    {
+                        baseLBA = value;
+                        Console.WriteLine("Found Zengba Card data on PhysicalDrive{0}. Base LBA: {1}", diskIndex, baseLBA);
+                        break; // 找到后退出循环，保持hDevice打开
+                    }
+                }
+
+                // 未找到有效数据，关闭句柄继续下一个磁盘
+                NativeMethods.CloseHandle(hDevice);
+                hDevice = INVALID_HANDLE_VALUE;
+            }
+
+            if (baseLBA == 0)
+            {
+                throw new Exception("Error: Could not find a drive with Zengba Card data.");
+            }
+
+            // 2. 读取存储密码的扇区
+            byte[] sectorBuffer = new byte[512];
+            ulong targetLba = baseLBA + 6410;
+
+            // 填充输入缓冲区：前8字节为目标LBA，后4字节为扇区数1
+            byte[] lbaBytes = BitConverter.GetBytes(targetLba);
+            byte[] countBytes = BitConverter.GetBytes((uint)1);
+            Buffer.BlockCopy(lbaBytes, 0, sectorBuffer, 0, 8);
+            Buffer.BlockCopy(countBytes, 0, sectorBuffer, 8, 4);
+
+            // 发送 IOCTL_ZENGBA_READ_SECTOR 控制码 (0x7201C) 读取扇区
+            bool readResult = NativeMethods.DeviceIoControl(hDevice, 0x7201C, sectorBuffer, 512, sectorBuffer, 512, out dwBytesReturned, IntPtr.Zero);
+
+            if (!readResult)
+            {
+                int error = Marshal.GetLastWin32Error();
+                NativeMethods.CloseHandle(hDevice);
+                throw new Exception(string.Format("Error: Failed to read sector. LastError: {0}", error));
+            }
+
+            // 3. 解密数据
+            // 密钥1: 0x48414947 的小端字节序列
+            byte[] key1 = { 0x47, 0x49, 0x41, 0x48 };
+            // 密钥2: 0x55414E47 的小端字节序列
+            byte[] key2 = { 0x47, 0x4E, 0x41, 0x55 };
+            for (int i = 0; i < 4; i++)
+            {
+                sectorBuffer[i] ^= key1[i];
+                sectorBuffer[i + 4] ^= key2[i];
+            }
+
+            // 4. 输出密码
+
+            // 将字节数组转换为字符串，截断至第一个空字符
+            int nullIndex = Array.IndexOf(sectorBuffer, (byte)0, 0, 512);
+            string passwordString = nullIndex >= 0
+                ? Encoding.ASCII.GetString(sectorBuffer, 0, nullIndex)
+                : Encoding.ASCII.GetString(sectorBuffer);
+
+            NativeMethods.CloseHandle(hDevice);
+            return passwordString;
+        }
+
+        private void GetZBKPasswordButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string password = GetZBKPassword();
+                ZBKPasswordBlock.Text = $"密码: {password}";
+                ZBKPassword = password;
+                ZBKPasswordCopyButton.Visibility = Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                ZBKPasswordBlock.Text = $"获取密码失败: {ex.Message}";
+            }
+        }
+
+        private void ZBKPasswordCopyButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ZBKPassword != null)
+            {
+                Clipboard.SetText(ZBKPassword);
+            }
+        }
+        #endregion
     }
 }

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using Modern = iNKORE.UI.WPF.Modern.Controls;
 
-namespace MythKit.Pages.StudentManager
+namespace MythKit.Pages.RestrictionsRemoving
 {
     /// <summary>
     /// RecoverySettingsDialog.xaml 的交互逻辑

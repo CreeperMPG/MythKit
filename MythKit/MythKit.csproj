@@ -117,8 +117,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="Pages\Home\Suggestions\MythKitProtocolSuggestion.cs" />
-    <Compile Include="Pages\StudentManager\RecoverySettingsDialog.xaml.cs">
+    <Compile Include="Pages\RestrictionsRemoving\RecoverySettingsDialog.xaml.cs">
       <DependentUpon>RecoverySettingsDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\TaskManager\Converters\IsRunningOrIdleConverter.cs" />
@@ -170,11 +171,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\StudentManager\RecoverySettingsDialog.xaml">
+    <Page Include="Pages\RestrictionsRemoving\RecoverySettingsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\StudentManager\StudentManagerIndex.xaml">
+    <Page Include="Pages\RestrictionsRemoving\RestrictionsRemovingIndex.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -218,8 +219,8 @@
     </Compile>
     <Compile Include="Pages\Home\SuggestionAttribute.cs" />
     <Compile Include="Pages\Home\Suggestions\AdministratorPermissionSuggestion.cs" />
-    <Compile Include="Pages\StudentManager\StudentManagerIndex.xaml.cs">
-      <DependentUpon>StudentManagerIndex.xaml</DependentUpon>
+    <Compile Include="Pages\RestrictionsRemoving\RestrictionsRemovingIndex.xaml.cs">
+      <DependentUpon>RestrictionsRemovingIndex.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\UDPAttack\AttackPatterns\BlackScreenAttack.xaml.cs">
       <DependentUpon>BlackScreenAttack.xaml</DependentUpon>

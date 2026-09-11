@@ -1,9 +1,9 @@
-﻿<ui:ContentDialog x:Class="MythKit.Pages.StudentManager.RecoverySettingsDialog"
+﻿<ui:ContentDialog x:Class="MythKit.Pages.RestrictionsRemoving.RecoverySettingsDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:MythKit.Pages.StudentManager"
+             xmlns:local="clr-namespace:MythKit.Pages.RestrictionsRemoving"
              xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
              xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
              mc:Ignorable="d" 
@@ -19,6 +19,7 @@
             <ikw:SimpleStackPanel Spacing="8" Name="ResultPanel" Visibility="Collapsed">
                 <TextBlock Text="恢复结果" FontWeight="Bold" FontSize="16"/>
                 <TextBlock Text="若错误较多可尝试以管理员权限重启后重试" Name="AdminPrompt"/>
+                <TextBlock Text="部分功能可能需要重启资源管理器/重启电脑才能完全生效"/>
                 <ItemsControl ItemsSource="{Binding RecoveryResults}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
