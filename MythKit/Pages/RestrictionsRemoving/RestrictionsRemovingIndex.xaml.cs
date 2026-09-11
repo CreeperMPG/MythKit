@@ -20,25 +20,24 @@ namespace MythKit.Pages.RestrictionsRemoving
     /// </summary>
     public partial class RestrictionsRemovingIndex : UserControl
     {
-        // 路径缓存值
-        private string _jfglzsInstallPath = null;
-        public string JFGLZSInstallPath
+        public RestrictionsRemovingIndex()
         {
-            get
+            InitializeComponent();
+            using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
             {
-                if (_jfglzsInstallPath != null)
-                {
-                    return _jfglzsInstallPath;
-                }
-                // 从注册表获取路径
-                const string registryPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
-                _jfglzsInstallPath = Registry.LocalMachine.OpenSubKey(registryPath, false)?.GetValue("prozs", null)?.ToString() ??
-                                     Registry.LocalMachine.OpenSubKey(registryPath, false)?.GetValue("jfglzsn", null)?.ToString() ?? null;
-                _jfglzsInstallPath = Path.GetDirectoryName(_jfglzsInstallPath);
-                return _jfglzsInstallPath;
+                var principal = new System.Security.Principal.WindowsPrincipal(identity);
+                AdminFlag.Visibility = principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator) ? Visibility.Collapsed : Visibility.Visible;
             }
+            JFGLZSPathBlock.Text = $"安装路径：{JFGLZSInstallPath ?? "未找到"}";
+            OpenJFGLZSDirectoryButton.Visibility = (JFGLZSInstallPath == null) ? Visibility.Collapsed : Visibility.Visible;
+            PRZSProcessNameBlock.Text = $"przs.exe 伪装进程名：{GetPRZSCopyProcessName()}.exe（此伪装进程名每日更新一次，用于保护机房管理助手运行）";
         }
-        // 守护进程名
+
+        private void AdminFlag_Click(object sender, RoutedEventArgs e)
+        {
+            Home.Suggestions.AdministratorPermissionSuggestion.ButtonCallback();
+        }
+        #region Visual Basic 随机数生成器 API
         public static int VBMathRandomize(double Number)
         {
             int rndSeed = 327680;
@@ -52,19 +51,8 @@ namespace MythKit.Pages.RestrictionsRemoving
         {
             return (int)((randomizedSeed * 1140671485L + 12820163) & 0xFFFFFF) / 16777216f;
         }
-        public string GetPRZSCopyProcessName()
-        {
-            int seed = DateTime.Now.Month * DateTime.Now.Day;
-            long randomValue = (long)Math.Round((double)VBMathRnd(VBMathRandomize(seed)) * 100000.0 * 3.0 + 1.0);
-            string randomName = "";
-            for (int digitIndex = 1; digitIndex <= 5; digitIndex++)
-            {
-                long charCode = randomValue % 10L + 105L;
-                randomName = char.ToString(Convert.ToChar((int)charCode)) + randomName;
-                randomValue /= 10L;
-            }
-            return randomName;
-        }
+        #endregion
+        #region 注册表/任务 API
         public static void WriteRegistryValue(RegistryKey rootKey, string subKeyPath, string valueName, object targetValue, RegistryValueKind valueKind = RegistryValueKind.String)
         {
             try
@@ -87,11 +75,21 @@ namespace MythKit.Pages.RestrictionsRemoving
                 throw new Exception("写入注册表值时发生错误: " + ex.Message);
             }
         }
-        private void DeleteRegistryKey(RegistryKey registryKey, string path, string subKeyName)
+        private void DeleteRegistryKey(RegistryKey registryKey, string path, string subKeyName, bool throwWhenNotExists = true)
         {
-            RegistryKey subKey = registryKey.OpenSubKey(path, writable: true);
-            subKey.DeleteSubKeyTree(subKeyName, throwOnMissingSubKey: false);
-            subKey.DeleteValue(subKeyName, throwOnMissingValue: false);
+            try
+            {
+                RegistryKey subKey = registryKey.OpenSubKey(path, writable: true);
+                subKey.DeleteSubKeyTree(subKeyName, throwOnMissingSubKey: false);
+                subKey.DeleteValue(subKeyName, throwOnMissingValue: false);
+            }
+            catch (NullReferenceException nfe)
+            {
+                if (throwWhenNotExists)
+                {
+                    throw nfe;
+                }
+            }
         }
         private bool KillProcessByName(string processName)
         {
@@ -107,24 +105,38 @@ namespace MythKit.Pages.RestrictionsRemoving
             }
             return killed;
         }
-        public RestrictionsRemovingIndex()
-        {
-            InitializeComponent();
-            using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
-            {
-                var principal = new System.Security.Principal.WindowsPrincipal(identity);
-                AdminFlag.Visibility = principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator) ? Visibility.Collapsed : Visibility.Visible;
-            }
-            JFGLZSPathBlock.Text = $"安装路径：{JFGLZSInstallPath ?? "未找到"}";
-            OpenJFGLZSDirectoryButton.Visibility = (JFGLZSInstallPath == null) ? Visibility.Collapsed : Visibility.Visible;
-            PRZSProcessNameBlock.Text = $"przs.exe 伪装进程名：{GetPRZSCopyProcessName()}.exe（此伪装进程名每日更新一次，用于保护机房管理助手运行）";
-        }
-
-        private void AdminFlag_Click(object sender, RoutedEventArgs e)
-        {
-            Home.Suggestions.AdministratorPermissionSuggestion.ButtonCallback();
-        }
+        #endregion
         #region 机房管理助手
+        public string GetPRZSCopyProcessName()
+        {
+            int seed = DateTime.Now.Month * DateTime.Now.Day;
+            long randomValue = (long)Math.Round((double)VBMathRnd(VBMathRandomize(seed)) * 100000.0 * 3.0 + 1.0);
+            string randomName = "";
+            for (int digitIndex = 1; digitIndex <= 5; digitIndex++)
+            {
+                long charCode = randomValue % 10L + 105L;
+                randomName = char.ToString(Convert.ToChar((int)charCode)) + randomName;
+                randomValue /= 10L;
+            }
+            return randomName;
+        }
+        private string _jfglzsInstallPath = null; // 路径缓存值
+        public string JFGLZSInstallPath
+        {
+            get
+            {
+                if (_jfglzsInstallPath != null)
+                {
+                    return _jfglzsInstallPath;
+                }
+                // 从注册表获取路径
+                const string registryPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
+                _jfglzsInstallPath = Registry.LocalMachine.OpenSubKey(registryPath, false)?.GetValue("prozs", null)?.ToString() ??
+                                     Registry.LocalMachine.OpenSubKey(registryPath, false)?.GetValue("jfglzsn", null)?.ToString() ?? null;
+                _jfglzsInstallPath = Path.GetDirectoryName(_jfglzsInstallPath);
+                return _jfglzsInstallPath;
+            }
+        }
         private void KillJFGLZS_Click(object sender, RoutedEventArgs e)
         {
             KillProcessByName("jfglzs");
@@ -183,7 +195,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             });
         }
 
-        // https://GitHub.com/CreeperMPG/jfglzs
+        // ref => https://GitHub.com/CreeperMPG/jfglzs
         private List<Tuple<string, bool, string>> RecoverySystem_Background()
         {
             List<Tuple<string, bool, string>> result = new List<Tuple<string, bool, string>>();
@@ -935,7 +947,7 @@ namespace MythKit.Pages.RestrictionsRemoving
         static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
         private string GetZBKPassword()
         {
-            // https://www.luogu.com.cn/article/bzu60i4t
+            // ref => https://www.luogu.com.cn/article/bzu60i4t
             IntPtr hDevice = INVALID_HANDLE_VALUE;
             ulong baseLBA = 0;
             uint dwBytesReturned;
@@ -1043,6 +1055,34 @@ namespace MythKit.Pages.RestrictionsRemoving
             if (ZBKPassword != null)
             {
                 Clipboard.SetText(ZBKPassword);
+            }
+        }
+        #endregion
+
+        #region 基础限制解除
+        private void BasicRR_Settings_ControlPanel_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoControlPanel", false);
+                DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoSettingsPage", false);
+                new Modern.ContentDialog()
+                {
+                    Title = "操作完成",
+                    Content = "已尝试启用设置和控制面板",
+                    DefaultButton = Modern.ContentDialogButton.Close,
+                    CloseButtonText = "确认"
+                }.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                new Modern.ContentDialog()
+                {
+                    Title = "操作失败",
+                    Content = ex.Message,
+                    DefaultButton = Modern.ContentDialogButton.Close,
+                    CloseButtonText = "确认"
+                }.ShowAsync();
             }
         }
         #endregion
