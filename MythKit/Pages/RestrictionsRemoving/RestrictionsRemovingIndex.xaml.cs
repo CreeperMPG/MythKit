@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using MythKit.Properties;
+using MythKit.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -53,45 +54,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             return (int)((randomizedSeed * 1140671485L + 12820163) & 0xFFFFFF) / 16777216f;
         }
         #endregion
-        #region 注册表/任务/服务 API
-        public static void WriteRegistryValue(RegistryKey rootKey, string subKeyPath, string valueName, object targetValue, RegistryValueKind valueKind = RegistryValueKind.String)
-        {
-            try
-            {
-                using (RegistryKey registryKey = rootKey.OpenSubKey(subKeyPath, true))
-                {
-                    if (registryKey == null)
-                    {
-                        using (RegistryKey registryKey2 = rootKey.CreateSubKey(subKeyPath))
-                        {
-                            registryKey2.SetValue(valueName, RuntimeHelpers.GetObjectValue(targetValue), valueKind);
-                            return;
-                        }
-                    }
-                    registryKey.SetValue(valueName, RuntimeHelpers.GetObjectValue(targetValue), valueKind);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("写入注册表值时发生错误: " + ex.Message);
-            }
-        }
-        private void DeleteRegistryKey(RegistryKey registryKey, string path, string subKeyName, bool throwWhenNotExists = true)
-        {
-            try
-            {
-                RegistryKey subKey = registryKey.OpenSubKey(path, writable: true);
-                subKey.DeleteSubKeyTree(subKeyName, throwOnMissingSubKey: false);
-                subKey.DeleteValue(subKeyName, throwOnMissingValue: false);
-            }
-            catch (NullReferenceException nfe)
-            {
-                if (throwWhenNotExists)
-                {
-                    throw nfe;
-                }
-            }
-        }
+        #region 任务/服务 API
         private bool KillProcessByName(string processName)
         {
             bool killed = false;
@@ -106,22 +69,32 @@ namespace MythKit.Pages.RestrictionsRemoving
             }
             return killed;
         }
-        public static void StopService(string serviceName, int timeoutMs = 30000)
+        public static void StopService(string serviceName, int timeoutMs = 30000, bool throwWhenFail = true)
         {
-            var sc = new ServiceController(serviceName);
-
-            if (sc.Status == ServiceControllerStatus.Stopped ||
-                sc.Status == ServiceControllerStatus.StopPending)
+            try
             {
-                return;
+                var sc = new ServiceController(serviceName);
+
+                if (sc.Status == ServiceControllerStatus.Stopped ||
+                    sc.Status == ServiceControllerStatus.StopPending)
+                {
+                    return;
+                }
+
+                if (!sc.CanStop)
+                    throw new InvalidOperationException($"服务 {serviceName} 不支持停止。");
+
+                sc.Stop();
+
+                sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(timeoutMs));
             }
-
-            if (!sc.CanStop)
-                throw new InvalidOperationException($"服务 {serviceName} 不支持停止。");
-
-            sc.Stop();
-
-            sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(timeoutMs));
+            catch (Exception ex)
+            {
+                if (throwWhenFail)
+                {
+                    throw ex;
+                }
+            }
         }
         #endregion
         #region 机房管理助手
@@ -219,7 +192,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 1. 恢复命令提示符 (CMD)
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Software\\Policies\\Microsoft\\Windows\\System",
                     "DisableCMD",
@@ -236,7 +209,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 2. 恢复注册表编辑器
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
                     "DisableRegistryTools",
@@ -253,7 +226,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 3. 恢复运行对话框 (Win+R)
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
                     "NoRun",
@@ -274,7 +247,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 4. 恢复锁屏 (Win+L)
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
                     "DisableLockWorkstation",
@@ -298,10 +271,10 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 6. 删除恶意自启动项 (Run 键)
             try
             {
-                DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "prozs");
-                DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "jfglzsn");
-                DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "prozs");
-                DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "jfglzsn");
+                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "prozs");
+                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "jfglzsn");
+                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "prozs");
+                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "jfglzsn");
                 result.Add(Tuple.Create("删除机房管理助手自启动项", true, ""));
             }
             catch (Exception ex)
@@ -316,28 +289,28 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 7. 启用 USB 存储 (Start=3 手动)
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SYSTEM\\CurrentControlSet\\Services\\usbstor",
                     "Start",
                     3,
                     RegistryValueKind.DWord
                 );
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SYSTEM\\ControlSet001\\Services\\usbstor",
                     "Start",
                     3,
                     RegistryValueKind.DWord
                 );
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SYSTEM\\ControlSet002\\Services\\usbstor",
                     "Start",
                     3,
                     RegistryValueKind.DWord
                 );
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SYSTEM\\ControlSet003\\Services\\usbstor",
                     "Start",
@@ -358,7 +331,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 8. 恢复文件夹选项
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
                     "NoFolderOptions",
@@ -375,7 +348,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 9. 恢复"显示隐藏文件"选项
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\Folder\\Hidden\\SHOWALL",
                     "CheckedValue",
@@ -392,7 +365,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 10. 恢复任务栏右键菜单
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
                     "NoTrayContextMenu",
@@ -409,7 +382,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 11. 恢复任务视图按钮 (Win+Tab)
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
                     "ShowTaskViewButton",
@@ -431,7 +404,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             try
             {
                 // 12. IE 恢复文件下载 (1803=0 允许下载)
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\3",
                     "1803",
@@ -440,7 +413,7 @@ namespace MythKit.Pages.RestrictionsRemoving
                 );
 
                 // 13. IE 恢复文件打开 (2200=0 允许打开)
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\3",
                     "2200",
@@ -449,7 +422,7 @@ namespace MythKit.Pages.RestrictionsRemoving
                 );
 
                 // 14. IE 恢复"另存为"
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Software\\Policies\\Microsoft\\Internet Explorer\\Restrictions",
                     "NoBrowserSaveAs",
@@ -472,7 +445,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             try
             {
                 // 15. Edge 恢复下载
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SOFTWARE\\Policies\\Microsoft\\Edge",
                     "DownloadRestrictions",
@@ -481,7 +454,7 @@ namespace MythKit.Pages.RestrictionsRemoving
                 );
 
                 // 16. Edge 恢复另存为
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SOFTWARE\\Policies\\Microsoft\\Edge",
                     "SaveAs",
@@ -490,7 +463,7 @@ namespace MythKit.Pages.RestrictionsRemoving
                 );
 
                 // 17. Edge 恢复开发者工具 (F12)
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SOFTWARE\\Policies\\Microsoft\\Edge",
                     "DeveloperToolsAvailability",
@@ -512,7 +485,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             try
             {
                 // 18. Chrome 恢复下载
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SOFTWARE\\Policies\\Google\\Chrome",
                     "DownloadRestrictions",
@@ -521,7 +494,7 @@ namespace MythKit.Pages.RestrictionsRemoving
                 );
 
                 // 19. Chrome 恢复另存为
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SOFTWARE\\Policies\\Google\\Chrome",
                     "SaveAs",
@@ -530,7 +503,7 @@ namespace MythKit.Pages.RestrictionsRemoving
                 );
 
                 // 20. Chrome 恢复开发者工具 (F12)
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SOFTWARE\\Policies\\Google\\Chrome",
                     "DeveloperToolsAvailability",
@@ -552,7 +525,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             try
             {
                 // 21. Firefox 恢复下载
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SOFTWARE\\Policies\\Mozilla\\Firefox",
                     "DisableDownloads",
@@ -561,7 +534,7 @@ namespace MythKit.Pages.RestrictionsRemoving
                 );
 
                 // 22. Firefox 恢复 about:downloads 页面
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SOFTWARE\\Policies\\Mozilla\\Firefox",
                     "BlockAboutDownloads",
@@ -570,7 +543,7 @@ namespace MythKit.Pages.RestrictionsRemoving
                 );
 
                 // 23. Firefox 恢复开发者工具
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SOFTWARE\\Policies\\Mozilla\\Firefox",
                     "DeveloperToolsAvailability",
@@ -592,10 +565,10 @@ namespace MythKit.Pages.RestrictionsRemoving
             try
             {
                 // 24. 删除 Chrome 组策略
-                DeleteRegistryKey(Registry.LocalMachine, "Software\\Policies\\Google", "Chrome");
+                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "Software\\Policies\\Google", "Chrome");
 
                 // 25. 删除 Edge 组策略
-                DeleteRegistryKey(Registry.LocalMachine, "Software\\Policies\\Microsoft", "Edge");
+                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "Software\\Policies\\Microsoft", "Edge");
 
                 result.Add(Tuple.Create("删除浏览器组策略", true, ""));
             }
@@ -612,7 +585,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             try
             {
                 // 26. 恢复 IPv6
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.LocalMachine,
                     "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
                     "DisabledComponents",
@@ -662,7 +635,7 @@ namespace MythKit.Pages.RestrictionsRemoving
 
                 foreach (string keyName in ifeoKeys)
                 {
-                    DeleteRegistryKey(Registry.LocalMachine, ifeoPath, keyName);
+                    RegUtils.DeleteRegistryKey(Registry.LocalMachine, ifeoPath, keyName);
                 }
 
                 result.Add(Tuple.Create("删除被劫持的系统工具/内置游戏", true, ""));
@@ -679,7 +652,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 30. 删除强制结束任务设置
             try
             {
-                DeleteRegistryKey(
+                RegUtils.DeleteRegistryKey(
                     Registry.CurrentUser,
                     "Control Panel\\Desktop",
                     "AutoEndTasks"
@@ -694,7 +667,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 31. 恢复应用程序超时 (3000ms)
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Control Panel\\Desktop",
                     "HungAppTimeout",
@@ -711,7 +684,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 32. 恢复进程结束超时 (10000ms)
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Control Panel\\Desktop",
                     "WaitToKillAppTimeout",
@@ -728,7 +701,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 33. 删除启动延迟设置
             try
             {
-                DeleteRegistryKey(
+                RegUtils.DeleteRegistryKey(
                     Registry.CurrentUser,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
                     "StartupDelayInMSec"
@@ -747,7 +720,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 34. 恢复触摸键盘
             try
             {
-                WriteRegistryValue(
+                RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "SOFTWARE\\Microsoft\\TabletTip\\1.7",
                     "TipbandDesiredVisibility",
@@ -792,7 +765,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             try
             {
                 // 37. 恢复 Microsoft Store
-                DeleteRegistryKey(
+                RegUtils.DeleteRegistryKey(
                     Registry.LocalMachine,
                     "SOFTWARE\\Policies\\Microsoft\\WindowsStore",
                     "RemoveWindowsStore"
@@ -811,7 +784,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             // 38. 移除 Scancode Map
             try
             {
-                DeleteRegistryKey(
+                RegUtils.DeleteRegistryKey(
                     Registry.LocalMachine,
                     "SYSTEM\\CurrentControlSet\\Control\\Keyboard Layout",
                     "Scancode Map"
@@ -842,8 +815,8 @@ namespace MythKit.Pages.RestrictionsRemoving
             try
             {
                 string ifeoPath = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
-                WriteRegistryValue(Registry.LocalMachine, ifeoPath + "jfglzsn.exe", "Debugger", "null");
-                WriteRegistryValue(Registry.LocalMachine, ifeoPath + "jfglzs.exe", "Debugger", "null");
+                RegUtils.WriteRegistryValue(Registry.LocalMachine, ifeoPath + "jfglzsn.exe", "Debugger", "null");
+                RegUtils.WriteRegistryValue(Registry.LocalMachine, ifeoPath + "jfglzs.exe", "Debugger", "null");
                 Modern.ContentDialog successDialog = new Modern.ContentDialog()
                 {
                     Title = "操作完成",
@@ -871,8 +844,8 @@ namespace MythKit.Pages.RestrictionsRemoving
             try
             {
                 string ifeoPath = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
-                DeleteRegistryKey(Registry.LocalMachine, ifeoPath, "jfglzsn.exe");
-                DeleteRegistryKey(Registry.LocalMachine, ifeoPath, "jfglzs.exe");
+                RegUtils.DeleteRegistryKey(Registry.LocalMachine, ifeoPath, "jfglzsn.exe");
+                RegUtils.DeleteRegistryKey(Registry.LocalMachine, ifeoPath, "jfglzs.exe");
                 Modern.ContentDialog successDialog = new Modern.ContentDialog()
                 {
                     Title = "操作完成",
@@ -927,7 +900,7 @@ namespace MythKit.Pages.RestrictionsRemoving
         {
             try
             {
-                WriteRegistryValue(Registry.CurrentUser, "Software\\", "n", "92bf4bdc8277b626e73074ea254f02bcabb989ab7b970d00829dc7ff89533e60"); // SHA256('114514' + 'bfdshgs')
+                RegUtils.WriteRegistryValue(Registry.CurrentUser, "Software\\", "n", "92bf4bdc8277b626e73074ea254f02bcabb989ab7b970d00829dc7ff89533e60"); // SHA256('114514' + 'bfdshgs')
                 Modern.ContentDialog successDialog = new Modern.ContentDialog()
                 {
                     Title = "操作完成",
@@ -1076,8 +1049,8 @@ namespace MythKit.Pages.RestrictionsRemoving
         {
             try
             {
-                DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoControlPanel", false);
-                DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoSettingsPage", false);
+                RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoControlPanel", false);
+                RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoSettingsPage", false);
                 new Modern.ContentDialog()
                 {
                     Title = "操作完成",
@@ -1102,8 +1075,8 @@ namespace MythKit.Pages.RestrictionsRemoving
             try
             {
                 KillProcessByName("MasterHelper");
-                StopService("TDFileFilter");
-                StopService("TDNetFilter");
+                StopService("TDFileFilter", 3000, false);
+                StopService("TDNetFilter", 3000, false);
                 new Modern.ContentDialog()
                 {
                     Title = "操作完成",
