@@ -163,7 +163,7 @@ namespace MythKit.Pages.UDPAttack
                         AttackPacket packets = null; string errorMessage = "";
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            packets = Config.AttackPattern.ConstructPacket(ref errorMessage, targetIP.ToString(), CurrentCycle, CurrentGroup);
+                            packets = Config.AttackPattern.ConstructPacket(ref errorMessage, targetIP, CurrentCycle, CurrentGroup);
                         });
                         for (int packetCount = 0; packetCount < packets.AttackPackets.Count; packetCount++)
                         {

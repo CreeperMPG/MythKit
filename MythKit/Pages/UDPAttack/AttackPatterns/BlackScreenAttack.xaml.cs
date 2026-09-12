@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,7 +29,7 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
         public string AttackName => "黑屏安静";
         public string AttackId => "black_screen";
         public AttackTarget Target => AttackTarget.Student;
-        public AttackPacket ConstructPacket(ref string message, string ip, int cycleCount, int groupCount)
+        public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
         {
             byte[] packetBlack = new byte[55]
             {

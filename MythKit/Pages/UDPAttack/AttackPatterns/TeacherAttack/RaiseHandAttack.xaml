@@ -8,10 +8,14 @@
              xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Slider
-        Name="RaiseHandInterval"
-        Minimum="1"
-        ui:ControlHelper.Header="举手间隔（毫秒）"
-        Maximum="1000"
-        Value="500" />
+    <ikw:SimpleStackPanel Spacing="16">
+        <TextBlock Text="这是针对教师端的攻击类型，请填写教师端 IP。"/>
+        <Slider
+            Name="RaiseHandInterval"
+            Minimum="1"
+            ui:ControlHelper.Header="举手间隔（毫秒）"
+            Maximum="1000"
+            Value="500" />
+        <ui:NumberBox Value="1" SpinButtonPlacementMode="Inline" Minimum="1" Maximum="32" MinWidth="100" ui:ControlHelper.Header="极域频道" Name="TDChannelID"/>
+    </ikw:SimpleStackPanel>
 </UserControl>

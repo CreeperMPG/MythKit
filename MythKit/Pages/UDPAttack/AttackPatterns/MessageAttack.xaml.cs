@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Windows.Controls;
 
@@ -19,7 +20,7 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
         public string AttackName => "发送消息";
         public string AttackId => "send_message";
         public AttackTarget Target => AttackTarget.Student;
-        public AttackPacket ConstructPacket(ref string message, string ip, int cycleCount, int groupCount)
+        public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
         {
             byte[] packet;
             using (MemoryStream memoryStream = new MemoryStream())
@@ -48,7 +49,7 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
                 memoryStream.Write(payloadBytes, 0, payloadBytes.Length);
 
                 // Command text bytes
-                byte[] commandTextBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Message.Text, ip, cycleCount, groupCount));
+                byte[] commandTextBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Message.Text, ip.ToString(), cycleCount, groupCount));
                 memoryStream.Write(commandTextBytes, 0, commandTextBytes.Length);
 
                 int currentPacketLength = (int)memoryStream.Length;
