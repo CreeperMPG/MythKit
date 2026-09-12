@@ -48,7 +48,7 @@ namespace MythKit.Utils
                 }
             }
         }
-        public static object GetRegistryValue(RegistryKey rootKey, string subKeyPath, string valueName)
+        public static object GetRegistryValue(RegistryKey rootKey, string subKeyPath, string valueName, bool throwOnFailure = true)
         {
             try
             {
@@ -59,7 +59,11 @@ namespace MythKit.Utils
             }
             catch (Exception ex)
             {
-                throw new Exception("读取注册表值时发生错误: " + ex.Message);
+                if (throwOnFailure)
+                {
+                    throw new Exception("读取注册表值时发生错误: " + ex.Message);
+                }
+                return null;
             }
         }
     }

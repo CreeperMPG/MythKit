@@ -42,7 +42,7 @@
                 <ui:InfoBar Message="学生机房管理助手通过密码集中控制，能批量禁用U盘、禁止软件运行、锁定屏幕，并拥有顽固自启动和自恢复能力。&#13;&#10;Tip: 钟鸣（学生机房管理助手作者），号称绿色无毒，却通过篡改浏览器主页为2345主页每月收入超万元以上。" IsOpen="True" Visibility="{Binding IsOpen, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <ui:InfoBar Message="此部分功能为学生机房管理助手 v13.1 设计，其它版本可能不适用。" IsOpen="True" IsClosable="False"/>
                 <ui:ScrollViewerEx HorizontalScrollBarVisibility="Auto">
-                    <ikw:SimpleStackPanel Spacing="12">
+                    <ikw:SimpleStackPanel Spacing="12" Margin="0,0,0,14">
                         <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="8">
                             <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Folder_20_Regular}" FontSize="20" />
                             <TextBlock Name="JFGLZSPathBlock" FontSize="14" VerticalAlignment="Center"/>

@@ -192,12 +192,8 @@ namespace MythKit.Pages.Home
         private string TDPassword = null;
         private string GetTDPassword()
         {
-            object registryValue = RegUtils.GetRegistryValue(Registry.CurrentUser, "SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class Standard\\1.00", "UninstallPasswd");
-            if (registryValue == null)
-            {
-                throw new Exception("未找到注册表项");
-            }
-            if (registryValue.ToString() != "Passwd[123456]")
+            object registryValue = RegUtils.GetRegistryValue(Registry.CurrentUser, "SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class Standard\\1.00", "UninstallPasswd", false);
+            if (registryValue != null && registryValue.ToString() != "Passwd[123456]")
             {
                 // 极域低版本，密码格式 Passwd<xxxxxx>
                 return registryValue.ToString().Substring(6);
@@ -206,7 +202,9 @@ namespace MythKit.Pages.Home
             {
                 // 高版本加密密码
                 // ref => https://github.com/imengyu/JiYuTrainer
-                byte[] buffer = RegUtils.GetRegistryValue(Registry.CurrentUser, "SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class\\Student", "Knock1") as byte[];
+                byte[] knock = RegUtils.GetRegistryValue(Registry.LocalMachine, "SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class\\Student", "Knock", false) as byte[];
+                byte[] knock1 = RegUtils.GetRegistryValue(Registry.LocalMachine, "SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class\\Student", "Knock1", false) as byte[];
+                byte[] buffer = knock != null ? knock : knock1;
                 // 原 C++ 代码中分别异或了 0x50434C45 和 0x454C4350
                 // 0x50434C45 ^ 0x454C4350 = 0x150F0F15
                 uint xorMask = 0x150F0F15;
