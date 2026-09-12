@@ -48,5 +48,19 @@ namespace MythKit.Utils
                 }
             }
         }
+        public static object GetRegistryValue(RegistryKey rootKey, string subKeyPath, string valueName)
+        {
+            try
+            {
+                using (RegistryKey registryKey = rootKey.OpenSubKey(subKeyPath))
+                {
+                    return registryKey.GetValue(valueName);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("读取注册表值时发生错误: " + ex.Message);
+            }
+        }
     }
 }

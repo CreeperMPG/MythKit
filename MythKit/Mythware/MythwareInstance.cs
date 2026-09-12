@@ -96,20 +96,13 @@ namespace MythKit.Mythware
         {
             ObservableHashSet<MythwareInstance> result = new ObservableHashSet<MythwareInstance>();
             // Get the Mythware installation path from the registry
-            using (RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class Standard\\1.00"))
+            try
             {
-                bool isRegistryKeyAvailable = registryKey != null;
-                if (isRegistryKeyAvailable)
-                {
-                    object registryValue = registryKey.GetValue("TargetDirectory");
-                    bool isRegistryValueAvailable = registryValue != null;
-                    if (isRegistryValueAvailable)
-                    {
-                        string targetDirectoryPath = Path.Combine(registryValue.ToString(), "StudentMain.exe");
-                        result.Add(new MythwareInstance(targetDirectoryPath));
-                    }
-                }
+                var registryValue = RegUtils.GetRegistryValue(Registry.LocalMachine, "SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class Standard\\1.00", "TargetDirectory");
+                string targetDirectoryPath = Path.Combine(registryValue.ToString(), "StudentMain.exe");
+                result.Add(new MythwareInstance(targetDirectoryPath));
             }
+            catch { }
             // With its running process
             var processes = Process.GetProcessesByName("StudentMain");
             foreach (var process in processes)
