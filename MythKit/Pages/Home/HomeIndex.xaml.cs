@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using MythKit.Mythware;
 using MythKit.Pages.About;
 using MythKit.Pages.TaskManager;
+using MythKit.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -184,6 +186,74 @@ namespace MythKit.Pages.Home
                 {
                     Process.Start("explorer.exe", $@"/select, ""{path}""");
                 }
+            }
+        }
+
+        private string TDPassword = null;
+        private string GetTDPassword()
+        {
+            object registryValue = RegUtils.GetRegistryValue(Registry.CurrentUser, "SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class Standard\\1.00", "UninstallPasswd");
+            if (registryValue == null)
+            {
+                throw new Exception("未找到注册表项");
+            }
+            if (registryValue.ToString() != "Passwd[123456]")
+            {
+                // 极域低版本，密码格式 Passwd<xxxxxx>
+                return registryValue.ToString().Substring(6);
+            }
+            else
+            {
+                // 高版本加密密码
+                // ref => https://github.com/imengyu/JiYuTrainer
+                byte[] buffer = RegUtils.GetRegistryValue(Registry.CurrentUser, "SOFTWARE\\Wow6432Node\\TopDomain\\e-Learning Class\\Student", "Knock1") as byte[];
+                // 原 C++ 代码中分别异或了 0x50434C45 和 0x454C4350
+                // 0x50434C45 ^ 0x454C4350 = 0x150F0F15
+                uint xorMask = 0x150F0F15;
+                for (int i = 0; i <= buffer.Length - 4; i += 4)
+                {
+                    uint val = BitConverter.ToUInt32(buffer, i);
+                    val ^= xorMask;
+                    byte[] decryptedDword = BitConverter.GetBytes(val);
+                    Array.Copy(decryptedDword, 0, buffer, i, 4);
+                }
+
+                // 获取宽字符串的偏移量
+                byte offset = buffer[0];
+                if (offset >= buffer.Length)
+                    return null;
+
+                // 提取 UTF-16LE 字符串，直到遇到 \0\0 终止符
+                int maxBytes = buffer.Length - offset;
+                int charCount = 0;
+                while (charCount + 1 < maxBytes)
+                {
+                    // 检查是否到达宽字符空终止符 (\0\0)
+                    if (buffer[offset + charCount] == 0 && buffer[offset + charCount + 1] == 0)
+                        break;
+                    charCount += 2;
+                }
+                return Encoding.Unicode.GetString(buffer, offset, charCount);
+            }
+        }
+        private void TDPasswordCopyButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (TDPassword != null)
+                Clipboard.SetText(TDPassword);
+        }
+
+        private void GetTDPasswordButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string password = GetTDPassword();
+                TDPasswordBlock.Text = $"密码: {password}";
+                TDPassword = password;
+                TDPasswordCopyButton.Visibility = Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                TDPasswordBlock.Text = $"获取密码失败: {ex.Message}";
             }
         }
     }

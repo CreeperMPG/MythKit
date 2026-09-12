@@ -145,6 +145,15 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                <ikw:SimpleStackPanel Spacing="8" Orientation="Horizontal">
+                    <Button Name="GetTDPasswordButton" Content="尝试获取极域密码" Click="GetTDPasswordButton_Click"/>
+                    <TextBlock Name="TDPasswordBlock" FontSize="14" VerticalAlignment="Center"/>
+                    <Button Name="TDPasswordCopyButton" Click="TDPasswordCopyButton_Click" Visibility="Collapsed">
+                        <Button.Content>
+                            <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Copy_16_Regular}" FontSize="16" />
+                        </Button.Content>
+                    </Button>
+                </ikw:SimpleStackPanel>
             </ikw:SimpleStackPanel>
             <ikw:SimpleStackPanel Spacing="8" Name="SuggestionsBox">
                 <TextBlock FontWeight="SemiBold" Text="建议的操作" FontSize="20"/>
