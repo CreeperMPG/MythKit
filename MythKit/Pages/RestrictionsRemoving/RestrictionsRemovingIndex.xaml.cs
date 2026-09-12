@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -52,7 +53,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             return (int)((randomizedSeed * 1140671485L + 12820163) & 0xFFFFFF) / 16777216f;
         }
         #endregion
-        #region 注册表/任务 API
+        #region 注册表/任务/服务 API
         public static void WriteRegistryValue(RegistryKey rootKey, string subKeyPath, string valueName, object targetValue, RegistryValueKind valueKind = RegistryValueKind.String)
         {
             try
@@ -105,6 +106,23 @@ namespace MythKit.Pages.RestrictionsRemoving
             }
             return killed;
         }
+        public static void StopService(string serviceName, int timeoutMs = 30000)
+        {
+            var sc = new ServiceController(serviceName);
+
+            if (sc.Status == ServiceControllerStatus.Stopped ||
+                sc.Status == ServiceControllerStatus.StopPending)
+            {
+                return;
+            }
+
+            if (!sc.CanStop)
+                throw new InvalidOperationException($"服务 {serviceName} 不支持停止。");
+
+            sc.Stop();
+
+            sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromMilliseconds(timeoutMs));
+        }
         #endregion
         #region 机房管理助手
         public string GetPRZSCopyProcessName()
@@ -142,15 +160,10 @@ namespace MythKit.Pages.RestrictionsRemoving
             KillProcessByName("jfglzs");
             KillProcessByName("jfglzsn");
             KillProcessByName(GetPRZSCopyProcessName());
-            System.ServiceProcess.ServiceController zmserv = new System.ServiceProcess.ServiceController("zmserv");
             string exceptionInfo = null;
             try
             {
-                if (zmserv.Status == System.ServiceProcess.ServiceControllerStatus.Running)
-                {
-                    zmserv.Stop();
-                    zmserv.WaitForStatus(System.ServiceProcess.ServiceControllerStatus.Stopped);
-                }
+                StopService("zmserv");
                 KillProcessByName("zmserv");
             }
             catch (Exception ex)
@@ -1058,7 +1071,6 @@ namespace MythKit.Pages.RestrictionsRemoving
             }
         }
         #endregion
-
         #region 基础限制解除
         private void BasicRR_Settings_ControlPanel_Click(object sender, RoutedEventArgs e)
         {
@@ -1070,6 +1082,32 @@ namespace MythKit.Pages.RestrictionsRemoving
                 {
                     Title = "操作完成",
                     Content = "已尝试启用设置和控制面板",
+                    DefaultButton = Modern.ContentDialogButton.Close,
+                    CloseButtonText = "确认"
+                }.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                new Modern.ContentDialog()
+                {
+                    Title = "操作失败",
+                    Content = ex.Message,
+                    DefaultButton = Modern.ContentDialogButton.Close,
+                    CloseButtonText = "确认"
+                }.ShowAsync();
+            }
+        }
+        private void BasicRR_TDNet_File_Filter_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                KillProcessByName("MasterHelper");
+                StopService("TDFileFilter");
+                StopService("TDNetFilter");
+                new Modern.ContentDialog()
+                {
+                    Title = "操作完成",
+                    Content = "已尝试关闭极域U盘/网络过滤器",
                     DefaultButton = Modern.ContentDialogButton.Close,
                     CloseButtonText = "确认"
                 }.ShowAsync();
