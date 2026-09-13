@@ -16,7 +16,7 @@ namespace MythKit
     /// </summary>
     public partial class App : Application
     {
-        public const string VERSION = "1.2.1";
+        public const string VERSION = "1.2.2";
         public static List<string> DecodePrefixedStrings(string data)
         {
             if (data == null)
