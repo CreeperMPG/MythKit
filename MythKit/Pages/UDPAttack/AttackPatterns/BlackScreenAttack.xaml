@@ -10,5 +10,6 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <ikw:SimpleStackPanel Spacing="16">
         <ui:ToggleSwitch Name="OpenCloseSwitch" ui:ControlHelper.Header="开启 / 关闭黑屏安静"/>
+        <ui:NumberBox Value="1" SpinButtonPlacementMode="Inline" Minimum="1" Maximum="32" MinWidth="100" ui:ControlHelper.Header="极域频道" Name="TDChannelID"/>
     </ikw:SimpleStackPanel>
 </UserControl>
