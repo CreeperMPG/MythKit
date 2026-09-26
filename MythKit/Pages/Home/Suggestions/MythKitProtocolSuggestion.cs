@@ -7,42 +7,6 @@ using System.Windows;
 
 namespace MythKit.Pages.Home.Suggestions
 {
-    public static class UriProtocolRegistrar
-    {
-        public static bool IsProtocolRegisteredForCurrentUser(string scheme)
-        {
-            using (var key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{scheme}"))
-            {
-                return key != null;
-            }
-        }
-        public static void RegisterForCurrentUser(string scheme, string appPath, string description = "")
-        {
-            string keyPath = $@"Software\Classes\{scheme}";
-            using (var rootKey = Registry.CurrentUser.CreateSubKey(keyPath))
-            {
-                // 设置默认描述
-                rootKey.SetValue("", string.IsNullOrEmpty(description) ? $"URL:{scheme}" : description);
-                // 标记为 URL 协议（必须）
-                rootKey.SetValue("URL Protocol", "");
-
-                // 可选：设置默认图标（使用 EXE 第一个图标）
-                using (var iconKey = rootKey.CreateSubKey("DefaultIcon"))
-                {
-                    iconKey.SetValue("", $"{appPath},0");
-                }
-
-                // 设置启动命令（必须带 "%1" 以接收完整 URI）
-                using (var shellKey = rootKey.CreateSubKey("shell"))
-                using (var openKey = shellKey.CreateSubKey("open"))
-                using (var commandKey = openKey.CreateSubKey("command"))
-                {
-                    // 路径中含空格必须加引号
-                    commandKey.SetValue("", $"\"{appPath}\" \"%1\"");
-                }
-            }
-        }
-    }
     [Suggestion(
         "启用协议链接",
         "当前系统未注册 mythkit:// 协议，点击后可一键注册，方便从浏览器或外部调用本应用。",
@@ -52,9 +16,16 @@ namespace MythKit.Pages.Home.Suggestions
     )]
     internal static class MythKitProtocolSuggestion
     {
+        public static bool IsProtocolRegisteredForCurrentUser(string scheme)
+        {
+            using (var key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{scheme}"))
+            {
+                return key != null;
+            }
+        }
         public static bool IsEnabled()
         {
-            return !UriProtocolRegistrar.IsProtocolRegisteredForCurrentUser("mythkit");
+            return !IsProtocolRegisteredForCurrentUser("mythkit");
         }
 
         public static void ButtonCallback()

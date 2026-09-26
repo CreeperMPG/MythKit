@@ -58,6 +58,20 @@
                     </ui:SettingsCard>
                 </ui:SettingsExpander.Items>
             </ui:SettingsExpander>
+            <ui:SettingsExpander Header="更多选项" IsEnabled="True" IsExpanded="True">
+                <ui:SettingsExpander.HeaderIcon>
+                    <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.MoreCircle_20_Regular}" />
+                </ui:SettingsExpander.HeaderIcon>
+                <ui:SettingsExpander.Items>
+                    <ui:SettingsCard ContentAlignment="Left">
+                        <ui:SettingsCard.Content>
+                            <ikw:SimpleStackPanel>
+                                <Button Content="取消注册 mythkit:// URI" Name="CancelMythKitURIButton" Click="CancelMythKitURIButton_Click"/>
+                            </ikw:SimpleStackPanel>
+                        </ui:SettingsCard.Content>
+                    </ui:SettingsCard>
+                </ui:SettingsExpander.Items>
+            </ui:SettingsExpander>
         </ikw:SimpleStackPanel>
     </ui:ScrollViewerEx>
 </UserControl>

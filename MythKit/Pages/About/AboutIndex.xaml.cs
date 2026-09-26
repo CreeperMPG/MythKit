@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using iNKORE.UI.WPF.Modern.Controls;
+using Microsoft.Win32;
+using MythKit.Utils;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -62,6 +65,18 @@ namespace MythKit.Pages.About
             VersionInfoBlock.Text += " (轻量版)";
             VersionInfo.Description = "轻量版不支持部分功能。";
 #endif
+        }
+
+        private void CancelMythKitURIButton_Click(object sender, RoutedEventArgs e)
+        {
+            RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Classes", "mythkit");
+            var successDialog = new ContentDialog
+            {
+                Title = "取消注册完成",
+                Content = "mythkit:// 协议已取消注册。",
+                CloseButtonText = "确定"
+            };
+            successDialog.ShowAsync();
         }
     }
 }
