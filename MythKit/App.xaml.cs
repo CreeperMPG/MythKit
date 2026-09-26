@@ -65,7 +65,7 @@ namespace MythKit
             }
 
             string[] args = Environment.GetCommandLineArgs();
-            SingleInstanceManager.OtherInstanceStarted += SingleInstanceManager_OtherInstanceStarted;
+            HomePage.HomePageLoadedEvent += () => SingleInstanceManager.OtherInstanceStarted += SingleInstanceManager_OtherInstanceStarted;
 
             foreach (string arg in args)
             {
@@ -76,18 +76,17 @@ namespace MythKit
                 }
             }
 
-            MainWindow = new MainWindow();
-            MainWindow.Show();
-
             if (!string.IsNullOrEmpty(_activatedUri))
             {
                 try
                 {
                     Uri uri = new Uri(_activatedUri);
-                    ProcessUri(uri);
+                    HomePage.HomePageLoadedEvent += () => ProcessUri(uri);
                 }
                 catch { }
             }
+            MainWindow = new MainWindow();
+            MainWindow.Show();
         }
         public static void BringToFront(Window window)
         {
@@ -137,14 +136,13 @@ namespace MythKit
                         string targetIPs = paramsCollection["target"] ?? "";
                         string attackType = paramsCollection["type"];
                         var attackParams = DecodePrefixedStrings(paramsCollection["params"]).ToArray();
-                        Modern.ContentDialog dialog = new Modern.ContentDialog
-                        {
-                            Title = "外部应用提供的攻击参数",
-                            Content = new AttackIndex(attackType, attackParams),
-                            CloseButtonText = "取消",
-                            MinWidth = 720
-                        };
-                        dialog.ShowAsync(MainWindow);
+                        var N = HomePage.Instance.NavView;
+                        N.SelectedItem = N.MenuItems[1];
+                        N.Header = "UDP 重放";
+                        HomePage.Instance.AppFrameNavigate(typeof(AttackIndex), null);
+                        HomePage.NavPages.TryGetValue(typeof(AttackIndex), out object _index);
+                        var index = _index as AttackIndex;
+                        index.SwitchToType(attackType, attackParams);
                     }
                     break;
             }

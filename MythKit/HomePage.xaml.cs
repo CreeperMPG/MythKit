@@ -13,10 +13,13 @@ namespace MythKit
     public partial class HomePage : UserControl
     {
         public static Dictionary<Type, object> NavPages = new Dictionary<Type, object>();
+        public static event Action HomePageLoadedEvent;
+        public static HomePage Instance;
         public ObservableCollection<TaskEntry> TaskList => App.TaskManagerInstance.TaskList;
         public HomePage()
         {
             InitializeComponent();
+            Instance = this;
             bool isWindows11OrLater = Environment.OSVersion.Version.Build >= 22000;
             if (isWindows11OrLater)
             {
@@ -35,6 +38,7 @@ namespace MythKit
 #if LITE
             UDPAttackViewItem.IsEnabled = false;
 #endif
+            HomePageLoadedEvent.Invoke();
         }
 
         public void NavigationInit()
@@ -57,7 +61,7 @@ namespace MythKit
             AppFrameNavigate(typeof(Pages.Home.HomeIndex), null);
         }
 
-        private void AppFrameNavigate(Type navPageType, NavigationTransitionInfo transitionInfo)
+        public void AppFrameNavigate(Type navPageType, NavigationTransitionInfo transitionInfo)
         {
             if (navPageType == null) return;
 

@@ -24,14 +24,43 @@ namespace MythKit.Pages.UDPAttack
         public AttackIndex(string defaultType = null, string[] typeArguments = null)
         {
             InitializeComponent();
-            InitializePage(defaultType, typeArguments);
+            InitializePage();
+            SwitchToType(defaultType, typeArguments);
         }
         public AttackIndex()
         {
             InitializeComponent();
             InitializePage();
         }
-        private void InitializePage(string defaultType = null, string[] typeArguments = null)
+        public bool SwitchToType(string defaultType, string[] typeArguments)
+        {
+            int index = AttackTypes.FindIndex((item) => item.AttackId == defaultType);
+            if (index >= 0)
+            {
+                if (typeArguments != null && typeArguments.Length > 0)
+                {
+                    IAttackPattern attackPattern = AttackTypes[index];
+                    Type patternType = attackPattern.GetType();
+                    ConstructorInfo constructor = patternType.GetConstructors().FirstOrDefault();
+                    if (constructor != null)
+                    {
+                        try
+                        {
+                            object instance = constructor.Invoke(typeArguments);
+                            AttackTypes[index] = (IAttackPattern)instance;
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                    }
+                }
+                AttackCommandTypeComboBox.SelectedIndex = index;
+                return true;
+            }
+            return false;
+        }
+        private void InitializePage()
         {
             DataContext = this;
             StringFormattingDescription.Text = "只有部分输入框支持字符串格式化\n" +
@@ -45,37 +74,7 @@ namespace MythKit.Pages.UDPAttack
             AttackTypes.Add(new BlackScreenAttack());
             AttackTypes.Add(new TeacherAttack.RaiseHandAttack());
             AttackCommandTypeComboBox.ItemsSource = AttackTypes.Select((item) => item.AttackName);
-            if (defaultType != null)
-            {
-                int index = AttackTypes.FindIndex((item) => item.AttackId == defaultType);
-                if (index >= 0)
-                {
-                    if (typeArguments != null && typeArguments.Length > 0)
-                    {
-                        IAttackPattern attackPattern = AttackTypes[index];
-                        Type patternType = attackPattern.GetType();
-                        ConstructorInfo constructor = patternType.GetConstructors().FirstOrDefault();
-                        if (constructor != null)
-                        {
-                            try
-                            {
-                                object instance = constructor.Invoke(typeArguments);
-                                AttackTypes[index] = (IAttackPattern)instance;
-                            }
-                            catch { }
-                        }
-                    }
-                }
-                else
-                {
-                    index = 0;
-                }
-                AttackCommandTypeComboBox.SelectedIndex = index;
-            }
-            else
-            {
-                AttackCommandTypeComboBox.SelectedIndex = 0;
-            }
+            AttackCommandTypeComboBox.SelectedIndex = 0;
         }
         private void InternetIPCollectButton_Click(object sender, RoutedEventArgs e)
         {
