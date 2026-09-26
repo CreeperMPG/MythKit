@@ -188,5 +188,11 @@ namespace MythKit.Pages.UDPAttack
         {
             AttackArgumentsCard.Content = AttackTypes[AttackCommandTypeComboBox.SelectedIndex];
         }
+        public static int MythwareDefaultPort = 4705;
+
+        private void TDDefaultPort_ValueChanged(Modern.NumberBox sender, Modern.NumberBoxValueChangedEventArgs args)
+        {
+            MythwareDefaultPort = (int)args.NewValue;
+        }
     }
 }

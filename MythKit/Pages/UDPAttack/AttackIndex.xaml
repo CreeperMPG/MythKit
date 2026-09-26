@@ -80,6 +80,12 @@
                             </ikw:SimpleStackPanel>
                         </ikw:SimpleStackPanel>
                     </ui:SettingsCard>
+                    <ui:SettingsCard ContentAlignment="Vertical">
+                        <ikw:SimpleStackPanel VerticalAlignment="Center" Spacing="8">
+                            <TextBlock Text="极域端口"/>
+                            <ui:NumberBox Minimum="2048" Maximum="32767" Value="4705" MinWidth="50" Name="TDDefaultPort" ValueChanged="TDDefaultPort_ValueChanged"/>
+                        </ikw:SimpleStackPanel>
+                    </ui:SettingsCard>
                 </ui:SettingsExpander.Items>
             </ui:SettingsExpander>
             <Button Name="StartButton" HorizontalAlignment="Right" Content="开始" Style="{DynamicResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}" Click="StartButton_Click"/>

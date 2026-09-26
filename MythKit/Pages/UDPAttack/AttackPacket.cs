@@ -7,8 +7,12 @@ namespace MythKit.Pages.UDPAttack
         public List<byte[]> AttackPackets;
         public int TargetPort;
         public int IntervalMiliseconds;
-        public AttackPacket(List<byte[]> attackPackets, int targetPort = 4705, int intervalMiliseconds = 0)
+        public AttackPacket(List<byte[]> attackPackets, int targetPort = -1, int intervalMiliseconds = 0)
         {
+            if (targetPort == -1)
+            {
+                targetPort = AttackIndex.MythwareDefaultPort;
+            }
             AttackPackets = attackPackets;
             TargetPort = targetPort;
             IntervalMiliseconds = intervalMiliseconds;
