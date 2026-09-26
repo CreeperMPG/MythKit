@@ -156,7 +156,10 @@
                 </ikw:SimpleStackPanel>
             </ikw:SimpleStackPanel>
             <ikw:SimpleStackPanel Spacing="8" Name="SuggestionsBox">
-                <TextBlock FontWeight="SemiBold" Text="建议的操作" FontSize="20"/>
+                <Grid>
+                    <TextBlock FontWeight="SemiBold" Text="建议的操作" FontSize="20" VerticalAlignment="Top"/>
+                    <Button HorizontalAlignment="Right" VerticalAlignment="Stretch" Content="刷新" Name="SuggestionsPanelRefreshButton" Click="SuggestionsPanelRefreshButton_Click"/>
+                </Grid>
                 <WrapPanel Name="SuggestionsPanel" ItemHeight="Auto" SizeChanged="SuggestionsPanel_SizeChanged" ItemWidth="200"/>
             </ikw:SimpleStackPanel>
         </ikw:SimpleStackPanel>

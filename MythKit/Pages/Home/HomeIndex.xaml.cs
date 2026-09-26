@@ -254,5 +254,10 @@ namespace MythKit.Pages.Home
                 TDPasswordBlock.Text = $"获取密码失败: {ex.Message}";
             }
         }
+
+        private void SuggestionsPanelRefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            Refresh();
+        }
     }
 }
