@@ -46,7 +46,7 @@ namespace MythKit
             int OSVersionBuild = Environment.OSVersion.Version.Build;
             if (OSVersionBuild >= 10240 && OSVersionBuild < 22000)
             {
-                WindowHelper.SetSystemBackdropType(this, iNKORE.UI.WPF.Modern.Helpers.Styles.BackdropType.Acrylic10);
+                WindowHelper.SetSystemBackdropType(this, iNKORE.UI.WPF.Modern.Helpers.Styles.BackdropType.Acrylic);
             }
             else
             {

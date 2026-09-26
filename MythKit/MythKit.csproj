@@ -135,6 +135,7 @@
       <DependentUpon>AttackStateControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\UDPAttack\IAttackPattern.cs" />
+    <Compile Include="SingleInstanceManager.cs" />
     <Compile Include="Tasks\IManagedTask.cs" />
     <Compile Include="Tasks\TaskEntry.cs" />
     <Compile Include="Tasks\TaskManager.cs" />

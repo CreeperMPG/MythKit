@@ -17,6 +17,11 @@ namespace MythKit
     public partial class App : Application
     {
         public const string VERSION = "1.2.2";
+        protected override void OnExit(ExitEventArgs e)
+        {
+            SingleInstanceManager.Cleanup();
+            base.OnExit(e);
+        }
         public static List<string> DecodePrefixedStrings(string data)
         {
             if (data == null)
@@ -39,7 +44,8 @@ namespace MythKit
             }
             return result;
         }
-        public static TaskManager TaskManagerInstance { get; } = new TaskManager(); private string _activatedUri = null;
+        public static TaskManager TaskManagerInstance { get; } = new TaskManager();
+        private string _activatedUri = null;
         public static List<string> GetPathSegments(Uri uri)
         {
             if (uri == null) return new List<string>();
@@ -49,12 +55,17 @@ namespace MythKit
                       .Where(s => !string.IsNullOrEmpty(s))
                       .ToList();
         }
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            var first = SingleInstanceManager.Initialize();
+            if (!first)
+            {
+                Shutdown();
+            }
 
             string[] args = Environment.GetCommandLineArgs();
+            SingleInstanceManager.OtherInstanceStarted += SingleInstanceManager_OtherInstanceStarted;
 
             foreach (string arg in args)
             {
@@ -65,41 +76,77 @@ namespace MythKit
                 }
             }
 
-            var mainWindow = new MainWindow();
-            mainWindow.Show();
+            MainWindow = new MainWindow();
+            MainWindow.Show();
 
             if (!string.IsNullOrEmpty(_activatedUri))
             {
                 try
                 {
                     Uri uri = new Uri(_activatedUri);
-                    var paramsCollection = QueryStringHelper.ParseQueryString(uri.Query);
-                    var segments = GetPathSegments(uri);
-                    switch (uri.Host.ToLower())
+                    ProcessUri(uri);
+                }
+                catch { }
+            }
+        }
+        public static void BringToFront(Window window)
+        {
+            if (window == null) return;
+
+            if (window.WindowState == WindowState.Minimized)
+            {
+                window.WindowState = WindowState.Normal;
+            }
+            window.Activate();
+            window.Topmost = true;
+            window.Topmost = false;
+            window.Focus();
+        }
+
+        private void SingleInstanceManager_OtherInstanceStarted(string[] args)
+        {
+            BringToFront(MainWindow);
+            foreach (string arg in args)
+            {
+                if (arg.StartsWith("mythkit://", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
                     {
-                        case "attack":
+                        Uri uri = new Uri(arg);
+                        ProcessUri(uri);
+                    }
+                    catch { }
+                    break;
+                }
+            }
+        }
+
+        public void ProcessUri(Uri uri)
+        {
+            var paramsCollection = QueryStringHelper.ParseQueryString(uri.Query);
+            var segments = GetPathSegments(uri);
+            switch (uri.Host.ToLower())
+            {
+                case "attack":
 #if LITE
                             break;
 #endif
-                            // mythkit://attack/recommend
-                            if (segments.Count > 0 && segments[0].ToLower() == "recommend")
-                            {
-                                string targetIPs = paramsCollection["target"] ?? "";
-                                string attackType = paramsCollection["type"];
-                                var attackParams = DecodePrefixedStrings(paramsCollection["params"]).ToArray();
-                                Modern.ContentDialog dialog = new Modern.ContentDialog
-                                {
-                                    Title = "外部应用提供的攻击参数",
-                                    Content = new AttackIndex(attackType, attackParams),
-                                    CloseButtonText = "取消",
-                                    MinWidth = 720
-                                };
-                                dialog.ShowAsync(mainWindow);
-                            }
-                            break;
+                    // mythkit://attack/recommend
+                    if (segments.Count > 0 && segments[0].ToLower() == "recommend")
+                    {
+                        string targetIPs = paramsCollection["target"] ?? "";
+                        string attackType = paramsCollection["type"];
+                        var attackParams = DecodePrefixedStrings(paramsCollection["params"]).ToArray();
+                        Modern.ContentDialog dialog = new Modern.ContentDialog
+                        {
+                            Title = "外部应用提供的攻击参数",
+                            Content = new AttackIndex(attackType, attackParams),
+                            CloseButtonText = "取消",
+                            MinWidth = 720
+                        };
+                        dialog.ShowAsync(MainWindow);
                     }
-                }
-                catch { }
+                    break;
             }
         }
     }

@@ -19,6 +19,7 @@ namespace MythKit.Pages.Home.Suggestions
         }
         public static void ButtonCallback()
         {
+            SingleInstanceManager.Cleanup();
             // 创建启动程序信息
             var startInfo = new System.Diagnostics.ProcessStartInfo
             {
