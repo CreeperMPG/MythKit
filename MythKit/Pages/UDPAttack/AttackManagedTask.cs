@@ -200,7 +200,9 @@ namespace MythKit.Pages.UDPAttack
                             return;
                         }
                     }
+                    CurrentTargetIndex--;
                 }
+                CurrentCycle--;
                 Progress = 100;
                 StateUpdated?.Invoke(TaskState.Completed);
             }
