@@ -180,625 +180,527 @@ namespace MythKit.Pages.RestrictionsRemoving
                 Dispatcher.Invoke(() => dialog.RecoveryResults = results);
             });
         }
+        private Tuple<string, bool, string> RecoverySystem_TryRun(string actionName, Action action, string successPrompt = "")
+        {
+            try
+            {
+                action.Invoke();
+                return Tuple.Create(actionName, true, successPrompt);
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(actionName, false, ex.Message);
+            }
+        }
 
         // ref => https://GitHub.com/CreeperMPG/jfglzs
         private List<Tuple<string, bool, string>> RecoverySystem_Background()
         {
-            List<Tuple<string, bool, string>> result = new List<Tuple<string, bool, string>>();
-            // ============================================================
-            // 一、恢复系统基础工具
-            // ============================================================
+            List<Tuple<string, bool, string>> result = new List<Tuple<string, bool, string>>
+            {
+                // ============================================================
+                // 一、恢复系统基础工具
+                // ============================================================
 
-            // 1. 恢复命令提示符 (CMD)
-            try
-            {
-                RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "Software\\Policies\\Microsoft\\Windows\\System",
-                    "DisableCMD",
-                    0,
-                    RegistryValueKind.DWord
-                );
-                result.Add(Tuple.Create("恢复命令提示符", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复命令提示符", false, ex.Message));
-            }
+                // 1. 恢复命令提示符 (CMD)
+                RecoverySystem_TryRun("恢复命令提示符", () => RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Software\\Policies\\Microsoft\\Windows\\System",
+                        "DisableCMD",
+                        0,
+                        RegistryValueKind.DWord
+                    )),
 
-            // 2. 恢复注册表编辑器
-            try
-            {
-                RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-                    "DisableRegistryTools",
-                    0,
-                    RegistryValueKind.DWord
-                );
-                result.Add(Tuple.Create("恢复注册表编辑器", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复注册表编辑器", false, ex.Message));
-            }
+                // 2. 恢复注册表编辑器
+                RecoverySystem_TryRun("恢复注册表编辑器", () => RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+                        "DisableRegistryTools",
+                        0,
+                        RegistryValueKind.DWord
+                    )),
 
-            // 3. 恢复运行对话框 (Win+R)
-            try
-            {
-                RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-                    "NoRun",
-                    0,
-                    RegistryValueKind.DWord
-                );
-                result.Add(Tuple.Create("恢复运行对话框", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复运行对话框", false, ex.Message));
-            }
+                // 3. 恢复运行对话框 (Win+R)
+                RecoverySystem_TryRun("恢复运行对话框", () => RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+                        "NoRun",
+                        0,
+                        RegistryValueKind.DWord
+                    )),
+                RecoverySystem_TryRun("删除运行框黑名单", () => RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+                        "DisallowRun",
+                        0,
+                        RegistryValueKind.DWord
+                    )),
 
-            // ============================================================
-            // 二、恢复系统安全功能
-            // ============================================================
+                // ============================================================
+                // 二、恢复系统安全功能
+                // ============================================================
 
-            // 4. 恢复锁屏 (Win+L)
-            try
-            {
-                RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-                    "DisableLockWorkstation",
-                    0,
-                    RegistryValueKind.DWord
-                );
-                result.Add(Tuple.Create("恢复锁屏", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复锁屏", false, ex.Message));
-            }
+                // 4. 恢复锁屏 (Win+L)
+                RecoverySystem_TryRun("恢复锁屏", () => RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+                        "DisableLockWorkstation",
+                        0,
+                        RegistryValueKind.DWord
+                    )),
 
-            // ============================================================
-            // 三、恢复开机与启动项
-            // ============================================================
+                // ============================================================
+                // 三、恢复开机与启动项
+                // ============================================================
 
-            // 5. 恢复开机启动菜单 (F8 安全模式)
-            // REMOVED
+                // 5. 恢复开机启动菜单 (F8 安全模式)
+                // REMOVED
 
-            // 6. 删除恶意自启动项 (Run 键)
-            try
-            {
-                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "prozs");
-                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "jfglzsn");
-                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "prozs");
-                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "jfglzsn");
-                result.Add(Tuple.Create("删除机房管理助手自启动项", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("删除机房管理助手自启动项", false, ex.Message));
-            }
+                // 6. 删除恶意自启动项 (Run 键)
+                RecoverySystem_TryRun("删除机房管理助手自启动项", () =>
+                {
+                    RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "prozs");
+                    RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "jfglzsn");
+                    RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "prozs");
+                    RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "jfglzsn");
+                }),
 
-            // ============================================================
-            // 四、恢复 USB 存储设备
-            // ============================================================
+                // ============================================================
+                // 四、恢复 USB 存储设备
+                // ============================================================
 
-            // 7. 启用 USB 存储 (Start=3 手动)
-            try
-            {
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SYSTEM\\CurrentControlSet\\Services\\usbstor",
-                    "Start",
-                    3,
-                    RegistryValueKind.DWord
-                );
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SYSTEM\\ControlSet001\\Services\\usbstor",
-                    "Start",
-                    3,
-                    RegistryValueKind.DWord
-                );
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SYSTEM\\ControlSet002\\Services\\usbstor",
-                    "Start",
-                    3,
-                    RegistryValueKind.DWord
-                );
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SYSTEM\\ControlSet003\\Services\\usbstor",
-                    "Start",
-                    3,
-                    RegistryValueKind.DWord
-                );
-                result.Add(Tuple.Create("启用 USB 存储", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("启用 USB 存储", false, ex.Message));
-            }
+                // 7. 启用 USB 存储 (Start=3 手动)
+                RecoverySystem_TryRun("启用 USB 存储", () =>
+                {
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SYSTEM\\CurrentControlSet\\Services\\usbstor",
+                        "Start",
+                        3,
+                        RegistryValueKind.DWord
+                    );
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SYSTEM\\ControlSet001\\Services\\usbstor",
+                        "Start",
+                        3,
+                        RegistryValueKind.DWord
+                    );
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SYSTEM\\ControlSet002\\Services\\usbstor",
+                        "Start",
+                        3,
+                        RegistryValueKind.DWord
+                    );
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SYSTEM\\ControlSet003\\Services\\usbstor",
+                        "Start",
+                        3,
+                        RegistryValueKind.DWord
+                    );
+                }),
 
-            // ============================================================
-            // 五、恢复文件管理器功能
-            // ============================================================
+                // ============================================================
+                // 五、恢复文件管理器功能
+                // ============================================================
 
-            // 8. 恢复文件夹选项
-            try
-            {
-                RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-                    "NoFolderOptions",
-                    0,
-                    RegistryValueKind.DWord
-                );
-                result.Add(Tuple.Create("恢复文件夹选项", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复文件夹选项", false, ex.Message));
-            }
+                // 8. 恢复文件夹选项
+                RecoverySystem_TryRun("恢复文件夹选项", () =>
+                {
+                    RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+                        "NoFolderOptions",
+                        0,
+                        RegistryValueKind.DWord
+                    );
 
-            // 9. 恢复"显示隐藏文件"选项
-            try
-            {
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\Folder\\Hidden\\SHOWALL",
-                    "CheckedValue",
-                    1,
-                    RegistryValueKind.DWord
-                );
-                result.Add(Tuple.Create("恢复显示隐藏文件选项", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复显示隐藏文件选项", false, ex.Message));
-            }
+                    RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                        "HideFileExt",
+                        0,
+                        RegistryValueKind.DWord
+                    );
 
-            // 10. 恢复任务栏右键菜单
-            try
-            {
-                RegUtils.WriteRegistryValue(
+                    RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                        "Hidden",
+                        1,
+                        RegistryValueKind.DWord
+                    );
+                }),
+
+                // 9. 恢复"显示隐藏文件"选项
+                RecoverySystem_TryRun("恢复显示隐藏文件选项", () =>
+                {
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\Folder\\Hidden\\SHOWALL",
+                        "CheckedValue",
+                        1,
+                        RegistryValueKind.DWord
+                    );
+
+                    RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                        "Hidden",
+                        1,
+                        RegistryValueKind.DWord
+                    );
+                }),
+
+                // 10. 恢复任务栏右键菜单
+                RecoverySystem_TryRun("恢复任务栏右键菜单", () => RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
                     "NoTrayContextMenu",
                     0,
                     RegistryValueKind.DWord
-                );
-                result.Add(Tuple.Create("恢复任务栏右键菜单", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复任务栏右键菜单", false, ex.Message));
-            }
+                )),
 
-            // 11. 恢复任务视图按钮 (Win+Tab)
-            try
-            {
-                RegUtils.WriteRegistryValue(
+                // 11. 恢复任务视图按钮 (Win+Tab)
+                RecoverySystem_TryRun("恢复任务视图按钮", () => RegUtils.WriteRegistryValue(
                     Registry.CurrentUser,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
                     "ShowTaskViewButton",
                     1,
                     RegistryValueKind.DWord
-                );
-                result.Add(Tuple.Create("恢复任务视图按钮", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复任务视图按钮", false, ex.Message));
-            }
+                )),
 
-            // ============================================================
-            // 六、恢复浏览器功能 - Internet Explorer
-            // ============================================================
+                // ============================================================
+                // 六、恢复浏览器功能 - Internet Explorer
+                // ============================================================
 
-            // 12-14. Internet Explorer 恢复相关设置
-            try
-            {
-                // 12. IE 恢复文件下载 (1803=0 允许下载)
-                RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\3",
-                    "1803",
-                    0,
-                    RegistryValueKind.DWord
-                );
+                // 12-14. Internet Explorer 恢复相关设置
 
-                // 13. IE 恢复文件打开 (2200=0 允许打开)
-                RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\3",
-                    "2200",
-                    0,
-                    RegistryValueKind.DWord
-                );
-
-                // 14. IE 恢复"另存为"
-                RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "Software\\Policies\\Microsoft\\Internet Explorer\\Restrictions",
-                    "NoBrowserSaveAs",
-                    0,
-                    RegistryValueKind.DWord
-                );
-
-                result.Add(Tuple.Create("恢复 Internet Explorer 设置", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复 Internet Explorer 设置", false, ex.Message));
-            }
-
-            // ============================================================
-            // 七、恢复浏览器功能 - Microsoft Edge
-            // ============================================================
-
-            // 15-17. Microsoft Edge 恢复相关设置
-            try
-            {
-                // 15. Edge 恢复下载
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SOFTWARE\\Policies\\Microsoft\\Edge",
-                    "DownloadRestrictions",
-                    0,
-                    RegistryValueKind.DWord
-                );
-
-                // 16. Edge 恢复另存为
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SOFTWARE\\Policies\\Microsoft\\Edge",
-                    "SaveAs",
-                    1,
-                    RegistryValueKind.DWord
-                );
-
-                // 17. Edge 恢复开发者工具 (F12)
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SOFTWARE\\Policies\\Microsoft\\Edge",
-                    "DeveloperToolsAvailability",
-                    0,
-                    RegistryValueKind.DWord
-                );
-
-                result.Add(Tuple.Create("恢复 Microsoft Edge 设置", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复 Microsoft Edge 设置", false, ex.Message));
-            }
-
-            // ============================================================
-            // 八、恢复浏览器功能 - Google Chrome
-            // ============================================================
-
-            try
-            {
-                // 18. Chrome 恢复下载
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SOFTWARE\\Policies\\Google\\Chrome",
-                    "DownloadRestrictions",
-                    0,
-                    RegistryValueKind.DWord
-                );
-
-                // 19. Chrome 恢复另存为
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SOFTWARE\\Policies\\Google\\Chrome",
-                    "SaveAs",
-                    1,
-                    RegistryValueKind.DWord
-                );
-
-                // 20. Chrome 恢复开发者工具 (F12)
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SOFTWARE\\Policies\\Google\\Chrome",
-                    "DeveloperToolsAvailability",
-                    0,
-                    RegistryValueKind.DWord
-                );
-
-                result.Add(Tuple.Create("恢复 Google Chrome 设置", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复 Google Chrome 设置", false, ex.Message));
-            }
-
-            // ============================================================
-            // 九、恢复浏览器功能 - Mozilla Firefox
-            // ============================================================
-
-            try
-            {
-                // 21. Firefox 恢复下载
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SOFTWARE\\Policies\\Mozilla\\Firefox",
-                    "DisableDownloads",
-                    0,
-                    RegistryValueKind.DWord
-                );
-
-                // 22. Firefox 恢复 about:downloads 页面
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SOFTWARE\\Policies\\Mozilla\\Firefox",
-                    "BlockAboutDownloads",
-                    0,
-                    RegistryValueKind.DWord
-                );
-
-                // 23. Firefox 恢复开发者工具
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SOFTWARE\\Policies\\Mozilla\\Firefox",
-                    "DeveloperToolsAvailability",
-                    0,
-                    RegistryValueKind.DWord
-                );
-
-                result.Add(Tuple.Create("恢复 Mozilla Firefox 设置", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复 Mozilla Firefox 设置", false, ex.Message));
-            }
-
-            // ============================================================
-            // 十、删除浏览器组策略 (完整清除)
-            // ============================================================
-
-            try
-            {
-                // 24. 删除 Chrome 组策略
-                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "Software\\Policies\\Google", "Chrome");
-
-                // 25. 删除 Edge 组策略
-                RegUtils.DeleteRegistryKey(Registry.LocalMachine, "Software\\Policies\\Microsoft", "Edge");
-
-                result.Add(Tuple.Create("删除浏览器组策略", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("删除浏览器组策略", false, ex.Message));
-            }
-
-            // ============================================================
-            // 十一、恢复网络功能
-            // ============================================================
-
-            // 26-28. 恢复网络功能
-            try
-            {
-                // 26. 恢复 IPv6
-                RegUtils.WriteRegistryValue(
-                    Registry.LocalMachine,
-                    "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                    "DisabledComponents",
-                    0,
-                    RegistryValueKind.DWord
-                );
-
-                // 27. 恢复 hosts 文件
-                string hostsPath = Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\drivers\\etc\\hosts";
-                string hostsBackupPath = hostsPath + "-bak";
-
-                if (File.Exists(hostsBackupPath))
+                RecoverySystem_TryRun("恢复 Internet Explorer 设置", () =>
                 {
-                    File.SetAttributes(hostsPath, FileAttributes.Normal);
-                    File.SetAttributes(hostsBackupPath, FileAttributes.Normal);
-                    File.SetAttributes(Path.GetDirectoryName(hostsPath), FileAttributes.Normal);
-                    File.Copy(hostsBackupPath, hostsPath, true);
-                }
+                    // 12. IE 恢复文件下载 (1803=0 允许下载)
+                    RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\3",
+                        "1803",
+                        0,
+                        RegistryValueKind.DWord
+                    );
 
-                // 28. 刷新 DNS 缓存
-                ShellExecute("ipconfig /flushdns");
+                    // 13. IE 恢复文件打开 (2200=0 允许打开)
+                    RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\3",
+                        "2200",
+                        0,
+                        RegistryValueKind.DWord
+                    );
 
-                result.Add(Tuple.Create("恢复网络功能", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复网络功能", false, ex.Message));
-            }
+                    // 14. IE 恢复"另存为"
+                    RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Software\\Policies\\Microsoft\\Internet Explorer\\Restrictions",
+                        "NoBrowserSaveAs",
+                        0,
+                        RegistryValueKind.DWord
+                    );
+                }),
 
-            // ============================================================
-            // 十二、恢复系统工具 (删除映像劫持 IFEO)
-            // ============================================================
+                // ============================================================
+                // 七、恢复浏览器功能 - Microsoft Edge
+                // ============================================================
 
-            string ifeoPath = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
-
-            // 29. 删除所有被劫持的工具
-            try
-            {
-                string[] ifeoKeys = new string[]
+                // 15-17. Microsoft Edge 恢复相关设置
+                RecoverySystem_TryRun("恢复 Microsoft Edge 设置", () =>
                 {
+                    // 15. Edge 恢复下载
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SOFTWARE\\Policies\\Microsoft\\Edge",
+                        "DownloadRestrictions",
+                        0,
+                        RegistryValueKind.DWord
+                    );
+
+                    // 16. Edge 恢复另存为
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SOFTWARE\\Policies\\Microsoft\\Edge",
+                        "SaveAs",
+                        1,
+                        RegistryValueKind.DWord
+                    );
+
+                    // 17. Edge 恢复开发者工具 (F12)
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SOFTWARE\\Policies\\Microsoft\\Edge",
+                        "DeveloperToolsAvailability",
+                        0,
+                        RegistryValueKind.DWord
+                    );
+                }),
+
+                // ============================================================
+                // 八、恢复浏览器功能 - Google Chrome
+                // ============================================================
+
+                RecoverySystem_TryRun("恢复 Google Chrome 设置", () =>
+                {
+                    // 18. Chrome 恢复下载
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SOFTWARE\\Policies\\Google\\Chrome",
+                        "DownloadRestrictions",
+                        0,
+                        RegistryValueKind.DWord
+                    );
+
+                    // 19. Chrome 恢复另存为
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SOFTWARE\\Policies\\Google\\Chrome",
+                        "SaveAs",
+                        1,
+                        RegistryValueKind.DWord
+                    );
+
+                    // 20. Chrome 恢复开发者工具 (F12)
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SOFTWARE\\Policies\\Google\\Chrome",
+                        "DeveloperToolsAvailability",
+                        0,
+                        RegistryValueKind.DWord
+                    );
+                }),
+
+                // ============================================================
+                // 九、恢复浏览器功能 - Mozilla Firefox
+                // ============================================================
+
+                RecoverySystem_TryRun("恢复 Mozilla Firefox 设置", () =>
+                {
+                    // 21. Firefox 恢复下载
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SOFTWARE\\Policies\\Mozilla\\Firefox",
+                        "DisableDownloads",
+                        0,
+                        RegistryValueKind.DWord
+                    );
+
+                    // 22. Firefox 恢复 about:downloads 页面
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SOFTWARE\\Policies\\Mozilla\\Firefox",
+                        "BlockAboutDownloads",
+                        0,
+                        RegistryValueKind.DWord
+                    );
+
+                    // 23. Firefox 恢复开发者工具
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SOFTWARE\\Policies\\Mozilla\\Firefox",
+                        "DeveloperToolsAvailability",
+                        0,
+                        RegistryValueKind.DWord
+                    );
+                }),
+
+                // ============================================================
+                // 十、删除浏览器组策略 (完整清除)
+                // ============================================================
+
+                RecoverySystem_TryRun("删除浏览器组策略", () =>
+                {
+                    // 24. 删除 Chrome 组策略
+                    RegUtils.DeleteRegistryKey(Registry.LocalMachine, "Software\\Policies\\Google", "Chrome");
+
+                    // 25. 删除 Edge 组策略
+                    RegUtils.DeleteRegistryKey(Registry.LocalMachine, "Software\\Policies\\Microsoft", "Edge");
+                }),
+
+                // ============================================================
+                // 十一、恢复网络功能
+                // ============================================================
+
+                // 26-28. 恢复网络功能
+                RecoverySystem_TryRun("恢复网络功能", () =>
+                {
+                    // 26. 恢复 IPv6
+                    RegUtils.WriteRegistryValue(
+                        Registry.LocalMachine,
+                        "SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+                        "DisabledComponents",
+                        0,
+                        RegistryValueKind.DWord
+                    );
+
+                    // 27. 恢复 hosts 文件
+                    string hostsPath = Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\drivers\\etc\\hosts";
+                    string hostsBackupPath = hostsPath + "-bak";
+
+                    if (File.Exists(hostsBackupPath))
+                    {
+                        File.SetAttributes(hostsPath, FileAttributes.Normal);
+                        File.SetAttributes(hostsBackupPath, FileAttributes.Normal);
+                        File.SetAttributes(Path.GetDirectoryName(hostsPath), FileAttributes.Normal);
+                        File.Copy(hostsBackupPath, hostsPath, true);
+                    }
+
+                    // 28. 刷新 DNS 缓存
+                    ShellExecute("ipconfig /flushdns");
+                }),
+                // ============================================================
+                // 十二、恢复系统工具 (删除映像劫持 IFEO)
+                // ============================================================
+
+
+                // 29. 删除所有被劫持的工具
+                RecoverySystem_TryRun("删除被劫持的系统工具/内置游戏", () =>
+                {
+                    string ifeoPath = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
+                    string[] ifeoKeys = new string[]
+                    {
                     "taskkill.exe", "ntsd.exe", "sidebar.exe", "Chess.exe",
                     "FreeCell.exe", "Hearts.exe", "Minesweeper.exe", "PurblePlace.exe",
                     "Mahjong.exe", "SpiderSolitaire.exe", "bckgzm.exe", "chkrzm.exe",
                     "shvlzm.exe", "Solitaire.exe", "winmine", "Magnify.exe",
                     "sethc.exe", "tasklist.exe", "route.exe"
-                };
+                    };
 
-                foreach (string keyName in ifeoKeys)
+                    foreach (string keyName in ifeoKeys)
+                    {
+                        RegUtils.DeleteRegistryKey(Registry.LocalMachine, ifeoPath, keyName);
+                    }
+                }),
+
+                // ============================================================
+                // 十三、恢复系统性能设置
+                // ============================================================
+
+                // 30. 删除强制结束任务设置
+                RecoverySystem_TryRun("删除强制结束任务设置", () =>
                 {
-                    RegUtils.DeleteRegistryKey(Registry.LocalMachine, ifeoPath, keyName);
-                }
+                    RegUtils.DeleteRegistryKey(
+                        Registry.CurrentUser,
+                        "Control Panel\\Desktop",
+                        "AutoEndTasks"
+                    );
+                }),
 
-                result.Add(Tuple.Create("删除被劫持的系统工具/内置游戏", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("删除被劫持的系统工具/内置游戏", false, ex.Message));
-            }
-
-            // ============================================================
-            // 十三、恢复系统性能设置
-            // ============================================================
-
-            // 30. 删除强制结束任务设置
-            try
-            {
-                RegUtils.DeleteRegistryKey(
-                    Registry.CurrentUser,
-                    "Control Panel\\Desktop",
-                    "AutoEndTasks"
-                );
-                result.Add(Tuple.Create("删除强制结束任务设置", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("删除强制结束任务设置", false, ex.Message));
-            }
-
-            // 31. 恢复应用程序超时 (3000ms)
-            try
-            {
-                RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "Control Panel\\Desktop",
-                    "HungAppTimeout",
-                    "3000",
-                    RegistryValueKind.String
-                );
-                result.Add(Tuple.Create("恢复应用程序超时", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复应用程序超时", false, ex.Message));
-            }
-
-            // 32. 恢复进程结束超时 (10000ms)
-            try
-            {
-                RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "Control Panel\\Desktop",
-                    "WaitToKillAppTimeout",
-                    "10000",
-                    RegistryValueKind.String
-                );
-                result.Add(Tuple.Create("恢复进程结束超时", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复进程结束超时", false, ex.Message));
-            }
-
-            // 33. 删除启动延迟设置
-            try
-            {
-                RegUtils.DeleteRegistryKey(
-                    Registry.CurrentUser,
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
-                    "StartupDelayInMSec"
-                );
-                result.Add(Tuple.Create("删除启动延迟设置", true, ""));
-            }
-            catch (NullReferenceException)
-            {
-                result.Add(Tuple.Create("删除启动延迟设置", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("删除启动延迟设置", false, ex.Message));
-            }
-
-            // 34. 恢复触摸键盘
-            try
-            {
-                RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "SOFTWARE\\Microsoft\\TabletTip\\1.7",
-                    "TipbandDesiredVisibility",
-                    1,
-                    RegistryValueKind.DWord
-                );
-                result.Add(Tuple.Create("恢复触摸键盘", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复触摸键盘", false, ex.Message));
-            }
-
-            // ============================================================
-            // 十四、恢复文件/文件夹属性
-            // ============================================================
-
-            // 35-36. 恢复文件/文件夹属性
-            try
-            {
-                // 35. 恢复 Microsoft Games 文件夹
-                string gamesPath = "C:\\Program Files\\Microsoft Games";
-                if (Directory.Exists(gamesPath))
+                // 31. 恢复应用程序超时 (3000ms)
+                RecoverySystem_TryRun("恢复应用程序超时", () =>
                 {
-                    File.SetAttributes(gamesPath, FileAttributes.Normal);
-                }
+                    RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Control Panel\\Desktop",
+                        "HungAppTimeout",
+                        "3000",
+                        RegistryValueKind.String
+                    );
+                }),
 
-                // 36. 恢复 Windows.NET 文件夹
-                string netPath = "C:\\Windows\\Microsoft.NET";
-                if (Directory.Exists(netPath))
+                // 32. 恢复进程结束超时 (10000ms)
+                RecoverySystem_TryRun("恢复进程结束超时", () =>
                 {
-                    File.SetAttributes(netPath, FileAttributes.Normal);
-                }
+                    RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "Control Panel\\Desktop",
+                        "WaitToKillAppTimeout",
+                        "10000",
+                        RegistryValueKind.String
+                    );
+                }),
 
-                result.Add(Tuple.Create("恢复游戏/.NET文件夹隐藏属性", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复游戏/.NET文件夹隐藏属性", false, ex.Message));
-            }
+                // 33. 删除启动延迟设置
+                RecoverySystem_TryRun("删除启动延迟设置", () =>
+                {
+                    try
+                    {
+                        RegUtils.DeleteRegistryKey(
+                            Registry.CurrentUser,
+                            "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
+                            "StartupDelayInMSec"
+                        );
+                    }
+                    catch (NullReferenceException)
+                    {
+                        // treat as success
+                    }
+                }),
 
-            try
-            {
-                // 37. 恢复 Microsoft Store
-                RegUtils.DeleteRegistryKey(
-                    Registry.LocalMachine,
-                    "SOFTWARE\\Policies\\Microsoft\\WindowsStore",
-                    "RemoveWindowsStore"
-                );
-                result.Add(Tuple.Create("恢复 Microsoft Store", true, ""));
-            }
-            catch (NullReferenceException)
-            {
-                result.Add(Tuple.Create("恢复 Microsoft Store", true, ""));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("恢复 Microsoft Store", false, ex.Message));
-            }
+                // 34. 恢复触摸键盘
+                RecoverySystem_TryRun("恢复触摸键盘", () =>
+                {
+                    RegUtils.WriteRegistryValue(
+                        Registry.CurrentUser,
+                        "SOFTWARE\\Microsoft\\TabletTip\\1.7",
+                        "TipbandDesiredVisibility",
+                        1,
+                        RegistryValueKind.DWord
+                    );
+                }),
 
-            // 38. 移除 Scancode Map
-            try
-            {
-                RegUtils.DeleteRegistryKey(
-                    Registry.LocalMachine,
-                    "SYSTEM\\CurrentControlSet\\Control\\Keyboard Layout",
-                    "Scancode Map"
-                );
-                result.Add(Tuple.Create("移除键盘映射", true, "修改后可能需要重启电脑"));
-            }
-            catch (NullReferenceException)
-            {
-                result.Add(Tuple.Create("移除键盘映射", true, "修改后可能需要重启电脑"));
-            }
-            catch (Exception ex)
-            {
-                result.Add(Tuple.Create("移除键盘映射", false, ex.Message));
-            }
+                // ============================================================
+                // 十四、恢复文件/文件夹属性
+                // ============================================================
+
+                // 35-36. 恢复文件/文件夹属性
+                RecoverySystem_TryRun("恢复游戏/.NET文件夹隐藏属性", () =>
+                {
+                    // 35. 恢复 Microsoft Games 文件夹
+                    string gamesPath = "C:\\Program Files\\Microsoft Games";
+                    if (Directory.Exists(gamesPath))
+                    {
+                        File.SetAttributes(gamesPath, FileAttributes.Normal);
+                    }
+
+                    // 36. 恢复 Windows.NET 文件夹
+                    string netPath = "C:\\Windows\\Microsoft.NET";
+                    if (Directory.Exists(netPath))
+                    {
+                        File.SetAttributes(netPath, FileAttributes.Normal);
+                    }
+                }),
+                RecoverySystem_TryRun("恢复 Microsoft Store", () =>
+                {
+                    try
+                    {
+                        // 37. 恢复 Microsoft Store
+                        RegUtils.DeleteRegistryKey(
+                            Registry.LocalMachine,
+                            "SOFTWARE\\Policies\\Microsoft\\WindowsStore",
+                            "RemoveWindowsStore"
+                        );
+                    }
+                    catch (NullReferenceException)
+                    {
+                        // treat as success
+                    }
+                }),
+
+                // 38. 移除 Scancode Map
+                RecoverySystem_TryRun("移除键盘映射", () =>
+                {
+                    try
+                    {
+                        RegUtils.DeleteRegistryKey(
+                            Registry.LocalMachine,
+                            "SYSTEM\\CurrentControlSet\\Control\\Keyboard Layout",
+                            "Scancode Map"
+                        );
+                    }
+                    catch (NullReferenceException)
+                    {
+                        // treat as success
+                    }
+                }, "修改后可能需要重启电脑")
+            };
             return result;
         }
 
@@ -1081,6 +983,30 @@ namespace MythKit.Pages.RestrictionsRemoving
                 {
                     Title = "操作完成",
                     Content = "已尝试关闭极域U盘/网络过滤器",
+                    DefaultButton = Modern.ContentDialogButton.Close,
+                    CloseButtonText = "确认"
+                }.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                new Modern.ContentDialog()
+                {
+                    Title = "操作失败",
+                    Content = ex.Message,
+                    DefaultButton = Modern.ContentDialogButton.Close,
+                    CloseButtonText = "确认"
+                }.ShowAsync();
+            }
+        }
+        private void BasicRR_Windows_MMC_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Policies\\Microsoft", "MMC", false);
+                new Modern.ContentDialog()
+                {
+                    Title = "操作完成",
+                    Content = "已尝试解禁 Windows 管理控制台",
                     DefaultButton = Modern.ContentDialogButton.Close,
                     CloseButtonText = "确认"
                 }.ShowAsync();

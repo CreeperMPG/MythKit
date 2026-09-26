@@ -19,6 +19,7 @@
                 <TextBlock Text="基础限制解除" FontWeight="SemiBold" FontSize="20"/>
                 <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="8">
                     <Button Content="解除设置、控制面板禁用" Name="BasicRR_Settings_ControlPanel" Click="BasicRR_Settings_ControlPanel_Click"/>
+                    <Button Content="解禁 Windows 管理控制台" Name="BasicRR_Windows_MMC" Click="BasicRR_Windows_MMC_Click"/>
                     <Button Content="移除极域U盘、网络控制" Name="BasicRR_TDNet_File_Filter" Click="BasicRR_TDNet_File_Filter_Click"/>
                 </ikw:SimpleStackPanel>
                 <TextBlock Text="其余的限制可尝试本页面下方机房管理助手板块的“恢复所有设置”按钮。"/>
