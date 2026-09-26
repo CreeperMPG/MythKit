@@ -117,7 +117,7 @@ namespace MythKit.Mythware
         public override bool Equals(object obj)
         {
             return obj is MythwareInstance instance &&
-                   MythwarePath == instance.MythwarePath;
+                   MythwarePath.Equals(instance.MythwarePath, StringComparison.OrdinalIgnoreCase);
         }
         public override int GetHashCode()
         {
