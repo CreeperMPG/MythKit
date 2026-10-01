@@ -261,26 +261,26 @@ namespace MythKit.Pages.RestrictionsRemoving
                     );
                     RegUtils.WriteRegistryValue(
                         Registry.LocalMachine,
-                        "SYSTEM\\ControlSet001\\Services\\usbstor",
-                        "Start",
-                        3,
+                        "SYSTEM\\CurrentControlSet\\Control\\StorageDevicePolicies",
+                        "WriteProtect",
+                        0,
                         RegistryValueKind.DWord
                     );
                     RegUtils.WriteRegistryValue(
                         Registry.LocalMachine,
-                        "SYSTEM\\ControlSet002\\Services\\usbstor",
-                        "Start",
-                        3,
+                        "SOFTWARE\\Policies\\Microsoft\\Windows\\RemovableStorageDevices",
+                        "Deny_Read",
+                        0,
                         RegistryValueKind.DWord
                     );
                     RegUtils.WriteRegistryValue(
                         Registry.LocalMachine,
-                        "SYSTEM\\ControlSet003\\Services\\usbstor",
-                        "Start",
-                        3,
+                        "SOFTWARE\\Policies\\Microsoft\\Windows\\RemovableStorageDevices",
+                        "Deny_Write",
+                        0,
                         RegistryValueKind.DWord
                     );
-                }),
+                }, "可能需要重新拔插 USB 存储设备"),
 
                 // 恢复文件夹选项
                 RecoverySystem_TryRun("恢复文件夹选项", () =>
