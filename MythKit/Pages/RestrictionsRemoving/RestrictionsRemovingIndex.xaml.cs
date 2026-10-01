@@ -3,6 +3,7 @@ using MythKit.Properties;
 using MythKit.Utils;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -128,28 +129,24 @@ namespace MythKit.Pages.RestrictionsRemoving
                 return _jfglzsInstallPath;
             }
         }
-        private void KillJFGLZS_Click(object sender, RoutedEventArgs e)
+        private void KillJFGLZS_Executor()
         {
             KillProcessByName("jfglzs");
             KillProcessByName("jfglzsn");
             KillProcessByName(GetPRZSCopyProcessName());
-            string exceptionInfo = null;
-            try
-            {
-                StopService("zmserv");
-                KillProcessByName("zmserv");
-            }
-            catch (Exception ex)
-            {
-                exceptionInfo = ex.Message;
-            }
+            StopService("zmserv", 30000, false);
+            KillProcessByName("zmserv");
             KillProcessByName("jfglzs");
             KillProcessByName("jfglzsn");
             KillProcessByName(GetPRZSCopyProcessName());
+        }
+        private void KillJFGLZS_Click(object sender, RoutedEventArgs e)
+        {
+            KillJFGLZS_Executor();
             Modern.ContentDialog successDialog = new Modern.ContentDialog()
             {
                 Title = "操作完成",
-                Content = "已尝试关闭机房管理助手" + (exceptionInfo == null ? "" : $"，期间遇到错误：{exceptionInfo}"),
+                Content = "已尝试关闭机房管理助手",
                 DefaultButton = Modern.ContentDialogButton.Close,
                 CloseButtonText = "确认"
             };
@@ -197,6 +194,9 @@ namespace MythKit.Pages.RestrictionsRemoving
         private List<Tuple<string, bool, string>> RecoverySystem_Background()
             => new List<Tuple<string, bool, string>>
             {
+                // 关闭机房管理助手
+                RecoverySystem_TryRun("关闭机房管理助手", KillJFGLZS_Executor),
+
                 // 恢复命令提示符 (CMD)
                 RecoverySystem_TryRun("恢复命令提示符", () => RegUtils.WriteRegistryValue(
                         Registry.CurrentUser,
@@ -214,6 +214,18 @@ namespace MythKit.Pages.RestrictionsRemoving
                         0,
                         RegistryValueKind.DWord
                     )),
+
+                // 恢复控制面板与设置
+                RecoverySystem_TryRun("恢复控制面板与设置", () =>
+                {
+                    RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoControlPanel", false);
+                    RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoSettingsPage", false);
+                }),
+                
+                // 恢复 MMC
+                RecoverySystem_TryRun("恢复 Windows 管理控制台", () => 
+                    RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Policies\\Microsoft", "MMC", false)
+                ),
 
                 // 恢复运行对话框 (Win+R)
                 RecoverySystem_TryRun("恢复运行对话框", () => RegUtils.WriteRegistryValue(
@@ -248,6 +260,14 @@ namespace MythKit.Pages.RestrictionsRemoving
                     RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "prozs");
                     RegUtils.DeleteRegistryKey(Registry.LocalMachine, "SOFTWARE\\WOW6432NODE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\RUN", "jfglzsn");
                 }),
+                
+                // 停止极域文件过滤器 & 网络过滤器服务
+                RecoverySystem_TryRun("停止极域文件过滤器 & 网络过滤器服务", () =>
+                {
+                    KillProcessByName("MasterHelper");
+                    StopService("TDFileFilter", 3000, false);
+                    StopService("TDNetFilter", 3000, false);
+                }),
 
                 // 启用 USB 存储
                 RecoverySystem_TryRun("启用 USB 存储", () =>
@@ -280,6 +300,7 @@ namespace MythKit.Pages.RestrictionsRemoving
                         0,
                         RegistryValueKind.DWord
                     );
+                    ShellExecute("gpupdate /force");
                 }, "可能需要重新拔插 USB 存储设备"),
 
                 // 恢复文件夹选项
@@ -792,7 +813,6 @@ namespace MythKit.Pages.RestrictionsRemoving
                     if (value != 0)
                     {
                         baseLBA = value;
-                        Console.WriteLine("Found Zengba Card data on PhysicalDrive{0}. Base LBA: {1}", diskIndex, baseLBA);
                         break; // 找到后退出循环，保持hDevice打开
                     }
                 }
@@ -804,7 +824,7 @@ namespace MythKit.Pages.RestrictionsRemoving
 
             if (baseLBA == 0)
             {
-                throw new Exception("Error: Could not find a drive with Zengba Card data.");
+                throw new Exception("未找到含有增霸卡数据的物理磁盘");
             }
 
             // 2. 读取存储密码的扇区
@@ -824,7 +844,7 @@ namespace MythKit.Pages.RestrictionsRemoving
             {
                 int error = Marshal.GetLastWin32Error();
                 NativeMethods.CloseHandle(hDevice);
-                throw new Exception(string.Format("Error: Failed to read sector. LastError: {0}", error));
+                throw new Exception(string.Format("读取扇区失败 => {0}", error));
             }
 
             // 3. 解密数据
@@ -870,83 +890,6 @@ namespace MythKit.Pages.RestrictionsRemoving
             if (ZBKPassword != null)
             {
                 Clipboard.SetText(ZBKPassword);
-            }
-        }
-        #endregion
-        #region 基础限制解除
-        private void BasicRR_Settings_ControlPanel_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoControlPanel", false);
-                RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoSettingsPage", false);
-                new Modern.ContentDialog()
-                {
-                    Title = "操作完成",
-                    Content = "已尝试启用设置和控制面板",
-                    DefaultButton = Modern.ContentDialogButton.Close,
-                    CloseButtonText = "确认"
-                }.ShowAsync();
-            }
-            catch (Exception ex)
-            {
-                new Modern.ContentDialog()
-                {
-                    Title = "操作失败",
-                    Content = ex.Message,
-                    DefaultButton = Modern.ContentDialogButton.Close,
-                    CloseButtonText = "确认"
-                }.ShowAsync();
-            }
-        }
-        private void BasicRR_TDNet_File_Filter_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                KillProcessByName("MasterHelper");
-                StopService("TDFileFilter", 3000, false);
-                StopService("TDNetFilter", 3000, false);
-                new Modern.ContentDialog()
-                {
-                    Title = "操作完成",
-                    Content = "已尝试关闭极域U盘/网络过滤器",
-                    DefaultButton = Modern.ContentDialogButton.Close,
-                    CloseButtonText = "确认"
-                }.ShowAsync();
-            }
-            catch (Exception ex)
-            {
-                new Modern.ContentDialog()
-                {
-                    Title = "操作失败",
-                    Content = ex.Message,
-                    DefaultButton = Modern.ContentDialogButton.Close,
-                    CloseButtonText = "确认"
-                }.ShowAsync();
-            }
-        }
-        private void BasicRR_Windows_MMC_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Policies\\Microsoft", "MMC", false);
-                new Modern.ContentDialog()
-                {
-                    Title = "操作完成",
-                    Content = "已尝试解禁 Windows 管理控制台",
-                    DefaultButton = Modern.ContentDialogButton.Close,
-                    CloseButtonText = "确认"
-                }.ShowAsync();
-            }
-            catch (Exception ex)
-            {
-                new Modern.ContentDialog()
-                {
-                    Title = "操作失败",
-                    Content = ex.Message,
-                    DefaultButton = Modern.ContentDialogButton.Close,
-                    CloseButtonText = "确认"
-                }.ShowAsync();
             }
         }
         #endregion
