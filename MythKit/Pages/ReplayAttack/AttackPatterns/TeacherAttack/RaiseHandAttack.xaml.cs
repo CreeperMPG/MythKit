@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Windows.Controls;
 
-namespace MythKit.Pages.UDPAttack.AttackFunctions.TeacherAttack
+namespace MythKit.Pages.ReplayAttack.AttackFunctions.TeacherAttack
 {
     /// <summary>
     /// RaiseHandAttack.xaml 的交互逻辑

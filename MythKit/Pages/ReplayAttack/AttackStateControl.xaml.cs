@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace MythKit.Pages.UDPAttack
+namespace MythKit.Pages.ReplayAttack
 {
     /// <summary>
     /// AttackStateControl.xaml 的交互逻辑

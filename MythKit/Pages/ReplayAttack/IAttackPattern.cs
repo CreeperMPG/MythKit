@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MythKit.Pages.UDPAttack
+namespace MythKit.Pages.ReplayAttack
 {
     public interface IAttackPattern
     {

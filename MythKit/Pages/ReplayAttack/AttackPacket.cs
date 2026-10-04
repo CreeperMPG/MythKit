@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MythKit.Pages.UDPAttack
+namespace MythKit.Pages.ReplayAttack
 {
     public class AttackPacket
     {

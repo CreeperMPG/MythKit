@@ -1,5 +1,5 @@
 ﻿using iNKORE.UI.WPF.Modern.Common.IconKeys;
-using MythKit.Pages.UDPAttack.AttackFunctions;
+using MythKit.Pages.ReplayAttack.AttackFunctions;
 using MythKit.Utils;
 using System;
 using System.Collections.Generic;
@@ -10,13 +10,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Modern = iNKORE.UI.WPF.Modern.Controls;
-using TeacherAttack = MythKit.Pages.UDPAttack.AttackFunctions.TeacherAttack;
+using TeacherAttack = MythKit.Pages.ReplayAttack.AttackFunctions.TeacherAttack;
 
-namespace MythKit.Pages.UDPAttack
+namespace MythKit.Pages.ReplayAttack
 {
     /// <summary>
     /// AttackIndex.xaml 的交互逻辑
@@ -25,42 +26,36 @@ namespace MythKit.Pages.UDPAttack
     {
         public List<IAttackPattern> DefaultAttackTypes { get; set; } = new List<IAttackPattern>();
         public ObservableCollection<UIAttackOption> UIAttackOptions { get; set; } = new ObservableCollection<UIAttackOption>();
-        public AttackIndex(string defaultType = null, string[] typeArguments = null)
-        {
-            InitializeComponent();
-            InitializePage();
-            SwitchToType(defaultType, typeArguments);
-        }
         public AttackIndex()
         {
             InitializeComponent();
             InitializePage();
         }
-        public bool SwitchToType(string defaultType, string[] typeArguments)
+        public bool InjectParams(string defaultType, JsonElement args)
         {
-            int index = DefaultAttackTypes.FindIndex((item) => item.AttackId == defaultType);
-            if (index >= 0)
-            {
-                if (typeArguments != null && typeArguments.Length > 0)
-                {
-                    IAttackPattern attackPattern = DefaultAttackTypes[index];
-                    Type patternType = attackPattern.GetType();
-                    ConstructorInfo constructor = patternType.GetConstructors().FirstOrDefault();
-                    if (constructor != null)
-                    {
-                        try
-                        {
-                            object instance = constructor.Invoke(typeArguments);
-                            DefaultAttackTypes[index] = (IAttackPattern)instance;
-                        }
-                        catch
-                        {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }
+            //int index = DefaultAttackTypes.FindIndex((item) => item.AttackId == defaultType);
+            //if (index >= 0)
+            //{
+            //    if (typeArguments != null && typeArguments.Length > 0)
+            //    {
+            //        IAttackPattern attackPattern = DefaultAttackTypes[index];
+            //        Type patternType = attackPattern.GetType();
+            //        ConstructorInfo constructor = patternType.GetConstructors().FirstOrDefault();
+            //        if (constructor != null)
+            //        {
+            //            try
+            //            {
+            //                object instance = constructor.Invoke(typeArguments);
+            //                DefaultAttackTypes[index] = (IAttackPattern)instance;
+            //            }
+            //            catch
+            //            {
+            //                return false;
+            //            }
+            //        }
+            //    }
+            //    return true;
+            //}
             return false;
         }
         private void InitializePage()

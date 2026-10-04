@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace MythKit.Pages.UDPAttack.AttackFunctions
+namespace MythKit.Pages.ReplayAttack.AttackFunctions
 {
     /// <summary>
     /// BlackScreenAttack.xaml 的交互逻辑

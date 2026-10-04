@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace MythKit.Pages.UDPAttack
+namespace MythKit.Pages.ReplayAttack
 {
     public enum WaitingState
     {

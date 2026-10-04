@@ -96,9 +96,11 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Text.Json, Version=10.0.0.10, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -126,15 +128,15 @@
     <Compile Include="Pages\TaskManager\TaskManagerIndex.xaml.cs">
       <DependentUpon>TaskManagerIndex.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackIndex.xaml.cs">
+    <Compile Include="Pages\ReplayAttack\AttackIndex.xaml.cs">
       <DependentUpon>AttackIndex.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackManagedTask.cs" />
-    <Compile Include="Pages\UDPAttack\AttackConfig.cs" />
-    <Compile Include="Pages\UDPAttack\AttackStateControl.xaml.cs">
+    <Compile Include="Pages\ReplayAttack\AttackManagedTask.cs" />
+    <Compile Include="Pages\ReplayAttack\AttackConfig.cs" />
+    <Compile Include="Pages\ReplayAttack\AttackStateControl.xaml.cs">
       <DependentUpon>AttackStateControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\IAttackPattern.cs" />
+    <Compile Include="Pages\ReplayAttack\IAttackPattern.cs" />
     <Compile Include="SingleInstanceManager.cs" />
     <Compile Include="Tasks\IManagedTask.cs" />
     <Compile Include="Tasks\TaskEntry.cs" />
@@ -186,27 +188,27 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\UDPAttack\AttackIndex.xaml">
+    <Page Include="Pages\ReplayAttack\AttackIndex.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Pages\UDPAttack\AttackPatterns\BlackScreenAttack.xaml">
+    <Page Include="Pages\ReplayAttack\AttackPatterns\BlackScreenAttack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\UDPAttack\AttackPatterns\CommandAttack.xaml">
+    <Page Include="Pages\ReplayAttack\AttackPatterns\CommandAttack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\UDPAttack\AttackPatterns\MessageAttack.xaml">
+    <Page Include="Pages\ReplayAttack\AttackPatterns\MessageAttack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\UDPAttack\AttackPatterns\TeacherAttack\RaiseHandAttack.xaml">
+    <Page Include="Pages\ReplayAttack\AttackPatterns\TeacherAttack\RaiseHandAttack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\UDPAttack\AttackStateControl.xaml">
+    <Page Include="Pages\ReplayAttack\AttackStateControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -225,20 +227,20 @@
     <Compile Include="Pages\RestrictionsRemoving\RestrictionsRemovingIndex.xaml.cs">
       <DependentUpon>RestrictionsRemovingIndex.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackPatterns\BlackScreenAttack.xaml.cs">
+    <Compile Include="Pages\ReplayAttack\AttackPatterns\BlackScreenAttack.xaml.cs">
       <DependentUpon>BlackScreenAttack.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackPatterns\CommandAttack.xaml.cs">
+    <Compile Include="Pages\ReplayAttack\AttackPatterns\CommandAttack.xaml.cs">
       <DependentUpon>CommandAttack.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackPatterns\MessageAttack.xaml.cs">
+    <Compile Include="Pages\ReplayAttack\AttackPatterns\MessageAttack.xaml.cs">
       <DependentUpon>MessageAttack.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackPatterns\TeacherAttack\RaiseHandAttack.xaml.cs">
+    <Compile Include="Pages\ReplayAttack\AttackPatterns\TeacherAttack\RaiseHandAttack.xaml.cs">
       <DependentUpon>RaiseHandAttack.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\UDPAttack\AttackPacket.cs" />
-    <Compile Include="Pages\UDPAttack\AttackTarget.cs" />
+    <Compile Include="Pages\ReplayAttack\AttackPacket.cs" />
+    <Compile Include="Pages\ReplayAttack\AttackTarget.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
