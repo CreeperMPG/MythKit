@@ -10,8 +10,8 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <ui:ScrollViewerEx>
         <ikw:SimpleStackPanel Spacing="8">
-            <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                <ui:ProgressRing Name="AttackProgressRing" IsIndeterminate="{Binding AttackTask.IsIndeterminate, Mode=OneWay}" Value="{Binding AttackTask.Progress, Mode=OneWay}" />
+            <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="16">
+                <ui:ProgressRing Name="AttackProgressRing" Width="48" Height="48" IsIndeterminate="{Binding AttackTask.IsIndeterminate, Mode=OneWay}" Value="{Binding AttackTask.Progress, Mode=OneWay}" />
                 <ikw:SimpleStackPanel>
                     <TextBlock Name="AttackProgressText" FontSize="16" FontWeight="Bold">
                         <Run Text="进度"/>
@@ -44,6 +44,14 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
+                    <TextBlock Name="AttackContentIndexTextBlock"> <!--正在处理第 x/y 项数据包-->
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}正在处理第 {0} / {1} 项数据包。">
+                                <Binding Path="AttackTask.CurrentContentIndexUI" />
+                                <Binding Path="AttackTask.Config.AttackContent.Count" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                     <TextBlock Name="AttackTargetTextBlock"> <!--第 x/y 轮攻击，本轮已攻击 a/b 个 IP-->
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
@@ -53,7 +61,7 @@
                                             <Setter.Value>
                                                 <MultiBinding StringFormat="{}第 {0} 轮攻击，本轮已攻击 {1}/{2} 个 IP。">
                                                     <Binding Path="AttackTask.CurrentCycle" />
-                                                    <Binding Path="AttackTask.CurrentTargetIndexUI" />
+                                                    <Binding Path="AttackTask.CurrentTargetIndex" />
                                                     <Binding Path="AttackTask.Config.TargetIPs.Count" />
                                                 </MultiBinding>
                                             </Setter.Value>
@@ -65,7 +73,7 @@
                                                 <MultiBinding StringFormat="{}第 {0}/{1} 轮攻击，本轮已攻击 {2}/{3} 个 IP。">
                                                     <Binding Path="AttackTask.CurrentCycle" />
                                                     <Binding Path="AttackTask.Config.TotalCycles" />
-                                                    <Binding Path="AttackTask.CurrentTargetIndexUI" />
+                                                    <Binding Path="AttackTask.CurrentTargetIndex" />
                                                     <Binding Path="AttackTask.Config.TargetIPs.Count" />
                                                 </MultiBinding>
                                             </Setter.Value>
@@ -87,6 +95,9 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding AttackTask.CurrentWaitingState}" Value="{x:Static local:WaitingState.CycleInterval}">
                                         <Setter Property="Text" Value="{Binding AttackTask.RemainingWaitingSeconds, Mode=OneWay, StringFormat={}等待 {0} 秒后攻击下一轮…}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding AttackTask.Cancelled}" Value="True">
+                                        <Setter Property="Text" Value="攻击已取消"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding AttackTask.Paused}" Value="True">
                                         <Setter Property="Text" Value="攻击已暂停"/>

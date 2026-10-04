@@ -21,6 +21,14 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions.TeacherAttack
         public string AttackName => "（教师端）举手";
         public string AttackId => "raise_hand";
         public AttackTarget Target => AttackTarget.Teacher;
+        public IAttackPattern Clone()
+        {
+            var clone = new RaiseHandAttack();
+            clone.RaiseHandInterval.Value = RaiseHandInterval.Value;
+            clone.TDChannelID.Value = TDChannelID.Value;
+            return clone;
+        }
+
         public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
         {
             byte[] packetRaise = new byte[72]

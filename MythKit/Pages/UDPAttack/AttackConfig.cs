@@ -12,12 +12,17 @@ namespace MythKit.Pages.UDPAttack
         public int SingleGroupSize { get; set; }
         public int GroupIntevalMilliseconds { get; set; }
     }
+    public class SingleAttackPack
+    {
+        public IAttackPattern AttackPattern { get; set; }
+        public int DelayMilliseconds { get; set; }
+    }
     public class AttackConfig
     {
         public List<IPAddress> TargetIPs { get; set; } = new List<IPAddress>();
         public IPGroupConfig? GroupConfig { get; set; }
         public int CycleIntervalMilliseconds { get; set; } = 1000;
         public int? TotalCycles { get; set; } // Infinity when null
-        public IAttackPattern AttackPattern { get; set; }
+        public List<SingleAttackPack> AttackContent { get; set; }
     }
 }

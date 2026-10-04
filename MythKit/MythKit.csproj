@@ -146,6 +146,7 @@
     <Compile Include="Utils\ObservableHashSet.cs" />
     <Compile Include="Utils\QueryStringHelper.cs" />
     <Compile Include="Utils\RegUtils.cs" />
+    <Compile Include="Utils\WPFUtils.cs" />
     <Page Include="HomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

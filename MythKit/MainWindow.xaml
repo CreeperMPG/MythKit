@@ -7,8 +7,9 @@
         mc:Ignorable="d"
         xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
         Loaded="Window_Loaded"
-        MinWidth="800" MinHeight="450"
-        Title="Myth Kit - 极域工具箱" Height="450" Width="800">
+        MinHeight="495" MinWidth="880"
+        Height="495" Width="880"
+        Title="Myth Kit">
     <Grid>
         <local:HomePage x:Name="AppPageInstance"/>
         <ui:ProgressRing IsActive="False" Name="LoadingRing"/>

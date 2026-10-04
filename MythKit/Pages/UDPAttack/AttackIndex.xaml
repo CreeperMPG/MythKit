@@ -36,25 +36,97 @@
                     </ui:SettingsCard>
                 </ui:SettingsExpander.Items>
             </ui:SettingsExpander>
-            <ui:SettingsExpander Name="AttackCommandCard" Header="执行命令" IsEnabled="True" IsExpanded="True">
+            <ui:SettingsExpander Name="AttackCommandCard" Header="数据包配置" IsEnabled="True" IsExpanded="True" ItemsSource="{Binding UIAttackOptions}">
                 <ui:SettingsExpander.HeaderIcon>
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.KeyCommand_16_Regular}" />
                 </ui:SettingsExpander.HeaderIcon>
-                <ui:SettingsExpander.Items>
-                    <ui:SettingsCard Name="AttackArgumentsCard" ContentAlignment="Vertical" />
+                <ui:SettingsExpander.ItemsHeader>
                     <ui:SettingsCard ContentAlignment="Left">
-                        <ui:SettingsCard.Content>
-                            <Button Content="查看关于字符串格式化的说明" Name="StringFormattingDisplayButton">
-                                <ui:FlyoutService.Flyout>
-                                    <ui:Flyout Placement="Bottom">
-                                        <TextBlock TextWrapping="Wrap" Name="StringFormattingDescription"/>
-                                    </ui:Flyout>
-                                </ui:FlyoutService.Flyout>
-                            </Button>
-                        </ui:SettingsCard.Content>
+                        <ui:HyperlinkButton VerticalAlignment="Center" Name="AddAttackButton" Click="AddAttackButton_Click">
+                            <ui:HyperlinkButton.Content>
+                                <ui:IconAndText Content="添加数据包" Icon="{x:Static ui:FluentSystemIcons.AddCircle_16_Regular}"/>
+                            </ui:HyperlinkButton.Content>
+                        </ui:HyperlinkButton>
                     </ui:SettingsCard>
-                </ui:SettingsExpander.Items>
-                <ComboBox Name="AttackCommandTypeComboBox" IsTextSearchEnabled="False" IsEditable="False" SelectionChanged="AttackCommandTypeComboBox_SelectionChanged"/>
+                </ui:SettingsExpander.ItemsHeader>
+                <ui:SettingsExpander.Content>
+                    <Button Content="字符串格式化说明" Name="StringFormattingDisplayButton">
+                        <ui:FlyoutService.Flyout>
+                            <ui:Flyout Placement="Bottom">
+                                <TextBlock TextWrapping="Wrap" Name="StringFormattingDescription"/>
+                            </ui:Flyout>
+                        </ui:FlyoutService.Flyout>
+                    </Button>
+                </ui:SettingsExpander.Content>
+                <ui:SettingsExpander.ItemTemplate>
+                    <DataTemplate DataType="{x:Type local:UIAttackOption}">
+                        <ui:SettingsCard ContentAlignment="Vertical" DataContext="{Binding}">
+                            <ui:SettingsCard.HeaderIcon>
+                                <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.ReOrderDotsVertical_24_Regular}" />
+                            </ui:SettingsCard.HeaderIcon>
+
+                            <ui:SettingsCard.Header>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="4" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 上移按钮 -->
+                                    <Button Grid.Column="0" Click="MoveUpButton_Click">
+                                        <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.ArrowUp_16_Regular}" />
+                                    </Button>
+
+                                    <!-- 下移按钮 -->
+                                    <Button Grid.Column="2" Click="MoveDownButton_Click">
+                                        <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.ArrowDown_16_Regular}" />
+                                    </Button>
+
+                                    <!-- 启用开关 -->
+                                    <ui:ToggleSwitch Grid.Column="4" IsOn="{Binding Enabled, Mode=TwoWay}" />
+
+                                    <!-- 数据包类型标签 -->
+                                    <TextBlock Grid.Column="6"
+                                           Text="数据包类型："
+                                           VerticalAlignment="Center" />
+                                    <ComboBox x:Name="AttackTypeComboBox"
+                                          Grid.Column="7"
+                                          DisplayMemberPath="AttackName"
+                                          SelectedIndex="{Binding PatternSelectedIndex, Mode=TwoWay}"
+                                          IsEditable="False"
+                                          ItemsSource="{Binding AttackTypes}" />
+                                    <TextBlock Grid.Column="9"
+                                           Text="延迟(毫秒)："
+                                           VerticalAlignment="Center" />
+                                    <ui:NumberBox Grid.Column="10"
+                                          MinWidth="80"
+                                          Minimum="0"
+                                          SpinButtonPlacementMode="Compact"
+                                          Value="{Binding DelayMs, Mode=TwoWay}" />
+                                    <!-- 删除按钮 -->
+                                    <Button Grid.Column="12" Click="DeleteButton_Click">
+                                        <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Delete_16_Regular}" Foreground="Red"/>
+                                    </Button>
+                                </Grid>
+                            </ui:SettingsCard.Header>
+                            <ContentControl Margin="0,8,0,0"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Content="{Binding SelectedItem.Source, ElementName=AttackTypeComboBox}" />
+                        </ui:SettingsCard>
+                    </DataTemplate>
+                </ui:SettingsExpander.ItemTemplate>
             </ui:SettingsExpander>
             <ui:SettingsExpander Name="MoreSettingsCard" Header="更多设置" IsEnabled="True" IsExpanded="True">
                 <ui:SettingsExpander.HeaderIcon>

@@ -1,17 +1,20 @@
-﻿using MythKit.Pages.Home;
+﻿using iNKORE.UI.WPF.Modern.Common.IconKeys;
 using MythKit.Pages.UDPAttack.AttackFunctions;
-using TeacherAttack = MythKit.Pages.UDPAttack.AttackFunctions.TeacherAttack;
+using MythKit.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.Windows.Data;
 using Modern = iNKORE.UI.WPF.Modern.Controls;
+using TeacherAttack = MythKit.Pages.UDPAttack.AttackFunctions.TeacherAttack;
 
 namespace MythKit.Pages.UDPAttack
 {
@@ -20,7 +23,8 @@ namespace MythKit.Pages.UDPAttack
     /// </summary>
     public partial class AttackIndex : UserControl
     {
-        public List<IAttackPattern> AttackTypes { get; set; } = new List<IAttackPattern>();
+        public List<IAttackPattern> DefaultAttackTypes { get; set; } = new List<IAttackPattern>();
+        public ObservableCollection<UIAttackOption> UIAttackOptions { get; set; } = new ObservableCollection<UIAttackOption>();
         public AttackIndex(string defaultType = null, string[] typeArguments = null)
         {
             InitializeComponent();
@@ -34,12 +38,12 @@ namespace MythKit.Pages.UDPAttack
         }
         public bool SwitchToType(string defaultType, string[] typeArguments)
         {
-            int index = AttackTypes.FindIndex((item) => item.AttackId == defaultType);
+            int index = DefaultAttackTypes.FindIndex((item) => item.AttackId == defaultType);
             if (index >= 0)
             {
                 if (typeArguments != null && typeArguments.Length > 0)
                 {
-                    IAttackPattern attackPattern = AttackTypes[index];
+                    IAttackPattern attackPattern = DefaultAttackTypes[index];
                     Type patternType = attackPattern.GetType();
                     ConstructorInfo constructor = patternType.GetConstructors().FirstOrDefault();
                     if (constructor != null)
@@ -47,7 +51,7 @@ namespace MythKit.Pages.UDPAttack
                         try
                         {
                             object instance = constructor.Invoke(typeArguments);
-                            AttackTypes[index] = (IAttackPattern)instance;
+                            DefaultAttackTypes[index] = (IAttackPattern)instance;
                         }
                         catch
                         {
@@ -55,7 +59,6 @@ namespace MythKit.Pages.UDPAttack
                         }
                     }
                 }
-                AttackCommandTypeComboBox.SelectedIndex = index;
                 return true;
             }
             return false;
@@ -68,13 +71,18 @@ namespace MythKit.Pages.UDPAttack
                 "\t${ip} - IP 地址\n" +
                 "\t${cycle} - 攻击轮数\n" +
                 "\t${group} - 攻击组数";
-            // 注册攻击类型
-            AttackTypes.Add(new MessageAttack());
-            AttackTypes.Add(new CommandAttack());
-            AttackTypes.Add(new BlackScreenAttack());
-            AttackTypes.Add(new TeacherAttack.RaiseHandAttack());
-            AttackCommandTypeComboBox.ItemsSource = AttackTypes.Select((item) => item.AttackName);
-            AttackCommandTypeComboBox.SelectedIndex = 0;
+            UIAttackOptions.Add(new UIAttackOption());
+        }
+        public static List<IAttackPattern> GetNewAttackPatterns()
+        {
+            List<IAttackPattern> result = new List<IAttackPattern>
+            {
+                new MessageAttack(),
+                new CommandAttack(),
+                new BlackScreenAttack(),
+                new TeacherAttack.RaiseHandAttack()
+            };
+            return result;
         }
         private void InternetIPCollectButton_Click(object sender, RoutedEventArgs e)
         {
@@ -143,7 +151,7 @@ namespace MythKit.Pages.UDPAttack
             AttackConfig config = new AttackConfig()
             {
                 TargetIPs = ipAddresses.Select(ip => IPAddress.Parse(ip)).ToList(),
-                AttackPattern = AttackTypes[AttackCommandTypeComboBox.SelectedIndex],
+                AttackContent = UIAttackOptions.Where(opt => opt.Enabled).Select(opt => opt.ToSingleAttackPack()).ToList(),
                 CycleIntervalMilliseconds = (int)(IntervalSeconds.Value * 1000),
                 TotalCycles = EnableInterval.IsChecked ?? false ? NotInfiniteSwitch.IsChecked ?? false ? (int)IntervalTimes.Value : (int?)null : 1
             };
@@ -183,16 +191,106 @@ namespace MythKit.Pages.UDPAttack
             attackDialog.ShowAsync();
             return;
         }
-
-        private void AttackCommandTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            AttackArgumentsCard.Content = AttackTypes[AttackCommandTypeComboBox.SelectedIndex];
-        }
         public static int MythwareDefaultPort = 4705;
 
         private void TDDefaultPort_ValueChanged(Modern.NumberBox sender, Modern.NumberBoxValueChangedEventArgs args)
         {
             MythwareDefaultPort = (int)args.NewValue;
         }
+
+        private void AddAttackButton_Click(object sender, RoutedEventArgs e)
+        {
+            UIAttackOptions.Add(new UIAttackOption());
+        }
+        private void MoveUpButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is FrameworkElement fe) || !(fe.DataContext is UIAttackOption option))
+                return;
+
+            int index = UIAttackOptions.IndexOf(option);
+            if (index <= 0)
+                return;
+
+            UIAttackOptions.RemoveAt(index);
+            UIAttackOptions.Insert(index - 1, option);
+        }
+
+        private void MoveDownButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is FrameworkElement fe) || !(fe.DataContext is UIAttackOption option))
+                return;
+
+            int index = UIAttackOptions.IndexOf(option);
+            if (index < 0 || index >= UIAttackOptions.Count - 1)
+                return;
+
+            UIAttackOptions.RemoveAt(index);
+            UIAttackOptions.Insert(index + 1, option);
+        }
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is FrameworkElement fe) || !(fe.DataContext is UIAttackOption option))
+                return;
+
+            if (UIAttackOptions.Count > 1)
+            {
+                UIAttackOptions.Remove(option);
+            }
+        }
+    }
+    public class AttackTypeItem
+    {
+        public string AttackName { get; set; }
+        public IAttackPattern Source { get; set; }   // 原对象
+    }
+    public class UIAttackOption : INotifyPropertyChanged
+    {
+        private int _patternSelectedIndex = 0;
+        private int _delayMs;
+        private bool _enabled;
+        public int PatternSelectedIndex
+        {
+            get => _patternSelectedIndex;
+            set
+            {
+                _patternSelectedIndex = value;
+                OnPropertyChanged();
+            }
+        }
+        public int DelayMs
+        {
+            get => _delayMs;
+            set
+            {
+                _delayMs = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool Enabled
+        {
+            get => _enabled;
+            set
+            {
+                _enabled = value;
+                OnPropertyChanged();
+            }
+        }
+        public IList<AttackTypeItem> AttackTypes { get; private set; }
+        public SingleAttackPack ToSingleAttackPack()
+        {
+            return new SingleAttackPack()
+            {
+                AttackPattern = AttackTypes[PatternSelectedIndex].Source,
+                DelayMilliseconds = DelayMs
+            };
+        }
+        public UIAttackOption()
+        {
+            Enabled = true;
+            AttackTypes = AttackIndex.GetNewAttackPatterns().Select(pt => new AttackTypeItem { AttackName = pt.AttackName, Source = pt }).ToList();
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

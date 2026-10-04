@@ -29,6 +29,13 @@ namespace MythKit.Pages.UDPAttack
             if (attackManagedTask.IsIndeterminate)
             {
                 AttackProgressText.Text = "正在进行无限次攻击";
+                attackManagedTask.StateUpdated += (state) =>
+                {
+                    if (state == TaskState.Cancelled)
+                    {
+                        Dispatcher.Invoke(() => { AttackProgressRing.IsIndeterminate = false; AttackProgressRing.Value = 100; });
+                    }
+                };
             }
             DataContext = this;
         }

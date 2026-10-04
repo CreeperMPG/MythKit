@@ -80,6 +80,18 @@ namespace MythKit.Pages.UDPAttack
             }
         }
 
+        private int _currentContentIndex = 1;
+        public int CurrentContentIndex
+        {
+            get => _currentContentIndex;
+            private set
+            {
+                _currentContentIndex = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CurrentContentIndexUI));
+            }
+        }
+        public int CurrentContentIndexUI => CurrentContentIndex + 1; // UI 显示从 1 开始
         private int _currentTargetIndex = 1;
         public int CurrentTargetIndex
         {
@@ -89,10 +101,8 @@ namespace MythKit.Pages.UDPAttack
                 _currentTargetIndex = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(CurrentAttackCount));
-                OnPropertyChanged(nameof(CurrentTargetIndexUI));
             }
         }
-        public int CurrentTargetIndexUI => CurrentTargetIndex - 1; // 用于 UI 显示的索引，从 0 开始
         private WaitingState _currentWaitingState = WaitingState.None;
         public WaitingState CurrentWaitingState
         {
@@ -113,8 +123,8 @@ namespace MythKit.Pages.UDPAttack
                 OnPropertyChanged();
             }
         }
-        public int CurrentAttackCount => (CurrentCycle - 1) * Config.TargetIPs.Count + CurrentTargetIndex;
-        public int? TotalAttackCount => Config.TotalCycles.HasValue ? (int?)(Config.TotalCycles.Value * Config.TargetIPs.Count) : null;
+        public int CurrentAttackCount => (CurrentCycle - 1) * Config.AttackContent.Count * Config.TargetIPs.Count + CurrentContentIndex * Config.TargetIPs.Count + CurrentTargetIndex;
+        public int? TotalAttackCount => Config.TotalCycles.HasValue ? (int?)(Config.TotalCycles.Value * Config.TargetIPs.Count * Config.AttackContent.Count) : null;
         private bool _paused = false;
         public bool Paused
         {
@@ -122,6 +132,16 @@ namespace MythKit.Pages.UDPAttack
             set
             {
                 _paused = value;
+                OnPropertyChanged();
+            }
+        }
+        private bool _cancelled = false;
+        public bool Cancelled
+        {
+            get => _cancelled;
+            set
+            {
+                _cancelled = value;
                 OnPropertyChanged();
             }
         }
@@ -139,76 +159,89 @@ namespace MythKit.Pages.UDPAttack
                 string totalCycleIndicator = Config.TotalCycles.HasValue ? $" / {Config.TotalCycles.Value}" : "";
                 for (; Config.TotalCycles == null || CurrentCycle <= Config.TotalCycles.Value; CurrentCycle++)
                 {
-                    CurrentTargetIndex = 1;
                     if (CurrentCycle != 1)
                     {
                         CurrentWaitingState = WaitingState.CycleInterval;
                         await WaitWithStatusAsync(Config.CycleIntervalMilliseconds, cancellationToken, $"第 {CurrentCycle - 1}{totalCycleIndicator} 轮攻击结束，等待间隔");
                         CurrentWaitingState = WaitingState.None;
                     }
-                    CurrentGroup = 1;
-                    for (; CurrentTargetIndex <= Config.TargetIPs.Count; CurrentTargetIndex++)
+                    CurrentContentIndex = 0;
+                    for (; CurrentContentIndex < Config.AttackContent.Count; CurrentContentIndex++)
                     {
-                        if (Config.GroupConfig != null && CurrentTargetIndex != 1 && (CurrentTargetIndex - 1) % Config.GroupConfig.Value.SingleGroupSize == 0)
+                        CurrentGroup = 1;
+                        if (Config.AttackContent[CurrentContentIndex].DelayMilliseconds != 0)
                         {
-                            CurrentWaitingState = WaitingState.GroupInterval;
-                            await WaitWithStatusAsync(Config.GroupConfig.Value.GroupIntevalMilliseconds, cancellationToken, $"第 {CurrentCycle}{totalCycleIndicator} 轮，第 {CurrentGroup} 组攻击结束，等待组间间隔");
-                            CurrentGroup++;
+                            CurrentWaitingState = WaitingState.CycleInterval;
+                            await WaitWithStatusAsync(Config.AttackContent[CurrentContentIndex].DelayMilliseconds, cancellationToken, $"第 {CurrentCycle}{totalCycleIndicator} 轮第 {CurrentContentIndex + 1} / {Config.AttackContent.Count} 个数据包即将开始发送，等待延迟");
                             CurrentWaitingState = WaitingState.None;
                         }
-                        var targetIP = Config.TargetIPs[CurrentTargetIndex - 1];
-                        StateMessageUpdatedBackground?.Invoke($"第 {CurrentCycle} 轮，第 {CurrentTargetIndex}/{Config.TargetIPs.Count} 个目标: {targetIP}");
+                        CurrentTargetIndex = 1;
+                        for (; CurrentTargetIndex <= Config.TargetIPs.Count; CurrentTargetIndex++)
+                        {
+                            if (Config.GroupConfig != null && CurrentTargetIndex != 1 && (CurrentTargetIndex - 1) % Config.GroupConfig.Value.SingleGroupSize == 0)
+                            {
+                                CurrentWaitingState = WaitingState.GroupInterval;
+                                await WaitWithStatusAsync(Config.GroupConfig.Value.GroupIntevalMilliseconds, cancellationToken, $"第 {CurrentCycle}{totalCycleIndicator} 轮，第 {CurrentGroup} 组攻击结束，等待组间间隔");
+                                CurrentGroup++;
+                                CurrentWaitingState = WaitingState.None;
+                            }
+                            var targetIP = Config.TargetIPs[CurrentTargetIndex - 1];
+                            StateMessageUpdatedBackground?.Invoke($"第 {CurrentCycle} 轮，第 {CurrentTargetIndex}/{Config.TargetIPs.Count} 个目标: {targetIP}");
 
-                        // 构造数据包并发送
-                        AttackPacket packets = null; string errorMessage = "";
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            packets = Config.AttackPattern.ConstructPacket(ref errorMessage, targetIP, CurrentCycle, CurrentGroup);
-                        });
-                        for (int packetCount = 0; packetCount < packets.AttackPackets.Count; packetCount++)
-                        {
-                            UdpClient udpClient = new UdpClient();
-                            byte[] packet = packets.AttackPackets[packetCount];
-                            try
+                            // 构造数据包并发送
+                            AttackPacket packets = null; string errorMessage = "";
+                            Application.Current.Dispatcher.Invoke(() =>
                             {
-                                udpClient.Send(packet, packet.Length, targetIP.ToString(), packets.TargetPort);
+                                packets = Config.AttackContent[CurrentContentIndex].AttackPattern.ConstructPacket(ref errorMessage, targetIP, CurrentCycle, CurrentGroup);
+                            });
+                            for (int packetCount = 0; packetCount < packets.AttackPackets.Count; packetCount++)
+                            {
+                                UdpClient udpClient = new UdpClient();
+                                byte[] packet = packets.AttackPackets[packetCount];
+                                try
+                                {
+                                    udpClient.Send(packet, packet.Length, targetIP.ToString(), packets.TargetPort);
+                                }
+                                catch
+                                {
+                                }
+                                if (packets.IntervalMiliseconds > 0 && packetCount == packets.AttackPackets.Count - 1)
+                                {
+                                    await Task.Delay(packets.IntervalMiliseconds, cancellationToken);
+                                }
                             }
-                            catch
+                            if (errorMessage != "") AddErrorMessage(errorMessage);
+                            if (Config.TotalCycles.HasValue)
                             {
+                                ProgressBackgroundUpdate(100.0 * CurrentAttackCount / TotalAttackCount.Value);
                             }
-                            if (packets.IntervalMiliseconds > 0 && packetCount == packets.AttackPackets.Count - 1)
+                            if (Paused)
                             {
-                                await Task.Delay(packets.IntervalMiliseconds, cancellationToken);
+                                StateMessageUpdated?.Invoke("攻击已暂停。点击详情按钮操控攻击启停");
+                                while (Paused)
+                                {
+                                    await Task.Delay(500, cancellationToken);
+                                }
+                            }
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                StateUpdated?.Invoke(TaskState.Cancelled);
+                                return;
                             }
                         }
-                        if (errorMessage != "") AddErrorMessage(errorMessage);
-                        if (Config.TotalCycles.HasValue)
-                        {
-                            ProgressBackgroundUpdate(100.0 * CurrentAttackCount / TotalAttackCount.Value);
-                        }
-                        if (Paused)
-                        {
-                            StateMessageUpdated?.Invoke("攻击已暂停。点击详情按钮操控攻击启停");
-                            while (Paused)
-                            {
-                                await Task.Delay(500, cancellationToken);
-                            }
-                        }
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            StateUpdated?.Invoke(TaskState.Cancelled);
-                            return;
-                        }
+                        CurrentTargetIndex--;
                     }
-                    CurrentTargetIndex--;
+                    CurrentContentIndex--;
                 }
                 CurrentCycle--;
+                OnPropertyChanged(nameof(CurrentAttackCount));
                 Progress = 100;
                 StateUpdated?.Invoke(TaskState.Completed);
             }
             catch (OperationCanceledException)
             {
                 StateUpdated?.Invoke(TaskState.Cancelled);
+                Cancelled = true;
                 return;
             }
         }

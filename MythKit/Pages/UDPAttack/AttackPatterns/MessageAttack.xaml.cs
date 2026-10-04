@@ -20,6 +20,8 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
         public string AttackName => "发送消息";
         public string AttackId => "send_message";
         public AttackTarget Target => AttackTarget.Student;
+        public IAttackPattern Clone() => new MessageAttack(Message.Text);
+
         public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
         {
             byte[] packet;

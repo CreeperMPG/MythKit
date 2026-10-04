@@ -30,6 +30,14 @@ namespace MythKit.Pages.UDPAttack.AttackFunctions
         public string AttackName => "黑屏安静";
         public string AttackId => "black_screen";
         public AttackTarget Target => AttackTarget.Student;
+        public IAttackPattern Clone()
+        {
+            var clone = new BlackScreenAttack();
+            clone.OpenCloseSwitch.IsOn = OpenCloseSwitch.IsOn;
+            clone.TDChannelID.Value = TDChannelID.Value;
+            return clone;
+        }
+
         public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
         {
             byte[] packetBlack = new byte[55]

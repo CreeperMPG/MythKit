@@ -11,11 +11,11 @@
     <ikw:SimpleStackPanel Spacing="16">
         <TextBox
 			Name="Command"
-			ui:ControlHelper.Header="CMD 命令"
+			ui:ControlHelper.Header="启动的应用程序"
 			ui:ControlHelper.PlaceholderText="（支持字符串格式化）运行不存在的应用程序会导致学生端崩溃" />
         <TextBox
 			Name="Arguments"
 			ui:ControlHelper.Header="参数"
-			ui:ControlHelper.PlaceholderText="（支持字符串格式化）启动程序的命令行参数" />
+			ui:ControlHelper.PlaceholderText="（支持字符串格式化）命令行参数" />
     </ikw:SimpleStackPanel>
 </UserControl>

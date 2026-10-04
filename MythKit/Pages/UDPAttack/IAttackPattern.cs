@@ -13,5 +13,6 @@ namespace MythKit.Pages.UDPAttack
         AttackTarget Target { get; }
         string AttackName { get; }
         string AttackId { get; }
+        IAttackPattern Clone();
     }
 }
