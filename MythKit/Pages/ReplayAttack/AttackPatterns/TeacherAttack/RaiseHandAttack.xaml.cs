@@ -21,12 +21,18 @@ namespace MythKit.Pages.ReplayAttack.AttackFunctions.TeacherAttack
         public string AttackName => "（教师端）举手";
         public string AttackId => "raise_hand";
         public AttackTarget Target => AttackTarget.Teacher;
-        public IAttackPattern Clone()
+        public void Deserialize(Dictionary<string, object> serializedData)
         {
-            var clone = new RaiseHandAttack();
-            clone.RaiseHandInterval.Value = RaiseHandInterval.Value;
-            clone.TDChannelID.Value = TDChannelID.Value;
-            return clone;
+            if (serializedData == null)
+                return;
+
+            if (serializedData.TryGetValue("raiseHandInterval", out object intervalValue) &&
+                double.TryParse(Convert.ToString(intervalValue), out double interval))
+                RaiseHandInterval.Value = interval;
+
+            if (serializedData.TryGetValue("tdChannelId", out object channelValue) &&
+                double.TryParse(Convert.ToString(channelValue), out double channelId))
+                TDChannelID.Value = channelId;
         }
 
         public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)

@@ -145,6 +145,7 @@
     <Compile Include="Utils\ConverterChain.cs" />
     <Compile Include="Utils\InverseBooleanConverter.cs" />
     <Compile Include="Utils\InverseVisibilityConverter.cs" />
+    <Compile Include="Utils\JSONUtils.cs" />
     <Compile Include="Utils\ObservableHashSet.cs" />
     <Compile Include="Utils\QueryStringHelper.cs" />
     <Compile Include="Utils\RegUtils.cs" />

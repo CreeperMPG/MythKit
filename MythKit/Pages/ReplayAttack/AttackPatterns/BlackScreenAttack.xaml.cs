@@ -30,12 +30,18 @@ namespace MythKit.Pages.ReplayAttack.AttackFunctions
         public string AttackName => "黑屏安静";
         public string AttackId => "black_screen";
         public AttackTarget Target => AttackTarget.Student;
-        public IAttackPattern Clone()
+        public void Deserialize(Dictionary<string, object> serializedData)
         {
-            var clone = new BlackScreenAttack();
-            clone.OpenCloseSwitch.IsOn = OpenCloseSwitch.IsOn;
-            clone.TDChannelID.Value = TDChannelID.Value;
-            return clone;
+            if (serializedData == null)
+                return;
+
+            if (serializedData.TryGetValue("openCloseSwitch", out object openCloseValue) &&
+                bool.TryParse(Convert.ToString(openCloseValue), out bool isOn))
+                OpenCloseSwitch.IsOn = isOn;
+
+            if (serializedData.TryGetValue("tdChannelId", out object channelValue) &&
+                double.TryParse(Convert.ToString(channelValue), out double channelId))
+                TDChannelID.Value = channelId;
         }
 
         public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)

@@ -13,6 +13,6 @@ namespace MythKit.Pages.ReplayAttack
         AttackTarget Target { get; }
         string AttackName { get; }
         string AttackId { get; }
-        IAttackPattern Clone();
+        void Deserialize(Dictionary<string, object> serializedData);
     }
 }

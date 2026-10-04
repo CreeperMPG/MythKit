@@ -1,10 +1,11 @@
-﻿using MythKit.Pages.UDPAttack;
+﻿using MythKit.Pages.ReplayAttack;
 using MythKit.Tasks;
 using MythKit.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Markup;
 using Modern = iNKORE.UI.WPF.Modern.Controls;
@@ -21,28 +22,6 @@ namespace MythKit
         {
             SingleInstanceManager.Cleanup();
             base.OnExit(e);
-        }
-        public static List<string> DecodePrefixedStrings(string data)
-        {
-            if (data == null)
-            {
-                return new List<string>();
-            }
-            var result = new List<string>();
-            int index = 0;
-            while (index < data.Length)
-            {
-                if (index + 4 > data.Length)
-                    break;
-                int length = int.Parse(data.Substring(index, 4));
-                index += 4;
-                if (index + length > data.Length)
-                    break;
-                length = Math.Min(length, data.Length - index);
-                result.Add(data.Substring(index, length));
-                index += length;
-            }
-            return result;
         }
         public static TaskManager TaskManagerInstance { get; } = new TaskManager();
         private string _activatedUri = null;
@@ -62,6 +41,7 @@ namespace MythKit
             if (!first)
             {
                 Shutdown();
+                return;
             }
 
             string[] args = Environment.GetCommandLineArgs();
@@ -134,15 +114,27 @@ namespace MythKit
                     if (segments.Count > 0 && segments[0].ToLower() == "recommend")
                     {
                         string targetIPs = paramsCollection["target"] ?? "";
-                        string attackType = paramsCollection["type"];
-                        var attackParams = DecodePrefixedStrings(paramsCollection["params"]).ToArray();
-                        var N = HomePage.Instance.NavView;
-                        N.SelectedItem = N.MenuItems[1];
-                        N.Header = "UDP 重放";
-                        HomePage.Instance.AppFrameNavigate(typeof(AttackIndex), null);
-                        HomePage.NavPages.TryGetValue(typeof(AttackIndex), out object _index);
-                        var index = _index as AttackIndex;
-                        index.SwitchToType(attackType, attackParams);
+                        try
+                        {
+                            JsonDocument attackParams = JsonDocument.Parse(paramsCollection["params"]);
+                            var N = HomePage.Instance.NavView;
+                            N.SelectedItem = N.MenuItems[1];
+                            N.Header = "重放攻击";
+                            HomePage.Instance.AppFrameNavigate(typeof(AttackIndex), null);
+                            HomePage.NavPages.TryGetValue(typeof(AttackIndex), out object _index);
+                            var index = _index as AttackIndex;
+                            index.InjectParams(attackParams.RootElement);
+                        }
+                        catch (Exception ex)
+                        {
+                            new Modern.ContentDialog
+                            {
+                                Title = "参数错误",
+                                Content = $"无法解析攻击参数，请检查链接是否正确。{ex.Message}",
+                                CloseButtonText = "确定"
+                            }.ShowAsync();
+                            return;
+                        }
                     }
                     break;
             }

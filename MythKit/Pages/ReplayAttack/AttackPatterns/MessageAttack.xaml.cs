@@ -20,7 +20,11 @@ namespace MythKit.Pages.ReplayAttack.AttackFunctions
         public string AttackName => "发送消息";
         public string AttackId => "send_message";
         public AttackTarget Target => AttackTarget.Student;
-        public IAttackPattern Clone() => new MessageAttack(Message.Text);
+        public void Deserialize(Dictionary<string, object> serializedData)
+        {
+            if (serializedData != null && serializedData.TryGetValue("message", out object message) && message is string text)
+                Message.Text = text;
+        }
 
         public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
         {

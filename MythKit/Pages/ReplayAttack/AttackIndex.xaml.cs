@@ -22,50 +22,54 @@ namespace MythKit.Pages.ReplayAttack
     /// <summary>
     /// AttackIndex.xaml 的交互逻辑
     /// </summary>
-    public partial class AttackIndex : UserControl
+    public partial class AttackIndex : UserControl, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         public List<IAttackPattern> DefaultAttackTypes { get; set; } = new List<IAttackPattern>();
-        public ObservableCollection<UIAttackOption> UIAttackOptions { get; set; } = new ObservableCollection<UIAttackOption>();
+        private ObservableCollection<UIAttackOption> _uiAttackOptions = new ObservableCollection<UIAttackOption>();
+        public ObservableCollection<UIAttackOption> UIAttackOptions
+        {
+            get => _uiAttackOptions;
+            set
+            {
+                _uiAttackOptions = value;
+                OnPropertyChanged();
+            }
+        }
         public AttackIndex()
         {
             InitializeComponent();
             InitializePage();
         }
-        public bool InjectParams(string defaultType, JsonElement args)
+        public void InjectParams(JsonElement args)
         {
-            //int index = DefaultAttackTypes.FindIndex((item) => item.AttackId == defaultType);
-            //if (index >= 0)
-            //{
-            //    if (typeArguments != null && typeArguments.Length > 0)
-            //    {
-            //        IAttackPattern attackPattern = DefaultAttackTypes[index];
-            //        Type patternType = attackPattern.GetType();
-            //        ConstructorInfo constructor = patternType.GetConstructors().FirstOrDefault();
-            //        if (constructor != null)
-            //        {
-            //            try
-            //            {
-            //                object instance = constructor.Invoke(typeArguments);
-            //                DefaultAttackTypes[index] = (IAttackPattern)instance;
-            //            }
-            //            catch
-            //            {
-            //                return false;
-            //            }
-            //        }
-            //    }
-            //    return true;
-            //}
-            return false;
+            ObservableCollection<UIAttackOption> options = new ObservableCollection<UIAttackOption>();
+            foreach (var element in args.EnumerateArray())
+            {
+                UIAttackOption opt = new UIAttackOption();
+                int index = opt.AttackTypes.FindIndex(ati => ati.AttackName.Equals(element.GetProperty("attackName").GetString(), StringComparison.OrdinalIgnoreCase));
+                if (index == -1)
+                {
+                    throw new InvalidOperationException("未找到对应的攻击名称。");
+                }
+                opt.PatternSelectedIndex = index;
+                opt.DelayMs = element.TryGetProperty("delayMs", out JsonElement delayEl) && delayEl.ValueKind == JsonValueKind.Number ? delayEl.GetInt32() : 0;
+                opt.Enabled = element.TryGetProperty("enabled", out JsonElement enabledEl) ? enabledEl.GetBoolean() : false;
+                opt.AttackTypes[index].Source.Deserialize(JSONUtils.ToDictionary(element.GetProperty("content")));
+                options.Add(opt);
+            }
+            UIAttackOptions = options;
         }
         private void InitializePage()
         {
             DataContext = this;
             StringFormattingDescription.Text = "只有部分输入框支持字符串格式化\n" +
                 "格式化语法：\n" +
-                "\t${ip} - IP 地址\n" +
-                "\t${cycle} - 攻击轮数\n" +
-                "\t${group} - 攻击组数";
+                "${ip} - IP 地址\n" +
+                "${cycle} - 攻击轮数\n" +
+                "${group} - 攻击组数";
             UIAttackOptions.Add(new UIAttackOption());
         }
         public static List<IAttackPattern> GetNewAttackPatterns()
@@ -270,7 +274,7 @@ namespace MythKit.Pages.ReplayAttack
                 OnPropertyChanged();
             }
         }
-        public IList<AttackTypeItem> AttackTypes { get; private set; }
+        public List<AttackTypeItem> AttackTypes { get; private set; }
         public SingleAttackPack ToSingleAttackPack()
         {
             return new SingleAttackPack()

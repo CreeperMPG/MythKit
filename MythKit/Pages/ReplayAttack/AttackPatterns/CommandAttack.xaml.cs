@@ -21,7 +21,16 @@ namespace MythKit.Pages.ReplayAttack.AttackFunctions
         public string AttackName => "远程命令";
         public string AttackId => "remote_command";
         public AttackTarget Target => AttackTarget.Student;
-        public IAttackPattern Clone() => new CommandAttack(Command.Text, Arguments.Text);
+        public void Deserialize(Dictionary<string, object> serializedData)
+        {
+            if (serializedData == null)
+                return;
+
+            if (serializedData.TryGetValue("command", out object command) && command is string commandText)
+                Command.Text = commandText;
+            if (serializedData.TryGetValue("arguments", out object arguments) && arguments is string argumentText)
+                Arguments.Text = argumentText;
+        }
 
         public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
         {
