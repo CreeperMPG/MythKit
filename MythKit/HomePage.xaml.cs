@@ -36,7 +36,7 @@ namespace MythKit
             NavigationInit();
             DataContext = this;
 #if LITE
-            UDPAttackViewItem.IsEnabled = false;
+            ReplayAttackViewItem.IsEnabled = false;
 #endif
             HomePageLoadedEvent.Invoke();
         }
