@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Windows.Controls;
 
-namespace MythKit.Pages.ReplayAttack.AttackFunctions
+namespace MythKit.Pages.ReplayAttack.AttackPatterns
 {
     /// <summary>
     /// MessageAttackxaml.xaml 的交互逻辑

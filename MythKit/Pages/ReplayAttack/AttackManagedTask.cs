@@ -194,22 +194,7 @@ namespace MythKit.Pages.ReplayAttack
                             {
                                 packets = Config.AttackContent[CurrentContentIndex].AttackPattern.ConstructPacket(ref errorMessage, targetIP, CurrentCycle, CurrentGroup);
                             });
-                            for (int packetCount = 0; packetCount < packets.AttackPackets.Count; packetCount++)
-                            {
-                                UdpClient udpClient = new UdpClient();
-                                byte[] packet = packets.AttackPackets[packetCount];
-                                try
-                                {
-                                    udpClient.Send(packet, packet.Length, targetIP.ToString(), packets.TargetPort);
-                                }
-                                catch
-                                {
-                                }
-                                if (packets.IntervalMiliseconds > 0 && packetCount == packets.AttackPackets.Count - 1)
-                                {
-                                    await Task.Delay(packets.IntervalMiliseconds, cancellationToken);
-                                }
-                            }
+                            await packets.SendToTarget(targetIP, cancellationToken);
                             if (errorMessage != "") AddErrorMessage(errorMessage);
                             if (Config.TotalCycles.HasValue)
                             {

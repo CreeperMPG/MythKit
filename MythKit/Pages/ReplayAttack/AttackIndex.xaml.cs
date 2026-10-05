@@ -1,6 +1,6 @@
 ﻿using iNKORE.UI.WPF.Modern.Common.IconKeys;
 using Microsoft.Win32;
-using MythKit.Pages.ReplayAttack.AttackFunctions;
+using MythKit.Pages.ReplayAttack.AttackPatterns;
 using MythKit.Utils;
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
 using Modern = iNKORE.UI.WPF.Modern.Controls;
-using TeacherAttack = MythKit.Pages.ReplayAttack.AttackFunctions.TeacherAttack;
+using TeacherAttack = MythKit.Pages.ReplayAttack.AttackPatterns.TeacherAttack;
 
 namespace MythKit.Pages.ReplayAttack
 {
@@ -76,13 +76,14 @@ namespace MythKit.Pages.ReplayAttack
             UIAttackOptions.Add(new UIAttackOption());
         }
         public static List<IAttackPattern> GetNewAttackPatterns()
-        {
+        { 
             List<IAttackPattern> result = new List<IAttackPattern>
             {
                 new MessageAttack(),
                 new CommandAttack(),
-                new BlackScreenAttack(),
-                new TeacherAttack.RaiseHandAttack()
+                //new BlackScreenAttack(),
+                new TeacherAttack.RaiseHandAttack(),
+                new TeacherAttack.HeapOverflowAttack()
             };
             return result;
         }

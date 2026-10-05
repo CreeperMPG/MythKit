@@ -122,6 +122,9 @@
     </ApplicationDefinition>
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Pages\Home\Suggestions\MythKitProtocolSuggestion.cs" />
+    <Compile Include="Pages\ReplayAttack\AttackPatterns\TeacherAttack\HeapOverflowAttack.xaml.cs">
+      <DependentUpon>HeapOverflowAttack.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\RestrictionsRemoving\RecoverySettingsDialog.xaml.cs">
       <DependentUpon>RecoverySettingsDialog.xaml</DependentUpon>
     </Compile>
@@ -175,6 +178,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\Home\HomeIndex.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ReplayAttack\AttackPatterns\TeacherAttack\HeapOverflowAttack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

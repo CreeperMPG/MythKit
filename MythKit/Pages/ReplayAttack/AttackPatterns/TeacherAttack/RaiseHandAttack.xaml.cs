@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Windows.Controls;
 
-namespace MythKit.Pages.ReplayAttack.AttackFunctions.TeacherAttack
+namespace MythKit.Pages.ReplayAttack.AttackPatterns.TeacherAttack
 {
     /// <summary>
     /// RaiseHandAttack.xaml 的交互逻辑
@@ -18,7 +18,7 @@ namespace MythKit.Pages.ReplayAttack.AttackFunctions.TeacherAttack
             if (int.TryParse(tdChannelString, out int tdChannel))
                 TDChannelID.Value = tdChannel;
         }
-        public string AttackName => "（教师端）举手";
+        public string AttackName => "举手";
         public string AttackId => "raise_hand";
         public AttackTarget Target => AttackTarget.Teacher;
         public void Deserialize(Dictionary<string, object> serializedData)
