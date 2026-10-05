@@ -52,10 +52,10 @@ namespace MythKit.Pages.ReplayAttack
             foreach (var element in args.EnumerateArray())
             {
                 UIAttackOption opt = new UIAttackOption();
-                int index = opt.AttackTypes.FindIndex(ati => ati.AttackName.Equals(element.GetProperty("attackName").GetString(), StringComparison.OrdinalIgnoreCase));
+                int index = opt.AttackTypes.FindIndex(ati => ati.Source.AttackId.Equals(element.GetProperty("attackId").GetString(), StringComparison.OrdinalIgnoreCase));
                 if (index == -1)
                 {
-                    throw new InvalidOperationException("未找到对应的攻击名称。");
+                    throw new InvalidOperationException("未找到对应的攻击 ID。");
                 }
                 opt.PatternSelectedIndex = index;
                 opt.DelayMs = element.TryGetProperty("delayMs", out JsonElement delayEl) && delayEl.ValueKind == JsonValueKind.Number ? delayEl.GetInt32() : 0;
@@ -252,7 +252,7 @@ namespace MythKit.Pages.ReplayAttack
                         Dictionary<string, object> serializedData = pattern.Serialize();
                         object data = new
                         {
-                            attackName = option.AttackTypes[option.PatternSelectedIndex].AttackName,
+                            attackId = option.AttackTypes[option.PatternSelectedIndex].Source.AttackId,
                             delayMs = option.DelayMs,
                             enabled = option.Enabled,
                             content = serializedData,
