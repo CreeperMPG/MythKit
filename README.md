@@ -3,19 +3,19 @@
 
 ## 软件概述
 
-MythKit 是一款基于 **WPF 和 .NET Framework** 构建的 Windows 极域管理器，使用 `iNKORE.UI.WPF.Modern` 库呈现 Fluent Design 界面。该工具主要用于管理与极域电子教室（Mythware）相关的任务和操作。
+MythKit 是一款基于 **WPF 和 .NET Framework** 构建的机房工具包，使用 `iNKORE.UI.WPF.Modern` 库呈现 Fluent Design 界面。
 
 > ⚠️ **免责声明**：本软件仅供学习交流使用。使用者应确保其使用行为符合适用的法律、法规、组织政策以及相关软件和网络环境的授权要求。项目作者不对因使用本软件造成的直接或间接损失承担责任。
 
 
 ## 环境要求
 
-| 项目                       | 要求                                   |
-| -------------------------- | -------------------------------------- |
-| **操作系统**               | Windows 10 / 11（推荐）                |
-| **运行时**                 | .NET Framework 4.7.2                   |
-| **管理员权限**             | 部分功能需要以管理员身份运行           |
-| **开发环境**（自行编译时） | Visual Studio（支持 WPF 开发工作负载） |
+| 项目                       | 要求                         |
+| -------------------------- | ---------------------------- |
+| **操作系统**               | Windows 10 / 11（推荐）      |
+| **运行时**                 | .NET Framework 4.7.2         |
+| **管理员权限**             | 部分功能需要以管理员身份运行 |
+| **开发环境**（自行编译时） | Visual Studio                |
 
 
 ## 获取与安装
@@ -48,17 +48,17 @@ MythKit 的主界面采用 Fluent Design 风格，左侧为导航栏，右侧为
 
 任务管理，负责任务的创建、启动、取消和进度跟踪。任务列表在页面实时显示，支持不确定进度任务和可取消任务。
 
-### UDP 重放攻击
+### 重放攻击
 
 该模块支持通过 **URI Scheme**（`mythkit://`）被外部调用，并触发攻击相关操作。
 
-- **支持的调用格式**：`mythkit://attack/recommend?target=<IP>&type=<类型>&params=<参数>`
+- **支持的调用格式**：`mythkit://attack/recommend?target=<IP>&params=<参数>`
 - 外部应用可借此向 MythKit 传递攻击目标、类型和参数，随后弹出确认对话框由用户决定是否执行。
 - 该模块在 `LITE` 编译版本中会被禁用。
 
 ### 限制解除
 
-该模块包含与极域限制、机房管理助手限制解除相关的功能，以及 **增霸卡密码获取** 功能。
+该模块包含与限制解除、增霸卡密码获取、机房管理助手控制相关的功能。
 
 
 ## 使用指南
@@ -95,7 +95,7 @@ MythKit 的主界面采用 Fluent Design 风格，左侧为导航栏，右侧为
 在浏览器或命令行中执行：
 
 ```
-mythkit://attack/recommend?target=192.168.1.100&type=black_screen&params=...
+mythkit://attack/recommend?target=192.168.1.100&params=[...]
 ```
 
 程序会弹出确认对话框，确认后执行相应操作。此功能需在非 `LITE` 版本中使用。
@@ -118,7 +118,7 @@ mythkit://attack/recommend?target=192.168.1.100&type=black_screen&params=...
 - **技术栈**：WPF + .NET Framework + iNKORE.UI.WPF.Modern
 - **项目结构**：
   - `Mythware/` — 极域交互核心逻辑
-  - `Pages/` — 各功能页面（Home、UDPAttack、RestrictionsRemoving 等）
+  - `Pages/` — 各功能页面（Home、ReplayAttack、RestrictionsRemoving 等）
   - `Tasks/` — 任务管理框架
   - `Utils/` — 工具类和转换器
 - **编译条件**：支持 `LITE` 条件编译
@@ -127,7 +127,7 @@ mythkit://attack/recommend?target=192.168.1.100&type=black_screen&params=...
 
 ![Myth Kit 主页](imgres/image-20260913131425604.png)
 
-![UDP 重放攻击页面（黑屏安静攻击暂不可用）](imgres/image-20260913131508431.png)
+![UDP 重放攻击页面](imgres/replayattack.png)
 
 ![限制解除页面](imgres/image-20260913131547439.png)
 
