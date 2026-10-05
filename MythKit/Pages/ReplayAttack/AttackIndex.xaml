@@ -42,11 +42,30 @@
                 </ui:SettingsExpander.HeaderIcon>
                 <ui:SettingsExpander.ItemsHeader>
                     <ui:SettingsCard ContentAlignment="Left">
-                        <ui:HyperlinkButton VerticalAlignment="Center" Name="AddAttackButton" Click="AddAttackButton_Click">
-                            <ui:HyperlinkButton.Content>
-                                <ui:IconAndText Content="添加数据包" Icon="{x:Static ui:FluentSystemIcons.AddCircle_16_Regular}"/>
-                            </ui:HyperlinkButton.Content>
-                        </ui:HyperlinkButton>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:HyperlinkButton Grid.Column="0" VerticalAlignment="Center" Name="AddAttackButton" Click="AddAttackButton_Click">
+                                <ui:HyperlinkButton.Content>
+                                    <ui:IconAndText Content="添加数据包" Icon="{x:Static ui:FluentSystemIcons.AddCircle_16_Regular}"/>
+                                </ui:HyperlinkButton.Content>
+                            </ui:HyperlinkButton>
+                            <ui:HyperlinkButton Grid.Column="2" VerticalAlignment="Center" Name="LoadAttackConfigButton" Click="LoadAttackConfigButton_Click">
+                                <ui:HyperlinkButton.Content>
+                                    <ui:IconAndText Content="从文件加载" Icon="{x:Static ui:FluentSystemIcons.Folder_16_Regular}"/>
+                                </ui:HyperlinkButton.Content>
+                            </ui:HyperlinkButton>
+                            <ui:HyperlinkButton Grid.Column="3" VerticalAlignment="Center" Name="SaveAttackConfigButton" Click="SaveAttackConfigButton_Click">
+
+                                <ui:HyperlinkButton.Content>
+                                    <ui:IconAndText Content="保存当前配置" Icon="{x:Static ui:FluentSystemIcons.Save_16_Regular}"/>
+                                </ui:HyperlinkButton.Content>
+                            </ui:HyperlinkButton>
+                        </Grid>
                     </ui:SettingsCard>
                 </ui:SettingsExpander.ItemsHeader>
                 <ui:SettingsExpander.Content>

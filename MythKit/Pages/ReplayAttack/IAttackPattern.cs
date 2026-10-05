@@ -14,5 +14,6 @@ namespace MythKit.Pages.ReplayAttack
         string AttackName { get; }
         string AttackId { get; }
         void Deserialize(Dictionary<string, object> serializedData);
+        Dictionary<string, object> Serialize();
     }
 }

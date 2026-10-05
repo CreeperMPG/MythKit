@@ -124,6 +124,7 @@ namespace MythKit
                             HomePage.NavPages.TryGetValue(typeof(AttackIndex), out object _index);
                             var index = _index as AttackIndex;
                             index.InjectParams(attackParams.RootElement);
+                            index.TargetIPAddress.Text = targetIPs;
                         }
                         catch (Exception ex)
                         {

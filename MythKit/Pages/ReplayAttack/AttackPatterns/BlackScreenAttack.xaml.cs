@@ -44,6 +44,12 @@ namespace MythKit.Pages.ReplayAttack.AttackFunctions
                 TDChannelID.Value = channelId;
         }
 
+        public Dictionary<string, object> Serialize() => new Dictionary<string, object>
+        {
+            ["openCloseSwitch"] = OpenCloseSwitch.IsOn,
+            ["tdChannelId"] = TDChannelID.Value
+        };
+
         public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
         {
             byte[] packetBlack = new byte[55]

@@ -21,7 +21,7 @@ namespace MythKit.Pages.ReplayAttack
     }
     public class AttackManagedTask : IManagedTask, INotifyPropertyChanged
     {
-        public string TaskName => "UDP 重放攻击";
+        public string TaskName => "重放攻击";
         public TaskState State => TaskState.Running;
         private double _progress;
         public double Progress

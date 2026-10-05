@@ -35,6 +35,12 @@ namespace MythKit.Pages.ReplayAttack.AttackFunctions.TeacherAttack
                 TDChannelID.Value = channelId;
         }
 
+        public Dictionary<string, object> Serialize() => new Dictionary<string, object>
+        {
+            ["raiseHandInterval"] = RaiseHandInterval.Value,
+            ["tdChannelId"] = TDChannelID.Value
+        };
+
         public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
         {
             byte[] packetRaise = new byte[72]

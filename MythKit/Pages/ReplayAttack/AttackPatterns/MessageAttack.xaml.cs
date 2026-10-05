@@ -26,6 +26,11 @@ namespace MythKit.Pages.ReplayAttack.AttackFunctions
                 Message.Text = text;
         }
 
+        public Dictionary<string, object> Serialize() => new Dictionary<string, object>
+        {
+            ["message"] = Message.Text
+        };
+
         public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
         {
             byte[] packet;

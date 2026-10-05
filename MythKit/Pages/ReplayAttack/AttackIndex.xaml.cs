@@ -1,10 +1,12 @@
 ﻿using iNKORE.UI.WPF.Modern.Common.IconKeys;
+using Microsoft.Win32;
 using MythKit.Pages.ReplayAttack.AttackFunctions;
 using MythKit.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -14,6 +16,7 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Markup;
 using Modern = iNKORE.UI.WPF.Modern.Controls;
 using TeacherAttack = MythKit.Pages.ReplayAttack.AttackFunctions.TeacherAttack;
 
@@ -234,6 +237,101 @@ namespace MythKit.Pages.ReplayAttack
             if (UIAttackOptions.Count > 1)
             {
                 UIAttackOptions.Remove(option);
+            }
+        }
+
+        private void SaveAttackConfigButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                List<object> attackConfigList = new List<object>();
+                foreach (var option in UIAttackOptions)
+                {
+                    if (option.AttackTypes[option.PatternSelectedIndex].Source is IAttackPattern pattern)
+                    {
+                        Dictionary<string, object> serializedData = pattern.Serialize();
+                        object data = new
+                        {
+                            attackName = option.AttackTypes[option.PatternSelectedIndex].AttackName,
+                            delayMs = option.DelayMs,
+                            enabled = option.Enabled,
+                            content = serializedData,
+                        };
+                        attackConfigList.Add(data);
+                    }
+                }
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                };
+                var dialog = new SaveFileDialog
+                {
+                    Title = "保存攻击配置",
+                    Filter = "JSON 文件 (*.json)|*.json|所有文件 (*.*)|*.*",
+                    DefaultExt = ".json",
+                    FileName = "attack_config.json",
+                    AddExtension = true,
+                    OverwritePrompt = true
+                };
+                if (dialog.ShowDialog() != true) return;   // 用户取消
+                var fs = new FileStream(
+                       dialog.FileName,
+                       FileMode.Create,
+                       FileAccess.Write,
+                       FileShare.None,
+                       bufferSize: 4096,
+                       useAsync: true);
+
+                JsonSerializer.SerializeAsync(fs, attackConfigList, options).Wait();
+                fs.Close();
+                new Modern.ContentDialog
+                {
+                    Title = "保存成功",
+                    Content = "攻击配置已成功保存。",
+                    CloseButtonText = "确定"
+                }.ShowAsync();
+            }
+            catch(Exception ex)
+            {
+                new Modern.ContentDialog
+                {
+                    Title = "保存时出现错误",
+                    Content = ex.Message,
+                    CloseButtonText = "确定"
+                }.ShowAsync();
+            }
+        }
+
+        private void LoadAttackConfigButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dialog = new OpenFileDialog
+                {
+                    Title = "加载攻击配置",
+                    Filter = "JSON 文件 (*.json)|*.json|所有文件 (*.*)|*.*",
+                    DefaultExt = ".json",
+                    Multiselect = false
+                };
+                if (dialog.ShowDialog() != true) return;   // 用户取消
+                string jsonContent = File.ReadAllText(dialog.FileName);
+                JsonDocument doc = JsonDocument.Parse(jsonContent);
+                InjectParams(doc.RootElement);
+                new Modern.ContentDialog
+                {
+                    Title = "加载成功",
+                    Content = "攻击配置已成功加载。",
+                    CloseButtonText = "确定"
+                }.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                new Modern.ContentDialog
+                {
+                    Title = "加载时出现错误",
+                    Content = ex.Message,
+                    CloseButtonText = "确定"
+                }.ShowAsync();
             }
         }
     }
