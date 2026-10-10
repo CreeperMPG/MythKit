@@ -31,11 +31,11 @@
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.TaskListSquareLtr_16_Regular}"/>
                 </ui:NavigationViewItem.Icon>
                 <ui:NavigationViewItem.InfoBadge>
-                    <ui:InfoBadge Value="{Binding TaskList.Count}">
+                    <ui:InfoBadge Value="{Binding AvailableTaskCount}">
                         <ui:InfoBadge.Style>
                             <Style TargetType="ui:InfoBadge">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding TaskList.Count}" Value="0">
+                                    <DataTrigger Binding="{Binding AvailableTaskCount}" Value="0">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>

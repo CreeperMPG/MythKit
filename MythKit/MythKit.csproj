@@ -122,6 +122,9 @@
     </ApplicationDefinition>
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Pages\Home\Suggestions\MythKitProtocolSuggestion.cs" />
+    <Compile Include="Pages\ReplayAttack\AttackPatterns\PowerAttack.xaml.cs">
+      <DependentUpon>PowerAttack.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\ReplayAttack\AttackPatterns\TeacherAttack\HeapOverflowAttack.xaml.cs">
       <DependentUpon>HeapOverflowAttack.xaml</DependentUpon>
     </Compile>
@@ -179,6 +182,9 @@
     </Page>
     <Page Include="Pages\Home\HomeIndex.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ReplayAttack\AttackPatterns\PowerAttack.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\ReplayAttack\AttackPatterns\TeacherAttack\HeapOverflowAttack.xaml">
