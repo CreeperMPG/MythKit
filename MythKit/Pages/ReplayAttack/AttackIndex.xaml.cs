@@ -81,7 +81,7 @@ namespace MythKit.Pages.ReplayAttack
             {
                 new MessageAttack(),
                 new CommandAttack(),
-                //new BlackScreenAttack(),
+                new PowerAttack(),
                 new TeacherAttack.RaiseHandAttack(),
                 new TeacherAttack.HeapOverflowAttack()
             };
