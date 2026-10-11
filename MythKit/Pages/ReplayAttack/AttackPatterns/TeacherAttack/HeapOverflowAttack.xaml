@@ -9,6 +9,10 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TextBlock Text="这是针对教师端的攻击类型，请填写教师端 IP。"/>
+        <TextBlock>
+            <Run Text="这是针对教师端的攻击类型，请填写教师端 IP。"/>
+            <LineBreak/>
+            <Run Text="对教师端发送数据包后，教师端会崩溃。"/>
+        </TextBlock>
     </Grid>
 </UserControl>

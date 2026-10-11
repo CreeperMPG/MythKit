@@ -60,7 +60,6 @@
                                 </ui:HyperlinkButton.Content>
                             </ui:HyperlinkButton>
                             <ui:HyperlinkButton Grid.Column="3" VerticalAlignment="Center" Name="SaveAttackConfigButton" Click="SaveAttackConfigButton_Click">
-
                                 <ui:HyperlinkButton.Content>
                                     <ui:IconAndText Content="保存当前配置" Icon="{x:Static ui:FluentSystemIcons.Save_16_Regular}"/>
                                 </ui:HyperlinkButton.Content>
@@ -83,7 +82,6 @@
                             <ui:SettingsCard.HeaderIcon>
                                 <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.ReOrderDotsVertical_24_Regular}" />
                             </ui:SettingsCard.HeaderIcon>
-
                             <ui:SettingsCard.Header>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -103,12 +101,12 @@
                                     </Grid.ColumnDefinitions>
 
                                     <!-- 上移按钮 -->
-                                    <Button Grid.Column="0" Click="MoveUpButton_Click">
+                                    <Button Grid.Column="0" Click="MoveUpButton_Click" ToolTip="上移">
                                         <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.ArrowUp_16_Regular}" />
                                     </Button>
 
                                     <!-- 下移按钮 -->
-                                    <Button Grid.Column="2" Click="MoveDownButton_Click">
+                                    <Button Grid.Column="2" Click="MoveDownButton_Click" ToolTip="下移">
                                         <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.ArrowDown_16_Regular}" />
                                     </Button>
 
