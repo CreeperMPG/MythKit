@@ -32,7 +32,7 @@
                     </ui:SettingsCard>
                 </ui:SettingsExpander.Items>
             </ui:SettingsExpander>
-            <ui:SettingsExpander Header="开放源代码许可" IsEnabled="True" IsExpanded="False">
+            <ui:SettingsExpander Header="开放源代码许可" IsEnabled="True" IsExpanded="True">
                 <ui:SettingsExpander.HeaderIcon>
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Code_24_Regular}" />
                 </ui:SettingsExpander.HeaderIcon>
@@ -58,7 +58,7 @@
                     </ui:SettingsCard>
                 </ui:SettingsExpander.Items>
             </ui:SettingsExpander>
-            <ui:SettingsExpander Header="更多选项" IsEnabled="True" IsExpanded="True">
+            <ui:SettingsExpander Header="更多选项" IsEnabled="True" IsExpanded="False">
                 <ui:SettingsExpander.HeaderIcon>
                     <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.MoreCircle_20_Regular}" />
                 </ui:SettingsExpander.HeaderIcon>

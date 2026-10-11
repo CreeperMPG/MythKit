@@ -1,4 +1,7 @@
-# MythKit
+<div align="center">
+<image src="imgres/icon.png" alt=“MythKit 图标”></image>
+<h1>Myth Kit</h1>
+</div>
 
 
 ## 软件概述
@@ -141,3 +144,8 @@ mythkit://attack/recommend?target=192.168.1.100&params=[...]
 - liveless：提供 ZBK 密码获取逻辑 [Link](https://www.luogu.com.cn/article/bzu60i4t)
 - JiYuTrainer：极域加密密码解密逻辑 [Repo](https://github.com/imengyu/JiYuTrainer) [解密逻辑](https://github.com/imengyu/JiYuTrainer/blob/350c7ee7e5e327a069ef1e4c6d622206797d2c71/JiYuTrainer/TrainerWorker.cpp#L1145)
 - [Mist_山岚](https://space.bilibili.com/3546769539467394)：测试应用
+
+## Vibe-Coding 信息
+
+这个项目是我目前维护项目中 AI 参与最少的了。
+开发过程中只使用 AI 完成了部分机械化的操作，功能实现由我完成。
