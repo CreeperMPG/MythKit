@@ -1,5 +1,5 @@
 <div align="center">
-<image src="imgres/icon.png" alt=“MythKit 图标”></image>
+<image src="imgres/icon256.ico" alt=“MythKit 图标” style="max-width: 256px; height: auto;"></image>
 <h1>Myth Kit</h1>
 </div>
 
