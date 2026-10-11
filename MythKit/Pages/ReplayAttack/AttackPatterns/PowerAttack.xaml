@@ -8,9 +8,18 @@
              mc:Ignorable="d"
              d:DesignHeight="120" d:DesignWidth="400">
     <ikw:SimpleStackPanel Spacing="16">
-		<ui:RadioButtons Header="电源选项">
+		<ui:RadioButtons Header="选项">
 			<RadioButton Name="RestartRadioButton" Content="重启" IsChecked="True" />
 			<RadioButton Name="ShutdownRadioButton" Content="关机" />
-		</ui:RadioButtons>
+            <RadioButton Name="CloseApplicationRadioButton" Content="关闭应用程序" />
+        </ui:RadioButtons>
+        <CheckBox Name="ImmediateExecutionCheckBox" Content="立即执行，不发送消息"/>
+        <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="8">
+            <TextBox
+			    Name="Message"
+			    ui:ControlHelper.Header="消息"
+			    ui:ControlHelper.PlaceholderText="（支持字符串格式化）执行操作时的消息" />
+            <ui:NumberBox MinWidth="150" ui:ControlHelper.Header="延迟时间（秒）" Name="Countdown" Minimum="0" SpinButtonPlacementMode="Compact"/>
+        </ikw:SimpleStackPanel>
     </ikw:SimpleStackPanel>
 </UserControl>

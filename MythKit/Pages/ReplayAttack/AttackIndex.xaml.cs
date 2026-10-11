@@ -91,7 +91,7 @@ namespace MythKit.Pages.ReplayAttack
         {
             try
             {
-                string localIPAddress = this.GetLocalIPAddress();
+                string localIPAddress = GetLocalIPAddress().ToString();
                 bool flag = string.IsNullOrEmpty(localIPAddress);
                 if (flag)
                 {
@@ -117,16 +117,12 @@ namespace MythKit.Pages.ReplayAttack
             }
         }
 
-        private string GetLocalIPAddress()
+        public static IPAddress GetLocalIPAddress()
         {
-            string result = string.Empty;
-            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.IP))
-            {
-                socket.Connect("8.8.8.8", 65530);
-                IPEndPoint ipendPoint = socket.LocalEndPoint as IPEndPoint;
-                result = ipendPoint.Address.ToString();
-            }
-            return result;
+            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.IP);
+            socket.Connect("8.8.8.8", 65530);
+            IPEndPoint ipendPoint = socket.LocalEndPoint as IPEndPoint;
+            return ipendPoint.Address;
         }
 
         private void TargetIP_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -338,7 +334,7 @@ namespace MythKit.Pages.ReplayAttack
     }
     public class AttackTypeItem
     {
-        public string AttackName { get; set; }
+        public string AttackName { get => (Source.Target == AttackTarget.Teacher ? "(教师端) " : "") + Source.AttackName; }
         public IAttackPattern Source { get; set; }   // 原对象
     }
     public class UIAttackOption : INotifyPropertyChanged
@@ -385,7 +381,7 @@ namespace MythKit.Pages.ReplayAttack
         public UIAttackOption()
         {
             Enabled = true;
-            AttackTypes = AttackIndex.GetNewAttackPatterns().Select(pt => new AttackTypeItem { AttackName = pt.AttackName, Source = pt }).ToList();
+            AttackTypes = AttackIndex.GetNewAttackPatterns().Select(pt => new AttackTypeItem { Source = pt }).ToList();
         }
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null) =>
