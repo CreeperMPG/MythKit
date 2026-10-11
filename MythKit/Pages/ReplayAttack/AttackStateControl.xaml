@@ -87,6 +87,9 @@
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AttackTask.CurrentWaitingState}" Value="{x:Static local:WaitingState.Completed}">
+                                        <Setter Property="Text" Value="攻击已完成"/>
+                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding AttackTask.CurrentWaitingState}" Value="{x:Static local:WaitingState.None}">
                                         <Setter Property="Text" Value="正在发送数据包"/>
                                     </DataTrigger>

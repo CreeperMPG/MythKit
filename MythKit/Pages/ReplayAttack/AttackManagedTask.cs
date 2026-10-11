@@ -17,7 +17,8 @@ namespace MythKit.Pages.ReplayAttack
     {
         None,
         CycleInterval,
-        GroupInterval
+        GroupInterval,
+        Completed
     }
     public class AttackManagedTask : IManagedTask, INotifyPropertyChanged
     {
@@ -159,12 +160,6 @@ namespace MythKit.Pages.ReplayAttack
                 string totalCycleIndicator = Config.TotalCycles.HasValue ? $" / {Config.TotalCycles.Value}" : "";
                 for (; Config.TotalCycles == null || CurrentCycle <= Config.TotalCycles.Value; CurrentCycle++)
                 {
-                    if (CurrentCycle != 1)
-                    {
-                        CurrentWaitingState = WaitingState.CycleInterval;
-                        await WaitWithStatusAsync(Config.CycleIntervalMilliseconds, cancellationToken, $"第 {CurrentCycle - 1}{totalCycleIndicator} 轮攻击结束，等待间隔");
-                        CurrentWaitingState = WaitingState.None;
-                    }
                     CurrentContentIndex = 0;
                     for (; CurrentContentIndex < Config.AttackContent.Count; CurrentContentIndex++)
                     {
@@ -217,10 +212,17 @@ namespace MythKit.Pages.ReplayAttack
                         CurrentTargetIndex--;
                     }
                     CurrentContentIndex--;
+                    if (Config.CycleIntervalMilliseconds != 0 && (Config.TotalCycles == null || CurrentCycle != Config.TotalCycles.Value))
+                    {
+                        CurrentWaitingState = WaitingState.CycleInterval;
+                        await WaitWithStatusAsync(Config.CycleIntervalMilliseconds, cancellationToken, $"第 {CurrentCycle}{totalCycleIndicator} 轮攻击结束，等待间隔");
+                        CurrentWaitingState = WaitingState.None;
+                    }
                 }
                 CurrentCycle--;
                 OnPropertyChanged(nameof(CurrentAttackCount));
                 Progress = 100;
+                CurrentWaitingState = WaitingState.Completed;
                 StateUpdated?.Invoke(TaskState.Completed);
             }
             catch (OperationCanceledException)
