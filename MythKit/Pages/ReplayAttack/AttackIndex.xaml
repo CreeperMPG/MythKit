@@ -71,7 +71,23 @@
                     <Button Content="字符串格式化说明" Name="StringFormattingDisplayButton">
                         <ui:FlyoutService.Flyout>
                             <ui:Flyout Placement="Bottom">
-                                <TextBlock TextWrapping="Wrap" Name="StringFormattingDescription"/>
+                                <TextBlock TextWrapping="Wrap">
+                                    <Run Text="部分输入框支持字符串格式化，支持以下占位符："/>
+                                    <LineBreak/>
+                                    <Run Text="${ip} - IP 地址"/>
+                                    <LineBreak/>
+                                    <Run Text="${ip.0} - IP 地址的第一部分"/>
+                                    <LineBreak/>
+                                    <Run Text="${ip.1} - IP 地址的第二部分"/>
+                                    <LineBreak/>
+                                    <Run Text="${ip.2} - IP 地址的第三部分"/>
+                                    <LineBreak/>
+                                    <Run Text="${ip.3} - IP 地址的第四部分"/>
+                                    <LineBreak/>
+                                    <Run Text="${cycle} - 攻击轮数"/>
+                                    <LineBreak/>
+                                    <Run Text="${group} - 攻击组数"/>
+                                </TextBlock>
                             </ui:Flyout>
                         </ui:FlyoutService.Flyout>
                     </Button>

@@ -68,11 +68,6 @@ namespace MythKit.Pages.ReplayAttack
         private void InitializePage()
         {
             DataContext = this;
-            StringFormattingDescription.Text = "只有部分输入框支持字符串格式化\n" +
-                "格式化语法：\n" +
-                "${ip} - IP 地址\n" +
-                "${cycle} - 攻击轮数\n" +
-                "${group} - 攻击组数";
             UIAttackOptions.Add(new UIAttackOption());
         }
         public static List<IAttackPattern> GetNewAttackPatterns()

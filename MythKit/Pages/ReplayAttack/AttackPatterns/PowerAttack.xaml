@@ -5,21 +5,25 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
              xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
+             xmlns:utils="clr-namespace:MythKit.Utils"
              mc:Ignorable="d"
-             d:DesignHeight="120" d:DesignWidth="400">
+             d:DesignHeight="320" d:DesignWidth="480">
+    <UserControl.Resources>
+        <utils:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </UserControl.Resources>
     <ikw:SimpleStackPanel Spacing="16">
 		<ui:RadioButtons Header="选项">
 			<RadioButton Name="RestartRadioButton" Content="重启" IsChecked="True" />
 			<RadioButton Name="ShutdownRadioButton" Content="关机" />
-            <RadioButton Name="CloseApplicationRadioButton" Content="关闭应用程序" />
+            <RadioButton Name="CloseApplicationRadioButton" Content="关闭运行的所有应用程序" />
         </ui:RadioButtons>
         <CheckBox Name="ImmediateExecutionCheckBox" Content="立即执行，不发送消息"/>
-        <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="8">
+        <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="8" IsEnabled="{Binding ElementName=ImmediateExecutionCheckBox, Path=IsChecked, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}">
             <TextBox
 			    Name="Message"
 			    ui:ControlHelper.Header="消息"
-			    ui:ControlHelper.PlaceholderText="（支持字符串格式化）执行操作时的消息" />
-            <ui:NumberBox MinWidth="150" ui:ControlHelper.Header="延迟时间（秒）" Name="Countdown" Minimum="0" SpinButtonPlacementMode="Compact"/>
+			    ui:ControlHelper.PlaceholderText="（支持字符串格式化）执行操作时的消息" MinWidth="300"/>
+            <ui:NumberBox MinWidth="150" Value="15" ui:ControlHelper.Header="延迟时间（秒）" Name="Countdown" Minimum="0" SpinButtonPlacementMode="Compact"/>
         </ikw:SimpleStackPanel>
     </ikw:SimpleStackPanel>
 </UserControl>

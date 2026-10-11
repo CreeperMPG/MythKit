@@ -60,7 +60,7 @@ namespace MythKit.Pages.ReplayAttack.AttackPatterns
                 memoryStream.Write(payloadBytes, 0, payloadBytes.Length);
 
                 // Command text bytes
-                byte[] commandTextBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Message.Text, ip.ToString(), cycleCount, groupCount));
+                byte[] commandTextBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Message.Text, ip, cycleCount, groupCount));
                 memoryStream.Write(commandTextBytes, 0, commandTextBytes.Length);
 
                 int currentPacketLength = (int)memoryStream.Length;

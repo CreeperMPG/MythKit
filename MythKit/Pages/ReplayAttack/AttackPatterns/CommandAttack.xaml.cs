@@ -67,7 +67,7 @@ namespace MythKit.Pages.ReplayAttack.AttackPatterns
                 memoryStream.Write(payloadBytes, 0, payloadBytes.Length);
 
                 // Command text bytes
-                byte[] commandBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Command.Text, ip.ToString(), cycleCount, groupCount));
+                byte[] commandBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Command.Text, ip, cycleCount, groupCount));
                 memoryStream.Write(commandBytes, 0, commandBytes.Length);
 
                 // Padding to 572 bytes
@@ -83,7 +83,7 @@ namespace MythKit.Pages.ReplayAttack.AttackPatterns
                 }
 
                 // Arguments text bytes
-                byte[] argumentBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Arguments.Text, ip.ToString(), cycleCount, groupCount));
+                byte[] argumentBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Arguments.Text, ip, cycleCount, groupCount));
                 memoryStream.Write(argumentBytes, 0, argumentBytes.Length);
 
                 // Padding to 906 bytes

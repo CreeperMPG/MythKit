@@ -28,10 +28,15 @@ namespace MythKit.Pages.ReplayAttack
             IntervalMiliseconds = intervalMiliseconds;
             this.protocolType = protocolType;
         }
-        public static string FormatString(string str, string ip, int cycleCount, int groupCount)
-        {
-            return str.Replace("${ip}", ip).Replace("${cycle}", cycleCount.ToString()).Replace("${group}", groupCount.ToString());
-        }
+        public static string FormatString(string str, IPAddress ip, int cycleCount, int groupCount) => str
+            .Replace("${ip}", ip.ToString())
+            .Replace("${cycle}", cycleCount.ToString())
+            .Replace("${group}", groupCount.ToString())
+            .Replace("${ip.0}", ip.GetAddressBytes()[0].ToString())
+            .Replace("${ip.1}", ip.GetAddressBytes()[1].ToString())
+            .Replace("${ip.2}", ip.GetAddressBytes()[2].ToString())
+            .Replace("${ip.3}", ip.GetAddressBytes()[3].ToString())
+        ;
         public async Task SendToTarget(IPAddress target, CancellationToken cancellationToken)
         {
             for (int packetCount = 0; packetCount < AttackPackets.Count; packetCount++)
