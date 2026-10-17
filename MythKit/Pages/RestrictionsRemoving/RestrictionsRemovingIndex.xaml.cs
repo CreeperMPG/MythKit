@@ -189,6 +189,32 @@ namespace MythKit.Pages.RestrictionsRemoving
                 return Tuple.Create(actionName, false, ex.Message);
             }
         }
+        private void EnsureRegistryKeyValue0OrNotExists(RegistryKey rootKey, string subKeyPath, string valueName)
+        {
+            using (var subKey = rootKey.OpenSubKey(subKeyPath, writable: false))
+            {
+                if (subKey != null)
+                {
+                    var value = subKey.GetValue(valueName);
+                    if (value == null || (value is int intValue && intValue == 0))
+                    {
+                        return;
+                    }
+                }
+            }
+            using (var subKey = rootKey.OpenSubKey(subKeyPath, writable: true))
+            {
+                if (subKey != null)
+                {
+                    subKey.SetValue(valueName, 0, RegistryValueKind.DWord);
+                }
+            }
+        }
+        private void EnsureRegistryKeyValue0OrNotExists(string subKeyPath, string valueName)
+        {
+            EnsureRegistryKeyValue0OrNotExists(Registry.CurrentUser, subKeyPath, valueName);
+            EnsureRegistryKeyValue0OrNotExists(Registry.LocalMachine, subKeyPath, valueName);
+        }
 
         // ref => https://GitHub.com/CreeperMPG/jfglzs
         private List<Tuple<string, bool, string>> RecoverySystem_Background()
@@ -198,59 +224,48 @@ namespace MythKit.Pages.RestrictionsRemoving
                 RecoverySystem_TryRun("关闭机房管理助手", KillJFGLZS_Executor),
 
                 // 恢复命令提示符 (CMD)
-                RecoverySystem_TryRun("恢复命令提示符", () => RegUtils.WriteRegistryValue(
-                        Registry.CurrentUser,
+                RecoverySystem_TryRun("恢复命令提示符", () => EnsureRegistryKeyValue0OrNotExists(
                         "Software\\Policies\\Microsoft\\Windows\\System",
-                        "DisableCMD",
-                        0,
-                        RegistryValueKind.DWord
+                        "DisableCMD"
                     )),
 
                 // 恢复注册表编辑器
-                RecoverySystem_TryRun("恢复注册表编辑器", () => RegUtils.WriteRegistryValue(
-                        Registry.CurrentUser,
+                RecoverySystem_TryRun("恢复注册表编辑器", () => EnsureRegistryKeyValue0OrNotExists(
                         "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-                        "DisableRegistryTools",
-                        0,
-                        RegistryValueKind.DWord
+                        "DisableRegistryTools"
+                    )),
+
+                // 恢复任务管理器
+                RecoverySystem_TryRun("恢复任务管理器", () => EnsureRegistryKeyValue0OrNotExists(
+                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+                        "DisableTaskMgr"
                     )),
 
                 // 恢复控制面板与设置
                 RecoverySystem_TryRun("恢复控制面板与设置", () =>
                 {
-                    RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoControlPanel", false);
-                    RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoSettingsPage", false);
+                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoControlPanel");
+                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoSettingsPage");
                 }),
                 
                 // 恢复 MMC
-                RecoverySystem_TryRun("恢复 Windows 管理控制台", () => 
-                    RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Policies\\Microsoft", "MMC", false)
+                RecoverySystem_TryRun("恢复 Windows 管理控制台", () =>
+                    EnsureRegistryKeyValue0OrNotExists("Software\\Policies\\Microsoft", "MMC")
                 ),
 
                 // 恢复运行对话框 (Win+R)
-                RecoverySystem_TryRun("恢复运行对话框", () => RegUtils.WriteRegistryValue(
-                        Registry.CurrentUser,
-                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-                        "NoRun",
-                        0,
-                        RegistryValueKind.DWord
-                    )),
-                RecoverySystem_TryRun("删除运行框黑名单", () => RegUtils.WriteRegistryValue(
-                        Registry.CurrentUser,
-                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-                        "DisallowRun",
-                        0,
-                        RegistryValueKind.DWord
-                    )),
+                RecoverySystem_TryRun("恢复运行对话框", () =>
+                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoRun")
+                ),
+
+                RecoverySystem_TryRun("删除运行框黑名单", () =>
+                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "DisallowRun")
+                ),
 
                 // 恢复锁屏 (Win+L)
-                RecoverySystem_TryRun("恢复锁屏", () => RegUtils.WriteRegistryValue(
-                        Registry.CurrentUser,
-                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-                        "DisableLockWorkstation",
-                        0,
-                        RegistryValueKind.DWord
-                    )),
+                RecoverySystem_TryRun("恢复锁屏", () =>
+                    EnsureRegistryKeyValue0OrNotExists( "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System", "DisableLockWorkstation")
+                ),
 
                 // 删除机房管理助手自启动项 (Run 键)
                 RecoverySystem_TryRun("删除机房管理助手自启动项", () =>
@@ -306,22 +321,8 @@ namespace MythKit.Pages.RestrictionsRemoving
                 // 恢复文件夹选项
                 RecoverySystem_TryRun("恢复文件夹选项", () =>
                 {
-                    RegUtils.WriteRegistryValue(
-                        Registry.CurrentUser,
-                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-                        "NoFolderOptions",
-                        0,
-                        RegistryValueKind.DWord
-                    );
-
-                    RegUtils.WriteRegistryValue(
-                        Registry.CurrentUser,
-                        "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                        "HideFileExt",
-                        0,
-                        RegistryValueKind.DWord
-                    );
-
+                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoFolderOptions");
+                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "HideFileExt");
                     RegUtils.WriteRegistryValue(
                         Registry.CurrentUser,
                         "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
@@ -352,13 +353,9 @@ namespace MythKit.Pages.RestrictionsRemoving
                 }),
 
                 // 恢复任务栏右键菜单
-                RecoverySystem_TryRun("恢复任务栏右键菜单", () => RegUtils.WriteRegistryValue(
-                    Registry.CurrentUser,
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-                    "NoTrayContextMenu",
-                    0,
-                    RegistryValueKind.DWord
-                )),
+                RecoverySystem_TryRun("恢复任务栏右键菜单", () =>
+                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoTrayContextMenu")
+                ),
 
                 // 恢复任务视图按钮 (Win+Tab)
                 RecoverySystem_TryRun("恢复任务视图按钮", () => RegUtils.WriteRegistryValue(
