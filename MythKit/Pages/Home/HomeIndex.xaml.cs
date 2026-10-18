@@ -30,9 +30,12 @@ namespace MythKit.Pages.Home
         public HomeIndex()
         {
             InitializeComponent();
-            RefreshSuggestions();
             DataContext = this;
             MythwareInstances = MythwareInstance.GetInstances();
+            Loaded += (s, e) =>
+            {
+                Refresh();
+            };
         }
         public void Refresh()
         {

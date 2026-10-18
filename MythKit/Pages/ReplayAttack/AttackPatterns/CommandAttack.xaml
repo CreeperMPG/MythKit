@@ -17,5 +17,13 @@
 			Name="Arguments"
 			ui:ControlHelper.Header="参数"
 			ui:ControlHelper.PlaceholderText="（支持字符串格式化）命令行参数" />
+        <ComboBox
+            Name="WindowType"
+            ui:ControlHelper.Header="窗口类型"
+            SelectedValuePath="Tag">
+            <ComboBoxItem Content="常规" Tag="normal" IsSelected="True" />
+            <ComboBoxItem Content="最小化" Tag="minimized" />
+            <ComboBoxItem Content="最大化" Tag="maximized" />
+        </ComboBox>
     </ikw:SimpleStackPanel>
 </UserControl>

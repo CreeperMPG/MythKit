@@ -52,6 +52,7 @@ namespace MythKit
             {
                 WindowHelper.SetSystemBackdropType(this, iNKORE.UI.WPF.Modern.Helpers.Styles.BackdropType.Mica);
             }
+            TitleBar.SetIsIconVisible(this, true);
             TitleBar.SetHeight(this, 36);
 #endif
         }

