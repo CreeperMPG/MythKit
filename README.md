@@ -1,12 +1,12 @@
 <div align="center">
-<image src="imgres/icon256.ico" alt=“MythKit 图标” style="max-width: 256px; height: auto;"></image>
+<image src="imgres/icon256.ico" alt="MythKit 图标" style="max-width: 256px; height: auto;"></image>
 <h1>Myth Kit</h1>
 </div>
 
 
 ## 软件概述
 
-MythKit 是一款基于 **WPF 和 .NET Framework** 构建的机房工具包，使用 `iNKORE.UI.WPF.Modern` 库呈现 Fluent Design 界面。
+Myth Kit 是一款基于 **WPF 和 .NET Framework** 构建的机房工具包，使用 `iNKORE.UI.WPF.Modern` 库呈现 Fluent Design 界面。
 
 > ⚠️ **免责声明**：本软件仅供学习交流使用。使用者应确保其使用行为符合适用的法律、法规、组织政策以及相关软件和网络环境的授权要求。项目作者不对因使用本软件造成的直接或间接损失承担责任。
 
@@ -15,10 +15,9 @@ MythKit 是一款基于 **WPF 和 .NET Framework** 构建的机房工具包，�
 
 | 项目                       | 要求                         |
 | -------------------------- | ---------------------------- |
-| **操作系统**               | Windows 10 / 11（推荐）      |
+| **操作系统**               | Windows 7 ~ 11     |
 | **运行时**                 | .NET Framework 4.7.2         |
 | **管理员权限**             | 部分功能需要以管理员身份运行 |
-| **开发环境**（自行编译时） | Visual Studio                |
 
 
 ## 获取与安装
@@ -35,6 +34,8 @@ MythKit 是一款基于 **WPF 和 .NET Framework** 构建的机房工具包，�
 ```bash
 git clone https://github.com/CreeperMPG/MythKit.git
 ```
+
+`iNKORE.UI.WPF.Modern` 库未使用 NuGet 加载，在编译前准备好其二进制 dll 文件。
 
 使用 Visual Studio 打开 `MythKit.sln`，还原 NuGet 包后直接生成解决方案。
 
@@ -90,8 +91,8 @@ MythKit 的主界面采用 Fluent Design 风格，左侧为导航栏，右侧为
 ### 管理任务
 
 1. 在任务管理界面查看已创建的任务列表；
-2. 点击任务可查看详情和进度；
-3. 支持启动、取消任务操作。
+2. 部分任务点击后可查看详情和进度；
+3. 支持暂停、取消任务。
 
 ### 通过 URI Scheme 调用攻击模块（高级）
 
@@ -103,28 +104,11 @@ mythkit://attack/recommend?target=192.168.1.100&params=[...]
 
 程序会弹出确认对话框，确认后执行相应操作。此功能需在非 `LITE` 版本中使用。
 
+`params` 参数格式可参考重放攻击保存配置的 JSON 格式。
+
 ### 获取极域/增霸卡密码
 
 在“主页/限制解除”页面中，使用密码获取功能读取极域/增霸卡相关密码信息。操作可能需要管理员权限。
-
-
-## 重要注意事项
-
-1. **法律与授权**：本软件仅供学习交流，使用者须确保行为符合法律法规及组织政策。
-2. **管理员权限**：多数功能依赖对系统进程、服务和注册表的操作，**必须以管理员权限运行**，否则部分功能会失效。
-3. **杀毒软件误报**：由于涉及进程操作和网络攻击模拟，可执行文件可能被安全软件标记，需自行判断并添加信任。
-4. **`LITE` 版本限制**：项目存在 `LITE` 编译条件，该版本会禁用 `UDPAttack` 等模块。若下载的是 LITE 版，部分功能将不可用。
-
-
-## 开发者信息
-
-- **技术栈**：WPF + .NET Framework + iNKORE.UI.WPF.Modern
-- **项目结构**：
-  - `Mythware/` — 极域交互核心逻辑
-  - `Pages/` — 各功能页面（Home、ReplayAttack、RestrictionsRemoving 等）
-  - `Tasks/` — 任务管理框架
-  - `Utils/` — 工具类和转换器
-- **编译条件**：支持 `LITE` 条件编译
 
 ## 截图
 
@@ -148,4 +132,6 @@ mythkit://attack/recommend?target=192.168.1.100&params=[...]
 ## Vibe-Coding 信息
 
 这个项目是我目前维护项目中 AI 参与最少的了。
+
 开发过程中只使用 AI 完成了部分机械化的操作，功能实现由我完成。
+
