@@ -45,7 +45,7 @@ namespace MythKit.Pages.About
         public AboutIndex()
         {
             InitializeComponent();
-            VersionInfoBlock.Text = App.VERSION;
+            VersionInfoBlock.Text = App.VERSION + " " + App.VERSION_SUFFIX;
             UpdateLogBlock.Text = new System.IO.StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("MythKit.Pages.About.Info.UpdateLog.txt")).ReadToEnd();
             foreach (string dependency in Dependencies)
             {
