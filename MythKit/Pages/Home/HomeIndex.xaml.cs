@@ -158,13 +158,24 @@ namespace MythKit.Pages.Home
 
             if (clickedButton.DataContext is MythwareInstance instance)
             {
-                if (instance.State == MythwareState.Running)
+                try
                 {
-                    instance.Kill();
+                    if (instance.State == MythwareState.Running)
+                    {
+                        instance.Kill();
+                    }
+                    else if (instance.State == MythwareState.NotRunning)
+                    {
+                        instance.Launch();
+                    }
                 }
-                else if (instance.State == MythwareState.NotRunning)
+                catch(Exception ex)
                 {
-                    instance.Launch();
+                    new Modern.ContentDialog()
+                    {
+                        Title = "执行失败",
+                        Content = $"遇到错误：{ex.Message}"
+                    }.ShowAsync();
                 }
                 Task.Run(async () =>
                 {
