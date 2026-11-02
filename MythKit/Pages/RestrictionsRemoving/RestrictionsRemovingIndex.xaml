@@ -31,12 +31,11 @@
                         </Button.Content>
                     </Button>
                 </ikw:SimpleStackPanel>
-                <ui:HyperlinkButton Content="功能思路来源 [外部链接]" Margin="-12, 0, 0, 0" NavigateUri="https://www.luogu.com.cn/article/bzu60i4t"/>
             </ikw:SimpleStackPanel>
             <ikw:SimpleStackPanel Spacing="12">
                 <TextBlock Text="机房管理助手相关" FontWeight="SemiBold" FontSize="20"/>
-                <ui:InfoBar Message="学生机房管理助手通过密码集中控制，能批量禁用U盘、禁止软件运行、锁定屏幕，并拥有顽固自启动和自恢复能力。&#13;&#10;Tip: 钟鸣（学生机房管理助手作者），号称绿色无毒，却通过篡改浏览器主页为2345主页每月收入超万元以上。" IsOpen="True" Visibility="{Binding IsOpen, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                <ui:InfoBar Message="此部分功能为学生机房管理助手 v13.1 设计，其它版本可能不适用。" IsOpen="True" IsClosable="False"/>
+                <ui:InfoBar Message="学生机房管理助手通过密码集中控制，能批量禁用U盘、禁止软件运行、锁定屏幕，并拥有顽固自启动和自恢复能力" IsOpen="True" Visibility="{Binding IsOpen, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <ui:InfoBar Message="此部分功能为学生机房管理助手 v13.1 - v13.4 设计，其它版本可能不适用" IsOpen="True" IsClosable="False"/>
                 <ui:ScrollViewerEx HorizontalScrollBarVisibility="Auto">
                     <ikw:SimpleStackPanel Spacing="12" Margin="0,0,0,14">
                         <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="8">

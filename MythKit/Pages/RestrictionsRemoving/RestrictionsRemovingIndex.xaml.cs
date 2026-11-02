@@ -189,32 +189,10 @@ namespace MythKit.Pages.RestrictionsRemoving
                 return Tuple.Create(actionName, false, ex.Message);
             }
         }
-        private void EnsureRegistryKeyValue0OrNotExists(RegistryKey rootKey, string subKeyPath, string valueName)
-        {
-            using (var subKey = rootKey.OpenSubKey(subKeyPath, writable: false))
-            {
-                if (subKey != null)
-                {
-                    var value = subKey.GetValue(valueName);
-                    if (value == null || (value is int intValue && intValue == 0))
-                    {
-                        return;
-                    }
-                }
-            }
-            using (var subKey = rootKey.OpenSubKey(subKeyPath, writable: true))
-            {
-                if (subKey != null)
-                {
-                    subKey.SetValue(valueName, 0, RegistryValueKind.DWord);
-                }
-            }
-        }
-        private void EnsureRegistryKeyValue0OrNotExists(string subKeyPath, string valueName)
-        {
-            EnsureRegistryKeyValue0OrNotExists(Registry.CurrentUser, subKeyPath, valueName);
-            EnsureRegistryKeyValue0OrNotExists(Registry.LocalMachine, subKeyPath, valueName);
-        }
+        public readonly string SPMWS = "Software\\Policies\\Microsoft\\Windows\\System";
+        public readonly string SMWCPS = "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System";
+        public readonly string SMWCPE = "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer";
+        public readonly string IFEO = Encoding.UTF8.GetString(Convert.FromBase64String("U09GVFdBUkVcTWljcm9zb2Z0XFdpbmRvd3MgTlRcQ3VycmVudFZlcnNpb25cSW1hZ2UgRmlsZSBFeGVjdXRpb24gT3B0aW9uc1w="));
 
         // ref => https://GitHub.com/CreeperMPG/jfglzs
         private List<Tuple<string, bool, string>> RecoverySystem_Background()
@@ -224,47 +202,47 @@ namespace MythKit.Pages.RestrictionsRemoving
                 RecoverySystem_TryRun("关闭机房管理助手", KillJFGLZS_Executor),
 
                 // 恢复命令提示符 (CMD)
-                RecoverySystem_TryRun("恢复命令提示符", () => EnsureRegistryKeyValue0OrNotExists(
-                        "Software\\Policies\\Microsoft\\Windows\\System",
+                RecoverySystem_TryRun("恢复命令提示符", () => RegUtils.EnsureRegValueZeroOrNotExists(
+                        SPMWS,
                         "DisableCMD"
                     )),
 
                 // 恢复注册表编辑器
-                RecoverySystem_TryRun("恢复注册表编辑器", () => EnsureRegistryKeyValue0OrNotExists(
-                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+                RecoverySystem_TryRun("恢复注册表编辑器", () => RegUtils.EnsureRegValueZeroOrNotExists(
+                        SMWCPS,
                         "DisableRegistryTools"
                     )),
 
                 // 恢复任务管理器
-                RecoverySystem_TryRun("恢复任务管理器", () => EnsureRegistryKeyValue0OrNotExists(
-                        "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+                RecoverySystem_TryRun("恢复任务管理器", () => RegUtils.EnsureRegValueZeroOrNotExists(
+                        SMWCPS,
                         "DisableTaskMgr"
                     )),
 
                 // 恢复控制面板与设置
                 RecoverySystem_TryRun("恢复控制面板与设置", () =>
                 {
-                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoControlPanel");
-                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoSettingsPage");
+                    RegUtils.EnsureRegValueZeroOrNotExists(SMWCPE, "NoControlPanel");
+                    RegUtils.EnsureRegValueZeroOrNotExists(SMWCPE, "NoSettingsPage");
                 }),
                 
                 // 恢复 MMC
                 RecoverySystem_TryRun("恢复 Windows 管理控制台", () =>
-                    EnsureRegistryKeyValue0OrNotExists("Software\\Policies\\Microsoft", "MMC")
+                    RegUtils.EnsureRegValueZeroOrNotExists("Software\\Policies\\Microsoft", "MMC")
                 ),
 
                 // 恢复运行对话框 (Win+R)
                 RecoverySystem_TryRun("恢复运行对话框", () =>
-                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoRun")
+                    RegUtils.EnsureRegValueZeroOrNotExists(SMWCPE, "NoRun")
                 ),
 
                 RecoverySystem_TryRun("删除运行框黑名单", () =>
-                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "DisallowRun")
+                    RegUtils.EnsureRegValueZeroOrNotExists(SMWCPE, "DisallowRun")
                 ),
 
                 // 恢复锁屏 (Win+L)
                 RecoverySystem_TryRun("恢复锁屏", () =>
-                    EnsureRegistryKeyValue0OrNotExists( "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System", "DisableLockWorkstation")
+                    RegUtils.EnsureRegValueZeroOrNotExists(SMWCPS, "DisableLockWorkstation")
                 ),
 
                 // 删除机房管理助手自启动项 (Run 键)
@@ -321,8 +299,8 @@ namespace MythKit.Pages.RestrictionsRemoving
                 // 恢复文件夹选项
                 RecoverySystem_TryRun("恢复文件夹选项", () =>
                 {
-                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoFolderOptions");
-                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "HideFileExt");
+                    RegUtils.EnsureRegValueZeroOrNotExists(SMWCPE, "NoFolderOptions");
+                    RegUtils.EnsureRegValueZeroOrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "HideFileExt");
                     RegUtils.WriteRegistryValue(
                         Registry.CurrentUser,
                         "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
@@ -354,7 +332,7 @@ namespace MythKit.Pages.RestrictionsRemoving
 
                 // 恢复任务栏右键菜单
                 RecoverySystem_TryRun("恢复任务栏右键菜单", () =>
-                    EnsureRegistryKeyValue0OrNotExists("Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", "NoTrayContextMenu")
+                    RegUtils.EnsureRegValueZeroOrNotExists(SMWCPE, "NoTrayContextMenu")
                 ),
 
                 // 恢复任务视图按钮 (Win+Tab)
@@ -536,7 +514,6 @@ namespace MythKit.Pages.RestrictionsRemoving
                 // 删除所有被劫持的工具
                 RecoverySystem_TryRun("删除被劫持的系统工具/内置游戏", () =>
                 {
-                    string ifeoPath = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
                     string[] ifeoKeys = new string[]
                     {
                         "taskkill.exe", "ntsd.exe", "sidebar.exe", "Chess.exe",
@@ -548,7 +525,7 @@ namespace MythKit.Pages.RestrictionsRemoving
 
                     foreach (string keyName in ifeoKeys)
                     {
-                        RegUtils.DeleteRegistryKey(Registry.LocalMachine, ifeoPath, keyName);
+                        RegUtils.DeleteRegistryKey(Registry.LocalMachine, IFEO, keyName);
                     }
                 }),
 
@@ -661,9 +638,8 @@ namespace MythKit.Pages.RestrictionsRemoving
         {
             try
             {
-                string ifeoPath = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
-                RegUtils.WriteRegistryValue(Registry.LocalMachine, ifeoPath + "jfglzsn.exe", "Debugger", "null");
-                RegUtils.WriteRegistryValue(Registry.LocalMachine, ifeoPath + "jfglzs.exe", "Debugger", "null");
+                RegUtils.WriteRegistryValue(Registry.LocalMachine, IFEO + "jfglzsn.exe", "Debugger", "null");
+                RegUtils.WriteRegistryValue(Registry.LocalMachine, IFEO + "jfglzs.exe", "Debugger", "null");
                 Modern.ContentDialog successDialog = new Modern.ContentDialog()
                 {
                     Title = "操作完成",

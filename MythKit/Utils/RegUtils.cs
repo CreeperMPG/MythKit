@@ -10,6 +10,32 @@ namespace MythKit.Utils
 {
     public static class RegUtils
     {
+        public static void EnsureRegistryKeyValue0OrNotExists(RegistryKey rootKey, string subKeyPath, string valueName)
+        {
+            using (var subKey = rootKey.OpenSubKey(subKeyPath, writable: false))
+            {
+                if (subKey != null)
+                {
+                    var value = subKey.GetValue(valueName);
+                    if (value == null || (value is int intValue && intValue == 0))
+                    {
+                        return;
+                    }
+                }
+            }
+            using (var subKey = rootKey.OpenSubKey(subKeyPath, writable: true))
+            {
+                if (subKey != null)
+                {
+                    subKey.SetValue(valueName, 0, RegistryValueKind.DWord);
+                }
+            }
+        }
+        public static void EnsureRegValueZeroOrNotExists(string subKeyPath, string valueName)
+        {
+            EnsureRegistryKeyValue0OrNotExists(Registry.CurrentUser, subKeyPath, valueName);
+            EnsureRegistryKeyValue0OrNotExists(Registry.LocalMachine, subKeyPath, valueName);
+        }
         public static void WriteRegistryValue(RegistryKey rootKey, string subKeyPath, string valueName, object targetValue, RegistryValueKind valueKind = RegistryValueKind.String)
         {
             try
