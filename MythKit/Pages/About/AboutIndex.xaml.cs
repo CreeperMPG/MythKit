@@ -1,5 +1,4 @@
-﻿using iNKORE.UI.WPF.Modern.Controls;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using MythKit.Utils;
 using System.Collections.Generic;
 using System.Reflection;
@@ -70,7 +69,7 @@ namespace MythKit.Pages.About
         private void CancelMythKitURIButton_Click(object sender, RoutedEventArgs e)
         {
             RegUtils.DeleteRegistryKey(Registry.CurrentUser, "Software\\Classes", "mythkit");
-            var successDialog = new ContentDialog
+            var successDialog = new Modern.ContentDialog
             {
                 Title = "取消注册完成",
                 Content = "mythkit:// 协议已取消注册。",

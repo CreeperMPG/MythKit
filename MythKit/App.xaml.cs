@@ -18,7 +18,7 @@ namespace MythKit
     public partial class App : Application
     {
         public const string VERSION = "1.3.1";
-        public const string VERSION_SUFFIX = "Snapshot 2";
+        public const string VERSION_SUFFIX = "Snapshot 3";
         protected override void OnExit(ExitEventArgs e)
         {
             SingleInstanceManager.Cleanup();
