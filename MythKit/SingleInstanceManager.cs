@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +16,6 @@ namespace MythKit
     {
         private const string AppId = "MythKit_CreeperMPG";
         private static Mutex _mutex;
-        private static NamedPipeServerStream _pipeServer;
 
         /// <summary>
         /// 另一个实例启动并发送通知时触发。参数为对方的命令行参数。
@@ -55,12 +56,24 @@ namespace MythKit
                     NamedPipeServerStream server = null;
                     try
                     {
+                        var pipeSecurity = new PipeSecurity();
+                        var usersSid = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+                        pipeSecurity.AddAccessRule(new PipeAccessRule(
+                            usersSid,
+                            PipeAccessRights.ReadWrite,
+                            AccessControlType.Allow
+                        ));
+
                         server = new NamedPipeServerStream(
                             AppId,
                             PipeDirection.In,
                             1,
                             PipeTransmissionMode.Message,
-                            PipeOptions.Asynchronous);
+                            PipeOptions.Asynchronous,
+                            1024,
+                            1024,
+                            pipeSecurity
+                            );
 
                         // 挂起等待客户端，不占CPU；支持取消
                         await server.WaitForConnectionAsync(token);
