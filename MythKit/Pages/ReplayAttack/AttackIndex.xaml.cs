@@ -13,6 +13,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -71,7 +72,7 @@ namespace MythKit.Pages.ReplayAttack
             UIAttackOptions.Add(new UIAttackOption());
         }
         public static List<IAttackPattern> GetNewAttackPatterns()
-        { 
+        {
             List<IAttackPattern> result = new List<IAttackPattern>
             {
                 new MessageAttack(),
@@ -283,7 +284,7 @@ namespace MythKit.Pages.ReplayAttack
                     CloseButtonText = "确定"
                 }.ShowAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 new Modern.ContentDialog
                 {
@@ -293,6 +294,53 @@ namespace MythKit.Pages.ReplayAttack
                 }.ShowAsync();
             }
         }
+        private List<UIAttackOption> ParseLRCToAttackConfig(string lrcContent)
+        {
+            List<UIAttackOption> attackOptionList = new List<UIAttackOption>();
+            var regex = new Regex(@"\[(\d{1,3}):(\d{1,2})(?:[.:](\d{1,3}))?\]");
+            var lines = new List<(TimeSpan Time, string Text)>();
+            foreach (var raw in lrcContent.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None))
+            {
+                var line = raw.Trim();
+                if (line.Length == 0) continue;
+                var matches = regex.Matches(line);
+                if (matches.Count == 0) continue;
+                var last = matches[matches.Count - 1];
+                string text = line.Substring(last.Index + last.Length).Trim();
+                if (text.Length == 0) continue;
+                foreach (Match m in matches)
+                {
+                    int mm = int.Parse(m.Groups[1].Value);
+                    int ss = int.Parse(m.Groups[2].Value);
+                    string xx = m.Groups[3].Value;
+                    int ms;
+                    switch (xx.Length)
+                    {
+                        case 1: ms = int.Parse(xx) * 100; break;     // [mm:ss.x]
+                        case 2: ms = int.Parse(xx) * 10; break;     // [mm:ss.xx]
+                        case 0: ms = 0; break;      // [mm:ss]
+                        default: ms = int.Parse(xx.Substring(0, 3)); break; // [mm:ss.xxx]
+                    }
+                    lines.Add((new TimeSpan(0, 0, mm, ss, ms), text));
+                }
+            }
+            (TimeSpan Time, string Text) lastItem = (new TimeSpan(), "");
+            (TimeSpan Time, string Text) currentItem = (new TimeSpan(), "");
+            for (int lineIndex = 0; lineIndex < lines.Count; lineIndex++)
+            {
+                lastItem = currentItem;
+                currentItem = lines.OrderBy(l => l.Time).ToArray()[lineIndex];
+                var attack = new MessageAttack();
+                var opt = new UIAttackOption();
+                attack.Message.Text = currentItem.Text;
+                int index = opt.AttackTypes.FindIndex(ati => ati.Source.AttackId.Equals("send_message", StringComparison.OrdinalIgnoreCase));
+                opt.PatternSelectedIndex = index;
+                opt.DelayMs = (int)(currentItem.Time.TotalMilliseconds - lastItem.Time.TotalMilliseconds);
+                opt.AttackTypes[index].Source = attack;
+                attackOptionList.Add(opt);
+            }
+            return attackOptionList;
+        }
 
         private void LoadAttackConfigButton_Click(object sender, RoutedEventArgs e)
         {
@@ -301,14 +349,27 @@ namespace MythKit.Pages.ReplayAttack
                 var dialog = new OpenFileDialog
                 {
                     Title = "加载攻击配置",
-                    Filter = "JSON 文件 (*.json)|*.json|所有文件 (*.*)|*.*",
+                    Filter = "JSON 文件 (*.json)|*.json|歌词文件 (*.lrc)|*.lrc|所有文件 (*.*)|*.*",
                     DefaultExt = ".json",
                     Multiselect = false
                 };
                 if (dialog.ShowDialog() != true) return;   // 用户取消
-                string jsonContent = File.ReadAllText(dialog.FileName);
-                JsonDocument doc = JsonDocument.Parse(jsonContent);
-                InjectParams(doc.RootElement);
+                if (Path.GetExtension(dialog.FileName) == ".json")
+                {
+                    string jsonContent = File.ReadAllText(dialog.FileName);
+                    JsonDocument doc = JsonDocument.Parse(jsonContent);
+                    InjectParams(doc.RootElement);
+                }
+                else if (Path.GetExtension(dialog.FileName) == ".lrc")
+                {
+                    string lrcContent = File.ReadAllText(dialog.FileName);
+                    ObservableCollection<UIAttackOption> options = new ObservableCollection<UIAttackOption>();
+                    foreach (var opt in ParseLRCToAttackConfig(lrcContent))
+                    {
+                        options.Add(opt);
+                    }
+                    UIAttackOptions = options;
+                }
                 new Modern.ContentDialog
                 {
                     Title = "加载成功",
